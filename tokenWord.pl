@@ -46,6 +46,9 @@
 # Replaced expires now with expires -1y to force picky browsers to reload.
 # Added cache control.
 #
+# 2003-January-18   Jason Rohrer
+# Added working no-cache directives of two types (Pragma and Cache-control).
+#
 
 
 use lib '.';
@@ -82,6 +85,12 @@ setupDataDirectory();
 
 
 my $cgiQuery = CGI->new();
+
+# always set the Pragma: no-cache directive
+# this feature seems to be undocumented...
+$cgiQuery->cache( 1 );
+
+
 my $action = $cgiQuery->param( "action" ) || '';
 
 
@@ -120,7 +129,7 @@ my $paymentDate = $cgiQuery->param( "payment_date" ) || '';
 
 if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
     print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                             -Cache-control=>'no-cache' );
+                             -Cache_control=>'no-cache' );
 
 
     # we encode the token_word username and num tokens deposited
@@ -194,7 +203,7 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
 }
 elsif( $action eq "createUserForm" ) {
     print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                             -Cache-control=>'no-cache' );
+                             -Cache_control=>'no-cache' );
     tokenWord::htmlGenerator::generateCreateUserForm( "" );
 }
 elsif( $action eq "createUser" ) {
@@ -209,7 +218,7 @@ elsif( $action eq "createUser" ) {
 
     
     print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                             -Cache-control=>'no-cache' );
+                             -Cache_control=>'no-cache' );
 
     if( $user eq '' ) {
         tokenWord::htmlGenerator::generateCreateUserForm( 
@@ -240,7 +249,7 @@ elsif( $action eq "createUser" ) {
 }
 elsif( $action eq "loginForm" ) {
     print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                             -Cache-control=>'no-cache' );
+                             -Cache_control=>'no-cache' );
     tokenWord::htmlGenerator::generateLoginForm( "" );
 }
 elsif( $action eq "login" ) {
@@ -256,7 +265,7 @@ elsif( $action eq "login" ) {
 
     if( not $correct ) {
         print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                                 -Cache-control=>'no-cache' );
+                                 -Cache_control=>'no-cache' );
         tokenWord::htmlGenerator::generateLoginForm( "login failed" );
     }
     else {
@@ -276,7 +285,7 @@ elsif( $action eq "login" ) {
         
         print $cgiQuery->header( -type=>'text/html',
                                  -expires=>'now',
-                                 -Cache-control=>'no-cache',
+                                 -Cache_control=>'no-cache',
                                  -cookie=>[ $userCookie, $sessionIDCookie ] );
         $loggedInUser = $user;
 
@@ -295,7 +304,7 @@ elsif( $action eq "logout" ) {
     
     print $cgiQuery->header( -type=>'text/html',
                              -expires=>'now',
-                             -Cache-control=>'no-cache',
+                             -Cache_control=>'no-cache',
                              -cookie=>[ $userCookie, $sessionIDCookie ] );
     
     # leave the old sessionID file in place    
@@ -311,8 +320,9 @@ elsif( $action eq "logout" ) {
 else {
 
     if( $loggedInUser eq '' ) {
+        
         print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                                 -Cache-control=>'no-cache' );
+                                 -Cache_control=>'no-cache' );
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
@@ -322,14 +332,14 @@ else {
         
         # bad session ID returned in cookie
         print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                                 -Cache-control=>'no-cache' );
+                                 -Cache_control=>'no-cache' );
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
     elsif( not -e "$dataDirectory/users/$loggedInUser/sessionID" ) {
         # session ID file does not exist
         print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                                 -Cache-control=>'no-cache' );
+                                 -Cache_control=>'no-cache' );
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
@@ -345,7 +355,7 @@ else {
                                                  -expires=>'+1h' );
         print $cgiQuery->header( -type=>'text/html',
                                  -expires=>'now',
-                                 -Cache-control=>'no-cache',
+                                 -Cache_control=>'no-cache',
                                  -cookie=>[ $userCookie, $sessionIDCookie ] );
 
         if( $action eq "test" ) {
