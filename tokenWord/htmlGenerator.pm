@@ -6,6 +6,10 @@ package tokenWord::htmlGenerator;
 # 2003-January-8   Jason Rohrer
 # Created.
 #
+# 2003-January-14   Jason Rohrer
+# Added missing comments.
+# Added support for most recent and most quoted lists.
+#
 
 
 use tokenWord::common;
@@ -14,6 +18,11 @@ use tokenWord::chunkManager;
 
 
 
+##
+# Generates a generic page header with no control bars.
+#
+# @param0 the title of the page.
+##
 sub generateHeader {
     ( my $title ) = @_;
 
@@ -26,6 +35,9 @@ sub generateHeader {
 
 
 
+##
+# Generates a generic page footer with no control bars.
+##
 sub generateFooter {
 
     my $footerText = readFileValue( "$htmlDirectory/footer.html" );
@@ -36,6 +48,11 @@ sub generateFooter {
 
 
 
+##
+# Generates a full page header for a page with control bars.
+#
+# @param0 the title of the page.
+##
 sub generateFullHeader {
     ( my $title ) = @_;
 
@@ -48,6 +65,11 @@ sub generateFullHeader {
 
 
 
+##
+# Generates a full page footer for a page with control bars.
+#
+# @param0 the currently logged-in user.
+##
 sub generateFullFooter {
     ( my $loggedInUser ) = @_;
     
@@ -61,11 +83,99 @@ sub generateFullFooter {
     $footerText =~ s/<!--#USER-->/$loggedInUser/;
     $footerText =~ s/<!--#TOKEN_BALANCE-->/$balance/;
 
+    # generate most quoted list
+    my @mostQuoted = tokenWord::documentManager::getMostQuotedDocuments();
+    
+    my @mostQuotedStrings = ();
+    
+    # push table header
+    push( @mostQuotedStrings, "<TABLE BORDER=0>\n" );
+    
+    foreach $quoted ( @mostQuoted ) {
+        ( my $doc, $count ) = split( /\|/, $quoted );
+        my @docRegions = extractRegionComponents( $doc );
+        my $docOwner = $docRegions[0];
+        my $docID = $docRegions[1];
+
+        my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
+                                                                $docID );
+        if( length( $docTitle ) > 20 ) {
+            $docTitle = substr( $docTitle, 0, 20 );
+        }
+        my $quotedString =
+            "<TR><TD>$docOwner\'s</TD>".
+            "<TD><A HREF=\"tokenWord.pl?action=showDocument".
+            "&docOwner=$docOwner".
+            "&docID=$docID\">".
+            "$docTitle</A></TD>".
+            "<TD>[$count]</TD></TR>\n";
+        push( @mostQuotedStrings, $quotedString );
+    }
+
+    if( scalar( @mostQuoted ) == 0 ) {
+        push( @mostQuotedStrings, "<TR><TD>none</TD></TR>" );
+    }
+
+    # push table footer
+    push( @mostQuotedStrings, "</TABLE>\n" );
+    
+    my $mostQuotedList = join( "", @mostQuotedStrings );
+    
+    $footerText =~ s/<!--#MOST_QUOTED_DOCUMENT_LIST-->/$mostQuotedList/;
+
+
+    # generate most recent list
+    my @mostRecent = tokenWord::documentManager::getMostRecentDocuments();
+    
+    my @mostRecentStrings = ();
+    
+    # push table header
+    push( @mostRecentStrings, "<TABLE BORDER=0>\n" );
+    
+    foreach $doc ( @mostRecent ) {
+        my @docRegions = extractRegionComponents( $doc );
+        my $docOwner = $docRegions[0];
+        my $docID = $docRegions[1];
+
+        my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
+                                                                $docID );
+        if( length( $docTitle ) > 20 ) {
+            $docTitle = substr( $docTitle, 0, 20 );
+        }
+        my $recentString =
+            "<TR><TD>$docOwner\'s</TD>".
+            "<TD><A HREF=\"tokenWord.pl?action=showDocument".
+            "&docOwner=$docOwner".
+            "&docID=$docID\">".
+            "$docTitle</A></TD></TR>\n";
+        push( @mostRecentStrings, $recentString );
+    }
+
+    if( scalar( @mostRecent ) == 0 ) {
+        push( @mostRecentStrings, "<TR><TD>none</TD></TR>" );
+    }
+
+    # push table footer
+    push( @mostRecentStrings, "</TABLE>\n" );
+    
+    my $mostRecentList = join( "", @mostRecentStrings );
+    
+    $footerText =~ s/<!--#MOST_RECENT_DOCUMENT_LIST-->/$mostRecentList/;
+
+
+
+
+
     print $footerText;
 }
 
 
 
+##
+# Generates the login form.
+#
+# @param0 a message to display in the form.
+##
 sub generateLoginForm {
     ( my $message ) = @_;
  
@@ -83,6 +193,11 @@ sub generateLoginForm {
 
 
 
+##
+# Generates a form for creating a new user.
+#
+# @param0 a message to display in the form.
+##
 sub generateCreateUserForm {
     ( my $message ) = @_;
  
@@ -100,23 +215,36 @@ sub generateCreateUserForm {
 
 
 
+##
+# Generates a generic main page.
+#
+# @param0 the currently logged-in user.
+##
 sub generateMainPage {
-    ( my $user ) = @_;
+    ( my $loggedInUser ) = @_;
  
     generateFullHeader( "main page" );
 
     my $pageText = readFileValue( "$htmlDirectory/mainPage.html" );
 
-    $pageText =~ s/<!--#USER-->/$user/;
+    $pageText =~ s/<!--#USER-->/$loggedInUser/;
     
     print $pageText;
 
 
-    generateFullFooter( $user );
+    generateFullFooter( $loggedInUser );
 }
 
 
 
+##
+# Generates a failed purchase page.
+#
+# @param0 the currently logged-in user.
+# @param1 the owner of the document being purchased.
+# @param2 the ID of the document being purchased.
+# @param3 the amount necessary for the purchase.
+##
 sub generateFailedPurchasePage {
     ( my $loggedInUser, my $docOwner, my $docID, my $amount ) = @_;
     
@@ -140,8 +268,13 @@ sub generateFailedPurchasePage {
 
 
 
+##
+# Generates a form for creating a document.
+#
+# @param0 the currently logged-in user.
+##
 sub generateCreateDocumentForm {
-    ( my $user ) = @_;
+    ( my $loggedInUser ) = @_;
 
     generateFullHeader( "create document" );
 
@@ -150,12 +283,25 @@ sub generateCreateDocumentForm {
     print $formText;
 
 
-    generateFullFooter( $user );
+    generateFullFooter( $loggedInUser );
 }
 
 
+
+
+##
+# Generates a page displaying a document.
+#
+# @param0 the currently logged-in user.
+# @param1 the owner of the document to display.
+# @param2 the ID of the document to display.
+# @param3 the text to display.
+# @param4 1 to display the document in quote mode, and 0 to display
+#   it in non-quote mode.
+##
 sub generateDocPage {
-    ( my $user, my $docOwner, my $docID, my $docText, my $quoteFlag ) = @_;
+    ( my $loggedInUser, my $docOwner, my $docID, 
+      my $docText, my $quoteFlag ) = @_;
     
     my @docElements = split( /\n\n/, $docText );
 
@@ -190,13 +336,22 @@ sub generateDocPage {
 
     print $docDisplayText;
 
-    generateFullFooter( $user );
+    generateFullFooter( $loggedInUser );
 }
 
 
 
+##
+# Generates a page displaying a document in quote display mode.
+#
+# @param0 the currently logged-in user.
+# @param1 the owner of the document to display.
+# @param2 the ID of the document to display.
+# @param3 the text to display.
+# @param4 an array of chunk regions in the document.
+##
 sub generateDocQuotesPage {
-    ( my $user, my $docOwner, my $docID, my @chunks ) = @_;
+    ( my $loggedInUser, my $docOwner, my $docID, my @chunks ) = @_;
     
 
     # build text for this document with links for each quote
@@ -241,13 +396,19 @@ sub generateDocQuotesPage {
     my $fullDocText = join( "", @textChunks );
 
     # pass to doc display function for formatting
-    generateDocPage( $user, $docOwner, $docID, $fullDocText, 1 );
+    generateDocPage( $loggedInUser, $docOwner, $docID, $fullDocText, 1 );
 }
 
 
 
+##
+# Generates user quote list.
+#
+# @param0 the currently logged-in user.
+# @param1 an array of quote regions to display.
+##
 sub generateQuoteListPage {
-    ( my $user, my @quotes ) = @_;
+    ( my $loggedInUser, my @quotes ) = @_;
 
     generateFullHeader( "quote list" );
     
@@ -276,7 +437,7 @@ sub generateQuoteListPage {
             print "&docOwner=$docOwner&docID=$docID\">$docTitle</A>:<BR><BR>";
 
             my $quoteText = tokenWord::quoteClipboard::renderQuoteText( 
-                                                              $user,
+                                                              $loggedInUser,
                                                               $quoteCounter );
             
             my @quoteParagraphs = split( /\n\n/, $quoteText );
@@ -300,11 +461,19 @@ sub generateQuoteListPage {
     }
     print "</TD></TR></TABLE></CENTER>\n";
     
-    generateFullFooter( $user );
+    generateFullFooter( $loggedInUser );
 }
 
 
 
+##
+# Generates a list of documents quoting a document.
+#
+# @param0 the currently logged-in user.
+# @param1 the owner of the quoted document.
+# @param2 the ID of the quoted document.
+# @param3 an array of regions of the quoting documents.
+##
 sub generateQuotingDocumentListPage {
     ( my $loggedInUser, my $docOwner, my $docID, my @quotingDocs ) = @_;
     
@@ -357,8 +526,16 @@ sub generateQuotingDocumentListPage {
 
 
 
+##
+# Generates a form for extracting a quote.
+#
+# @param0 the currently logged-in user.
+# @param1 the owner of the document to extract the quote from.
+# @param2 the ID of the document to extract the quote from.
+# @param3 the text of the document to extract the quote from.
+##
 sub generateExtractQuoteForm {
-    ( my $user, my $docOwner, my $docID, my $docText ) = @_;
+    ( my $loggedInUser, my $docOwner, my $docID, my $docText ) = @_;
 
     generateFullHeader( "extract quote" );
 
@@ -371,7 +548,7 @@ sub generateExtractQuoteForm {
     print $formText;
 
 
-    generateFullFooter( $user );
+    generateFullFooter( $loggedInUser );
 }
 
 

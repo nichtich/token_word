@@ -18,6 +18,7 @@
 # 2003-January-14   Jason Rohrer
 # Fixed holes that would allow a user to read a document without purchasing
 # it first.
+# Added creation of mostRecent and mostQuoted files.
 #
 
 
@@ -386,5 +387,11 @@ sub setupDataDirectory {
         
         mkdir( "$dataDirectory", oct( "0777" ) );
         mkdir( "$dataDirectory/users", oct( "0777" ) );
+
+        mkdir( "$dataDirectory/topDocuments", oct( "0777" ) );
+        
+        writeToFile( "$dataDirectory/topDocuments/mostQuoted", "" );
+        writeToFile( "$dataDirectory/topDocuments/mostRecent", "" );
+        
     }
 }

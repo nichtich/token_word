@@ -25,10 +25,18 @@ package tokenWord::documentManager;
 # 2003-January-13   Jason Rohrer
 # Added function for getting document title.
 #
+# 2003-January-14   Jason Rohrer
+# Added support for most recent and most quoted lists.
+#
 
 
 use tokenWord::common;
 use tokenWord::chunkManager;
+
+
+my $recentDocumentListSize = 10;
+
+
 
 
 ##
@@ -67,6 +75,31 @@ sub addDocument {
     # create quote count
     writeFile( "$docDirName/$safeNextID.quoteCount", "0" );
     
+    
+    # add to most recent file
+    
+    my $mostRecentFile = "$dataDirectory/topDocuments/mostRecent";
+    
+    my $mostRecentString = readFileValue( $mostRecentFile );
+
+    my @mostRecent = split( /\n/, $mostRecentString );
+
+    my $docString = "< $username, $safeNextID >";
+    
+    if( scalar( @mostRecent ) >= $recentDocumentListSize ) {
+        # remove least recent document
+        pop( @mostRecent );
+    }
+
+    # add to top of list
+    unshift( @mostRecent, $docString );
+    
+    my $newMostRecentString = join( "\n", @mostRecent );
+
+    writeFile( $mostRecentFile, $newMostRecentString );
+
+
+
     return $safeNextID;
 }
 
@@ -112,6 +145,102 @@ sub noteQuote {
     my $newCount = $quoteCount + 1;
 
     writeFile( $quoteCountFileName, $newCount );
+
+    
+
+    # check if this belongs in the most quoted file
+    
+    my $mostQuotedFile = "$dataDirectory/topDocuments/mostQuoted";
+    
+    my $mostQuotedString = readFileValue( $mostQuotedFile );
+
+    my @mostQuoted = split( /\n/, $mostQuotedString );
+
+    my $foundSpot = 0;
+    my $foundIndex = 0;
+    my $currentIndex = 0;
+    foreach $quoted ( @mostQuoted ) {
+        ( my $docRegion, my $count ) = split( /\|/, $quoted );
+
+        if( $newCount > $count and not $foundSpot ) {
+            $foundSpot = 1;
+            $foundIndex = $currentIndex;
+        }
+        $currentIndex += 1;
+    }
+    
+    if( scalar( @mostQuoted ) == 0 ) {
+        $foundSpot = 1;
+        $foundIndex = 0;
+    }
+
+    if( $foundSpot ) {
+
+        my $docString = "< $quotedUsername, $quotedDocID >|$newCount";
+        
+        
+        if( scalar( @mostQuoted ) >= $quotedDocumentListSize ) {
+            # remove least quoted document
+            pop( @mostQuoted );
+        }
+
+        # add to spot in list
+        splice( @mostQuoted, $foundIndex, 0, $docString );
+    
+        my $newMostQuotedString = join( "\n", @mostQuoted );
+
+        writeFile( $mostQuotedFile, $newMostQuotedString );
+    }
+    elsif( scalar( @mostQuoted ) >= $quotedDocumentListSize ) {
+        # there's room for this document at the end of the list
+
+        my $docString = "< $quotedUsername, $quotedDocID >|$newCount";
+
+        push( @mostQuoted, $docString );
+        
+        my $newMostQuotedString = join( "\n", @mostQuoted );
+
+        writeFile( $mostQuotedFile, $newMostQuotedString );
+    }
+
+}
+
+
+
+##
+# Gets the most quoted documents.
+#
+# @return an array of <document>|numQuotes strings.
+#
+# Example:
+# my @mostQuoted = getMostQuotedDocuments();
+##
+sub getMostQuotedDocuments {
+    
+    my $mostQuotedFile = "$dataDirectory/topDocuments/mostQuoted";
+    
+    my $mostQuotedString = readFileValue( $mostQuotedFile );
+
+    my @mostQuoted = split( /\n/, $mostQuotedString );
+}
+
+
+
+##
+# Gets the most recently created documents.
+#
+# @return an array of <document> strings.
+#
+# Example:
+# my @recent = getMostRecentDocuments();
+##
+sub getMostRecentDocuments {
+    
+    my $mostRecentFile = "$dataDirectory/topDocuments/mostRecent";
+    
+    my $mostRecentString = readFileValue( $mostRecentFile );
+
+    my @mostRecent = split( /\n/, $mostRecentString );
 }
 
 
