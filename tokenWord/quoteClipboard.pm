@@ -9,6 +9,9 @@ package tokenWord::quoteClipboard;
 # 2003-January-8   Jason Rohrer
 # Added taint checking for quote region string.
 #
+# 2003-January-16   Jason Rohrer
+# Added function for checking quote existence.
+#
 
 
 use tokenWord::common;
@@ -76,6 +79,32 @@ sub getQuoteCount {
     my ( $safeNextID ) = ( $nextID =~ /(\d+)/ );
     
     return $safeNextID;
+}
+
+
+
+##
+# Gets whether a quote exists.
+#
+# @param0 the username.
+# @param1 the quoteID.
+#
+# @return 1 if the quote exists, or 0 otherwise.
+#
+# Example:
+# my $exists = doesQuoteExist( "jj55", 3 );
+##
+sub doesQuoteExist {
+    ( my $username, my $quoteID ) = @_;
+    
+    my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";   
+    
+    if( -e "$quoteDirName/$quoteID" ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 

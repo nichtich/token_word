@@ -21,6 +21,7 @@ package tokenWord::userWorkspace;
 # Added check for bad abstract quote.
 # Added stripping of HTML tags from documents.
 # Added document preview.
+# Added checks for quote existence.
 #
 
 
@@ -78,55 +79,59 @@ sub submitAbstractDocument {
             # untaint
             ( $quoteNumber ) = ( $quoteNumber =~ /(\d+)/ );
             
-            # build a < chunkLocator; docLocator > style locator for each 
-            # chunk in this quote, where the docLocator points to the
-            # document being quoted now
+            # make sure quote exists
+            if( tokenWord::quoteClipboard::doesQuoteExist( $username, 
+                                                           $quoteNumber ) ) {
 
-            my @docRegion = 
-                tokenWord::quoteClipboard::getQuoteRegion( $username,  
-                                                           $quoteNumber );
+                # build a < chunkLocator; docLocator > style locator for each 
+                # chunk in this quote, where the docLocator points to the
+                # document being quoted now
             
-            # add this quote to our list of quotes to note
-
-            my $quoteLength = $docRegion[3];
+                my @docRegion = 
+                    tokenWord::quoteClipboard::getQuoteRegion( $username,  
+                                                               $quoteNumber );
             
-            my $quotedDocRegionString = join( ",", @docRegion );
-            my $quotingDocRegionString = 
-                "$username, DOC_ID, $netDocOffset, $quoteLength";
+                # add this quote to our list of quotes to note
 
-            push( @quotesToNote, 
-                  "< $quotedDocRegionString > | < $quotingDocRegionString >" );
-
-            $netDocOffset += $quoteLength;
-
-
-
-            my @quoteChunks =
-                tokenWord::documentManager::getRegionChunks( @docRegion );
+                my $quoteLength = $docRegion[3];
             
-            my $docOwner = $docRegion[0];
-            my $docNumber = $docRegion[1];
-            my $currentDocOffset = $docRegion[2];
+                my $quotedDocRegionString = join( ",", @docRegion );
+                my $quotingDocRegionString = 
+                    "$username, DOC_ID, $netDocOffset, $quoteLength";
 
-            foreach $chunk ( @quoteChunks ) {
+                push( @quotesToNote, 
+                 "< $quotedDocRegionString > | < $quotingDocRegionString >" );
 
-                my @chunkElements = extractRegionComponents( $chunk );
-                
-                my $chunkLength = $chunkElements[3];
-                
-                my $chunkLocator = join( ", ", @chunkElements );
+                $netDocOffset += $quoteLength;
 
-                my $docLocator = join( ", ", ( $docOwner, $docNumber,
-                                               $currentDocOffset ) );
 
-                my $fullChunkLocator =
-                    join( "; ", ( $chunkLocator, $docLocator ) );
+
+                my @quoteChunks =
+                    tokenWord::documentManager::getRegionChunks( @docRegion );
                 
-                push( @docRegions, "< $fullChunkLocator >" );
+                my $docOwner = $docRegion[0];
+                my $docNumber = $docRegion[1];
+                my $currentDocOffset = $docRegion[2];
+
+                foreach $chunk ( @quoteChunks ) {
+
+                    my @chunkElements = extractRegionComponents( $chunk );
                 
-                $currentDocOffset += $chunkLength;
+                    my $chunkLength = $chunkElements[3];
+                
+                    my $chunkLocator = join( ", ", @chunkElements );
+
+                    my $docLocator = join( ", ", ( $docOwner, $docNumber,
+                                                   $currentDocOffset ) );
+
+                    my $fullChunkLocator =
+                        join( "; ", ( $chunkLocator, $docLocator ) );
+                
+                    push( @docRegions, "< $fullChunkLocator >" );
+                
+                    $currentDocOffset += $chunkLength;
+                }
             }
-
         }
         else {
             # a new chunk
@@ -219,11 +224,15 @@ sub previewAbstractDocument {
             # untaint
             ( $quoteNumber ) = ( $quoteNumber =~ /(\d+)/ );
 
-            my $quoteText = 
-                tokenWord::quoteClipboard::renderQuoteText( $username,  
-                                                            $quoteNumber );
+            # make sure quote exists
+            if( tokenWord::quoteClipboard::doesQuoteExist( $username, 
+                                                           $quoteNumber ) ) {
+                my $quoteText = 
+                    tokenWord::quoteClipboard::renderQuoteText( $username,  
+                                                                $quoteNumber );
             
-            push( @docTextElements, $quoteText );
+                push( @docTextElements, $quoteText );
+            }
         }
         else {
             # a new chunk
