@@ -10,6 +10,8 @@ package tokenWord::htmlGenerator;
 
 use tokenWord::common;
 use tokenWord::userManager;
+use tokenWord::chunkManager;
+
 
 
 sub generateHeader {
@@ -130,17 +132,24 @@ sub generateCreateDocumentForm {
 
 
 sub generateDocPage {
-    ( my $user, my $docOwner, my $docID, my $docText ) = @_;
+    ( my $user, my $docOwner, my $docID, my $docText, my $quoteFlag ) = @_;
     
     my @docElements = split( /\n\n/, $docText );
 
     my $docTitle = shift( @docElements );
-
+    
     generateFullHeader( "document: $docTitle" );
     
-    my $docDisplayText = 
-        readFileValue( "$htmlDirectory/documentDisplay.html" ); 
-
+    my $docDisplayText;
+    
+    if( not $quoteFlag ) {
+        $docDisplayText = 
+            readFileValue( "$htmlDirectory/documentDisplay.html" );
+    }
+    else {
+        $docDisplayText = 
+            readFileValue( "$htmlDirectory/quoteDocumentDisplay.html" );
+    }
 
     $docDisplayText =~ s/<!--#DOC_TITLE-->/$docTitle/g;
     $docDisplayText =~ s/<!--#DOC_OWNER-->/$docOwner/g;
@@ -159,6 +168,57 @@ sub generateDocPage {
     print $docDisplayText;
 
     generateFullFooter( $user );
+}
+
+
+
+sub generateDocQuotesPage {
+    ( my $user, my $docOwner, my $docID, my @chunks ) = @_;
+    
+
+    # build text for this document with links for each quote
+
+    my @textChunks = ();
+
+    my $openBracketColor = "#00AF00";
+    my $closeBracketColor = "#FF0000";
+    
+
+    foreach $chunk ( @chunks ) {
+        
+        my @chunkElements = 
+            tokenWord::common::extractRegionComponents( $chunk );
+        my $text = 
+            tokenWord::chunkManager::getRegionText( @chunkElements );
+        
+        if( $chunk =~ /.*;.*/ ) {
+            # a chunk that quotes another doc
+            # make a link around the chunk
+            my $quotedOwner = $chunkElements[4];
+            my $quotedID = $chunkElements[5];
+
+            my $fullText =
+                "<FONT COLOR=$openBracketColor>[</FONT>".
+                "<A HREF=\"tokenWord.pl?action=showDocument".
+                "&docOwner=$quotedOwner".
+                "&docID=$quotedID\">".
+                "<FONT COLOR=#000000>$text</FONT></A>".
+                "<FONT COLOR=$closeBracketColor>]</FONT>";
+            
+            push( @textChunks, $fullText ); 
+
+        }
+        else {
+            # a pure chunk
+            push( @textChunks, $text );
+        }
+        
+    }
+    
+    my $fullDocText = join( "", @textChunks );
+
+    # pass to doc display function for formatting
+    generateDocPage( $user, $docOwner, $docID, $fullDocText, 1 );
 }
 
 

@@ -202,7 +202,32 @@ else {
             
             tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
                                                        $docOwner,
-                                                       $docID, $text );
+                                                       $docID, $text, 0 );
+        
+        }
+        elsif( $action eq "showDocumentQuotes" ) {
+        
+            my $docOwner = $cgiQuery->param( "docOwner" ) || '';
+            
+            # might equal 0
+            my $docID = $cgiQuery->param( "docID" );
+            
+
+            #untaint
+            ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
+            ( $docID ) = ( $docID =~ /(\d+)/ );
+            
+            #first, purchase the document
+            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                        $docOwner,
+                                                        $docID );
+            my @chunks = 
+                tokenWord::documentManager::getAllChunks( $docOwner,
+                                                          $docID );
+            
+            tokenWord::htmlGenerator::generateDocQuotesPage( $loggedInUser,
+                                                             $docOwner,
+                                                             $docID, @chunks );
         
         }
         elsif( $action eq "showQuoteList" ) {
