@@ -1,0 +1,1335 @@
+\ProvidesPackage{graphs}[2000/12/19]
+%
+%
+%_________________________________________________________________%%
+% Draw graphs only if this is set to TRUE:
+%_________________________________________________________________%%
+%
+\newif\ifdrawgraphs
+\drawgraphstrue
+
+\DeclareOption{draft}{\drawgraphsfalse}
+\ProcessOptions
+
+\typeout{}
+\typeout{LaTeX2e package `graphs', version 1.53}
+\typeout{Frank Drewes, University of Bremen, 19.12.2000}
+\typeout{}
+
+%
+% \input the low-level commands that produce PostScript \special's.
+%
+\input{graphs_ps}
+%
+% \input the local configuration.
+%
+\input{graphs_config}
+%
+%
+%_________________________________________________________________%%
+% Initial value of \unitlength:
+%
+\newdimen\g@oldunitlength
+\unitlength=1cm
+%
+%
+%_________________________________________________________________%%
+% Global settings and macros to change them (all lengths are numbers
+% interpreted as multiples of \unitlength, except for the ones in
+% \graphlinedash):
+%
+% - \graphlinewidth	define the width of lines (relevant
+%			for nodes and edges)
+% - \graphlinedash	define the dash style of lines; the argument
+%			is a sequence of natural numbers delimited by
+%			blanks (relevant for nodes and edges). Is
+%			taken as input to the postscript setdash
+%			command.
+% - \graphnodesize	define the size (= diameter) of nodes
+% - \graphnodecolour	define the interior shading of nodes (a
+%			number between 0 (= black) and 1 (= white))
+% - \fillednodestrue
+%   \fillednodesfalse	determine whether the interior of nodes shall be
+%                       filled or not
+% - \graphlinecolour	define the `colour' of edges; similar to
+%			\graphnodecolour
+% - \grapharrowlength	define the length from tip to basis of a
+%			directed edge's arrow head
+% - \grapharrowwidth	define the width of the basis of a
+%			directed edge's arrow head (in multiples of
+%			\grapharrowlength)
+% - \grapharrowtype	define the type of the arrow heads (argument
+%			should be 1 or 2)
+% - \autodistance	define the factor that defines the distance
+%			of automatically placed text boxes from the
+%			centre of a node (1 means "placed on the
+%			edge").
+% - \enlargeboxes	define the length that is added to
+%			text boxes (in x and y direction) in order
+%			to determine the size of the necessary
+%			white area underlying it.
+% - \opaquetexttrue
+%   \opaquetextfalse	determine whether text boxes shall be considered
+%			opaque or transparent (In the latter case
+%			\enlargeboxes doesn't have a (visible)
+%			effect.) Its initial value is true except
+%			for \autonodetext, which always has it set
+%			to false if it's not changed explicitely
+%			through the optional parameter. 
+% - \filledareastrue
+%   \filledareasfalse	determine whether areas shall be filled or not
+%
+% - \graphfillcolour	define the fill colour of areas (if filled
+%			at all).
+%			
+%_________________________________________________________________%%
+%
+\def\g@defrel#1*#2{\edef#1{#1\ps@s #2 0 ge {#2 mul} if}}
+\def\g@defplus#1+#2{\edef#1{
+	#1\ps@s
+	#2 1 gt
+	{1 exch sub #2 div 1 exch sub}
+	{#2 0 ge {#2 mul} if}
+	ifelse}}
+\def\g@defcolplus#1+#2{\edef#1{
+	#1
+	3 {
+	    3 1 roll
+	    #2 1 gt
+	    {1 exch sub #2 div 1 exch sub}
+	    {#2 0 ge {#2 mul} if}
+	    ifelse
+	  }
+	repeat
+}}
+\def\g@defabs#1#2#3{\def#1{#3}\def#2{}}
+\def\g@defcolabs#1#2{%
+	\@ifnextchar({\g@defcolabsrgb{#1}{#2}}{\g@defcolabsbw{#1}{#2}}%
+}
+\def\g@defcolabsbw#1#2#3{\def#1{#3\ps@s #3\ps@s #3}\def#2{}}
+\def\g@defcolabsrgb#1#2(#3,#4,#5){\def#1{#3\ps@s #4\ps@s #5}\def#2{}}
+%
+\def\graphlinewidth{%
+	\@ifnextchar*{\g@defrel{\g@lwidthmod}}%
+			{\g@defabs{\g@lwidth}{\g@lwidthmod}}}
+\graphlinewidth{.02}
+%
+\def\graphlinedash#1{\def\g@ldash{[ #1 ]}}
+\graphlinedash{}
+%
+\def\graphnodesize#1{\def\g@nsize{#1}}
+\graphnodesize{.2}
+%
+\def\graphnodecolour{%
+	\@ifnextchar+{\g@defcolplus{\g@ncolourmod}}%
+			{\g@defcolabs{\g@ncolour}{\g@ncolourmod}}}
+\graphnodecolour{0}
+%
+\newif\iffillednodes\fillednodestrue
+%
+\def\graphlinecolour{%
+	\@ifnextchar+{\g@defcolplus{\g@lcolourmod}}%
+			{\g@defcolabs{\g@lcolour}{\g@lcolourmod}}}
+\graphlinecolour{0}
+%
+\def\grapharrowlength{%
+	\@ifnextchar*{\g@defrel{\g@alengthmod}}%
+			{\g@defabs{\g@alength}{\g@alengthmod}}}
+\grapharrowlength{.3}
+%
+\def\grapharrowwidth{%
+	\@ifnextchar*{\g@defrel{\g@awidthmod}}%
+			{\g@defabs{\g@awidth}{\g@awidthmod}}}
+\grapharrowwidth{.5}
+%
+\def\grapharrowtype#1{\def\g@atype{#1}}
+\grapharrowtype{1}
+%
+\def\autodistance#1{\def\g@autodistance{#1}}
+\autodistance{1.3}
+%
+\def\enlargeboxes#1{\def\g@eboxes{#1}}
+\enlargeboxes{.1}
+%
+\newif\ifopaquetext\opaquetexttrue
+%
+\newif\iffilledareas\filledareastrue
+%
+\def\graphfillcolour{%
+	\@ifnextchar+{\g@defcolplus{\g@fcolourmod}}%
+			{\g@defcolabs{\g@fcolour}{\g@fcolourmod}}}
+\graphfillcolour{.5}
+%
+%
+%_________________________________________________________________%%
+% Issue a warning if a command name defined in graphs.sty already has
+% a meaning.
+%_________________________________________________________________%%
+%
+\def\g@test#1{
+	\@ifundefined{#1}{}{
+	  \typeout{}
+	  \typeout{Warning: command name `#1' already used;
+	  	redefined in graphs.sty!}
+	  \typeout{}
+	}
+}
+%
+%
+%_________________________________________________________________%%
+% This is the environment in which the macros above can be used.
+%
+% Arguments:
+%
+% As for the LaTeX picture environment, i.e., it starts with
+% \begin{graph}(x,y)(dx,dy) (where the second pair is optional) and
+% ends with \end{graph}.
+%
+% Remark:
+%
+% The graph enviroment is imlemented on the basis of the picture
+% environment. As a result, all commands allowed in pictures may be
+% used (in addition to the graph commands). The picture commands'
+% effects will always take place first, so subsequent AS WELL AS
+% PRECEEDING graph commands will overlay the ordinary LaTeX
+% picture. (This is one reason why a command like \freetext is NOT
+% useless: its effect takes place after nodes and edges have been
+% drawn.)
+%_________________________________________________________________%%
+%
+\g@test{graph}\g@test{framegraph}
+\def\framegraph(#1){\@ifnextchar({\g@graph f(#1)}{\g@graph f(#1)(0,0)}}
+\def\graph(#1){\@ifnextchar({\g@graph n(#1)}{\g@graph n(#1)(0,0)}}
+\def\g@graph#1(#2)(#3){%
+	\begin{picture}(#2)(#3)%
+	\if #1f%
+  	  \put(#3){\framebox(#2){}}%
+  	\fi%
+	\ifdrawgraphs\else%
+  	  \put(#3){\framebox(#2){graph}}%
+  	\fi%
+  	\def\g@nodeinfo{}\def\g@specialeffects{}\def\g@nodes{}\def\g@texts{}%
+  	\def\g@edges{}%
+}
+\def\endgraph{%
+	\ifdrawgraphs
+	  \g@nodeinfo\g@specialeffects\g@edges\g@nodes\g@texts%
+	\fi%
+	\end{picture}%
+}
+\def\endframegraph{\endgraph}
+%
+%
+%_________________________________________________________________%%
+% Types of nodes
+%_________________________________________________________________%%
+%
+\def\g@circletype{0}
+\def\g@rectangletype{1}
+%
+%
+%_________________________________________________________________%%
+% Definition of square nodes:
+%
+% Arguments:
+%
+% Nodename (a character sequence like abc)
+% Position (x,y) = a pair of numbers
+%_________________________________________________________________%%
+%
+\g@test{squarenode}
+\def\squarenode#1(#2,#3){
+	\@ifnextchar[{\g@squarenode{#1}(#2,#3)}{\g@squarenode{#1}(#2,#3)[]}
+}
+%
+\def\g@squarenode#1(#2,#3)[#4]{
+	\g@extendlist\g@nodeinfo{\g@node{#1}{\g@rectangletype}(#2,#3)[#4]}
+	\g@extendlist\g@nodes{\g@drawsquarenode{#1}(#2,#3)[#4]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawsquarenode#1(#2,#3)[#4]{%
+	\edef\g@size{\g@thenodesize{#1}}%
+	{#4%
+	\put(#2,#3){\expandafter\ps@rectangle\g@size}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of round nodes:
+%
+% Arguments:
+%
+% Nodename (a character sequence like abc)
+% Position (x,y) = a pair of numbers
+%_________________________________________________________________%%
+%
+\g@test{roundnode}
+\def\roundnode#1(#2,#3){
+	\@ifnextchar[{\g@roundnode{#1}(#2,#3)}{\g@roundnode{#1}(#2,#3)[]}
+}
+%
+\def\g@roundnode#1(#2,#3)[#4]{
+	\g@extendlist\g@nodeinfo{\g@node{#1}{\g@circletype}(#2,#3)[#4]}
+	\g@extendlist\g@nodes{\g@drawroundnode{#1}(#2,#3)[#4]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawroundnode#1(#2,#3)[#4]{%
+	\edef\g@size{\g@thenodesize{#1}}%
+	{#4%%
+	\put(#2,#3){\expandafter\ps@circle\g@size}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of rectangular nodes:
+%
+% Arguments:
+%
+% Nodename (a character sequence like abc)
+% Size [width,height] (in multiples of \unitlength)
+% Position (x,y) = a pair of numbers
+%_________________________________________________________________%%
+%
+\g@test{rectnode}
+\def\rectnode#1[#2,#3](#4,#5){
+	\@ifnextchar[{\g@rectnode{#1}[#2,#3](#4,#5)}%
+		{\g@rectnode{#1}[#2,#3](#4,#5)[]}
+}
+%
+\def\g@rectnode#1[#2,#3](#4,#5)[#6]{
+	\g@extendlist\g@nodeinfo{\g@noderect{#1}[#2,#3](#4,#5)}
+	\g@extendlist\g@nodes{\g@drawrectnode{#1}[#6]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawrectnode#1[#2]{%
+	\edef\g@size{\g@thenodesize{#1}}%
+	\edef\g@coords{\g@nodecoords{#1}}%
+	{#2%
+	\expandafter\put\g@coords{\expandafter\ps@rectangle\g@size}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of text nodes (rectangular nodes whose dimension is
+% determined by the given text):
+%
+% Arguments:
+%
+% Nodename (a character sequence like abc)
+% Position (x,y) = a pair of numbers
+% Text (=anything that may occur as a \put argument in a picture
+%	environment, i.e., even lines, vectors, and so on.)
+%_________________________________________________________________%%
+%
+\g@test{textnode}
+\def\textnode#1(#2,#3)#4{
+	\@ifnextchar[{\g@textnode{#1}(#2,#3){#4}}%
+		{\g@textnode{#1}(#2,#3){#4}[]}
+}
+%
+\def\g@textnode#1(#2,#3)#4[#5]{
+	\autonodetext{#1}{#4}[#5]
+	\g@extendlist\g@nodeinfo{\g@nodebytext{#1}(#2,#3){#4}[#5]}
+	\g@extendlist\g@nodes{\g@drawrectnode{#1}%
+					[\graphnodecolour{1}#5]}
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of an edge:
+%
+% Arguments:
+%
+% The two incident nodes
+%_________________________________________________________________%%
+%
+\g@test{edge}
+\def\edge#1#2{
+	\@ifnextchar[{\g@edge{#1}{#2}}{\g@edge{#1}{#2}[]}
+}
+%
+\def\g@edge#1#2[#3]{
+	\g@extendlist\g@edges{\g@drawedge{#1}{#2}[#3]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawedge#1#2[#3]{%
+	\g@testname{#1}\g@testname{#2}%
+	\g@differentpositions{#1}{#2}{\edge{#1}{#2}}%
+	\edef\g@firstcoords{\g@nodecoords{#1}}%
+	\edef\g@secondcoords{\g@nodecoords{#2}}%
+	\g@defcoorddiff{\g@diffcoords}{\g@firstcoords}{\g@secondcoords}%
+	{#3%
+	\expandafter\put\g@firstcoords{\expandafter\ps@line\g@diffcoords}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a directed edge:
+%
+% Arguments (same as for \edge):
+%
+% The two incident nodes (order indicates direction of the arrow)
+%_________________________________________________________________%%
+%
+\g@test{diredge}
+\def\diredge#1#2{
+	\@ifnextchar[{\g@diredge{#1}{#2}}{\g@diredge{#1}{#2}[]}
+}
+%
+\def\g@diredge#1#2[#3]{
+	\g@extendlist\g@edges{\g@drawdiredge{#1}{#2}[#3]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawdiredge#1#2[#3]{%
+	\g@testname{#1}\g@testname{#2}%
+	\g@differentpositions{#1}{#2}{\diredge{#1}{#2}}%
+	\edef\g@firstcoords{\g@nodecoords{#1}}%
+	\edef\g@secondcoords{\g@nodecoords{#2}}%
+	\g@defcoorddiff{\g@diffcoords}{\g@firstcoords}{\g@secondcoords}%
+	%
+	% Choose the right drawing procedure, according to the node's type:
+	%
+	\edef\g@type{\g@nodetype{#2}}%
+	\ifnum\g@circletype=\g@type%
+	  \let\g@draw=\ps@arrowoncircle%
+	\else%
+	  \let\g@draw=\ps@arrowonrectangle%
+	  \ifnum\g@rectangletype=\g@type%
+	  \else%
+	    \typeout{}%
+	    \typeout{Error in \string\g@drawdiredge: unrecognized node type}%
+	  \fi%
+	\fi%
+	%
+	% and draw it:
+	%
+	\edef\g@diffcoordsandsize{\g@diffcoords\g@thenodesize{#2}}%
+	{#3%
+	\expandafter\put\g@firstcoords{\expandafter\g@draw\g@diffcoordsandsize}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a `bow' (a curved edge):
+%
+% Arguments:
+%
+% The two incident nodes
+% The displacement factor of the midpoint relative to the distance.
+%	of both nodes. A positive number means the bow extends 
+%	to the left (if one looks in the direction of the edge).
+%_________________________________________________________________%%
+%
+\g@test{bow}
+\def\bow#1#2#3{
+	\@ifnextchar[{\g@bow{#1}{#2}{#3}}{\g@bow{#1}{#2}{#3}[]}
+}
+%
+\def\g@bow#1#2#3[#4]{
+	\g@extendlist\g@edges{\g@drawbow{#1}{#2}{#3}[#4]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawbow#1#2#3[#4]{%
+	\g@testname{#1}\g@testname{#2}%
+	\g@differentpositions{#1}{#2}{\bow{#1}{#2}...}%
+	\edef\g@firstcoords{\g@nodecoords{#1}}%
+	\edef\g@secondcoords{\g@nodecoords{#2}}%
+	\expandafter\g@bowcombine\g@secondcoords{#3}%
+	{#4%
+	\filledareasfalse%
+	\put(0,0){\expandafter\ps@path\g@combineresult}%
+	}%
+}
+%
+% Macro used above to combine coordinates of nodes and displacement:
+\def\g@bowcombine(#1,#2)#3{
+	\edef\g@combineresult{\g@firstcoords{(#1,#2,#3)}}
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a `directed bow' (a curved arrow):
+%
+% Arguments (same as for \bow):
+%
+% The two incident nodes
+% The displacement factor of the midpoint relative to the distance.
+%	of both nodes. A positive number means the bow extends 
+%	to the left (if one looks in the direction of the edge).
+%_________________________________________________________________%%
+%
+\g@test{dirbow}
+\def\dirbow#1#2#3{
+	\@ifnextchar[{\g@dirbow{#1}{#2}{#3}}{\g@dirbow{#1}{#2}{#3}[]}
+}
+%
+\def\g@dirbow#1#2#3[#4]{
+	\g@extendlist\g@edges{\g@drawdirbow{#1}{#2}{#3}[#4]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawdirbow#1#2#3[#4]{
+	\g@testname{#1}\g@testname{#2}%
+	\g@differentpositions{#1}{#2}{\dirbow{#1}{#2}...}%
+	\edef\g@firstcoords{\g@nodecoords{#1}}%
+	\edef\g@secondcoordsandsize{\g@nodecoords{#2}\g@thenodesize{#2}}%
+	\expandafter\g@dirbowcombine\g@secondcoordsandsize{#3}%
+	%
+	% Choose the right drawing procedure, according to the node's type:
+	%
+	\edef\g@type{\g@nodetype{#2}}%
+	\ifnum\g@circletype=\g@type%
+	  \let\g@draw=\ps@dirbowoncircle%
+	\else%
+	  \let\g@draw=\ps@dirbowonrectangle%
+	  \ifnum\g@rectangletype=\g@type%
+	  \else%
+	    \typeout{}%
+	    \typeout{Error in \string\g@drawdirbow: unrecognized node type}%
+	  \fi%
+	\fi%
+	%
+	% and draw it:
+	%
+	{#4%
+	\filledareasfalse%
+	\put(0,0){\expandafter\g@draw\g@combineresult}%
+	}%
+}
+%
+% Macro used above to combine coordinates of nodes and displacement:
+\def\g@dirbowcombine(#1,#2)[#3]#4{
+	\edef\g@combineresult{\g@firstcoords(#1,#2,#4)[#3]}
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a loop. There're two ways to provide this macro
+% with the necessary arguments. Here's the
+% first:
+%
+% Arguments:
+%
+% Node that carries the loop
+% Two relative coordinates (x1,y1) (x2,y2) indicating the lines from
+%	the incident node to (x1,y1) and (x2,y2) that form the loop
+%	together with a curve connecting (x1,y1) and (x2,y2).
+%_________________________________________________________________%%
+%
+\g@test{loopedge}
+\def\loopedge#1{
+	\@ifnextchar({\g@loopedgeA{#1}}{\g@loopedgeB{#1}}
+}
+%
+\def\g@loopedgeA#1(#2,#3)(#4,#5){
+	\@ifnextchar[{\g@loopedgeAa{#1}(#2,#3)(#4,#5)}%
+			{\g@loopedgeAa{#1}(#2,#3)(#4,#5)[]}
+}
+%
+\def\g@loopedgeAa#1(#2,#3)(#4,#5)[#6]{
+	\g@extendlist\g@edges{\g@drawloopedgeA{#1}(#2,#3)(#4,#5)[#6]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawloopedgeA#1(#2,#3)(#4,#5)[#6]{%
+	\g@testname{#1}%
+	\edef\g@coords{\g@nodecoords{#1}}%
+	{#6%
+	\expandafter\put\g@coords{%%
+	  \ps@loopA(#2,#3)(#4,#5)}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a loop - the second form:
+%
+% Arguments:
+%
+% Node that carries the loop
+% Angle the two lines defining the loop build
+% Coordinates (x,y) that give the axis along which the loop is
+% to be drawn and its length (ie, the length of the two lines 
+% defining the loop).
+%_________________________________________________________________%%
+%
+\def\g@loopedgeB#1#2(#3,#4){
+	\@ifnextchar[{\g@loopedgeBa{#1}{#2}(#3,#4)}%
+			{\g@loopedgeBa{#1}{#2}(#3,#4)[]}
+}
+%
+\def\g@loopedgeBa#1#2(#3,#4)[#5]{
+	\g@extendlist\g@edges{\g@drawloopedgeB{#1}{#2}(#3,#4)[#5]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawloopedgeB#1#2(#3,#4)[#5]{%
+	\g@testname{#1}%
+	\edef\g@coords{\g@nodecoords{#1}}%
+	{#5%
+	\expandafter\put\g@coords{%%
+	  \ps@loopB{#2}(#3,#4)}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a directed loop. There're two ways to provide
+% this macro with the necessary arguments. Here's the first:
+%
+% Arguments:
+%
+% Node that carries the loop
+% Two relative coordinates (x1,y1) (x2,y2) indicating the lines from
+%	the incident node to (x1,y1) and (x2,y2) that form the loop
+%	together with a curve connecting (x1,y1) and (x2,y2).
+%_________________________________________________________________%%
+%
+\g@test{dirloopedge}
+\def\dirloopedge#1{
+	\@ifnextchar({\g@dirloopedgeA{#1}}{\g@dirloopedgeB{#1}}
+}
+%
+\def\g@dirloopedgeA#1(#2,#3)(#4,#5){
+	\@ifnextchar[{\g@dirloopedgeAa{#1}(#2,#3)(#4,#5)}%
+			{\g@dirloopedgeAa{#1}(#2,#3)(#4,#5)[]}
+}
+%
+\def\g@dirloopedgeAa#1(#2,#3)(#4,#5)[#6]{
+	\g@extendlist\g@edges{\g@drawdirloopedgeA{#1}(#2,#3)(#4,#5)[#6]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawdirloopedgeA#1(#2,#3)(#4,#5)[#6]{%
+	\g@testname{#1}%
+	\edef\g@coords{\g@nodecoords{#1}}%
+	%
+	% Choose the drawing procedure for the arrow according
+	% to the node's type:
+	%
+	\edef\g@type{\g@nodetype{#1}}%
+	\ifnum\g@circletype=\g@type%
+	  \let\g@draw=\ps@looparrowoncircleA%
+	\else%
+	  \let\g@draw=\ps@looparrowonrectangleA%
+	  \ifnum\g@rectangletype=\g@type%
+	  \else%
+	    \typeout{}%
+	    \typeout{Error in \string\g@drawdirloopedge: unrecognized node type}%%
+	  \fi%
+	\fi%
+	\edef\g@args{(#2,#3)(#4,#5)\g@thenodesize{#1}}%
+	%
+	% and draw it:
+	%
+	{#6%
+	\expandafter\put\g@coords{\expandafter\g@draw\g@args}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a directed loop - the second form:
+%
+% Arguments:
+%
+% Node that carries the loop
+% Angle the two lines defining the loop build
+% Coordinates (x,y) that give the axis along which the loop is
+% to be drawn and its length (ie, the length of the two lines 
+% defining the loop).
+%_________________________________________________________________%%
+%
+\def\g@dirloopedgeB#1#2(#3,#4){
+	\@ifnextchar[{\g@dirloopedgeBa{#1}{#2}(#3,#4)}%
+			{\g@dirloopedgeBa{#1}{#2}(#3,#4)[]}
+}
+%
+\def\g@dirloopedgeBa#1#2(#3,#4)[#5]{
+	\g@extendlist\g@edges{\g@drawdirloopedgeB{#1}{#2}(#3,#4)[#5]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@drawdirloopedgeB#1#2(#3,#4)[#5]{%
+	\g@testname{#1}%
+	\edef\g@coords{\g@nodecoords{#1}}%
+	%
+	% Choose the drawing procedure for the arrow according
+	% to the node's type:
+	%
+	\edef\g@type{\g@nodetype{#1}}%
+	\ifnum\g@circletype=\g@type%
+	  \let\g@draw=\ps@looparrowoncircleB%
+	\else%
+	  \let\g@draw=\ps@looparrowonrectangleB%
+	  \ifnum\g@rectangletype=\g@type%
+	  \else%
+	    \typeout{}%
+	    \typeout{Error in \string\g@drawdirloopedge: unrecognized node type}%%
+	  \fi%
+	\fi%
+	\edef\g@args{{#2}(#3,#4)\g@thenodesize{#1}}%
+	%
+	% and draw it:
+	%
+	{#5%
+	\expandafter\put\g@coords{\expandafter\g@draw\g@args}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Automatic positioning of a node's text
+% (This one sets \opaquetextfalse if it's not enforced by the optional
+% parameter!):
+%
+% Arguments:
+%
+% Node
+% Optional (surrounded by []): n, s, e, w, ne, nw, se, sw (for north,
+%	south, east, west, ...) indicating the position of the text
+%	with respect to the node. If omitted, the text is centered
+%	inside the node.
+% Text (=anything that may occur as a \put argument in a picture
+%	environment, i.e., even lines, vectors, and so on.)
+%_________________________________________________________________%%
+%
+\g@test{autonodetext}
+\def\autonodetext#1{
+  \@ifnextchar[{\g@autonodetext{#1}}{\g@autonodetext{#1}[]}
+}
+%
+\def\g@autonodetext#1[#2]#3{
+  \@ifnextchar[{\g@autonodetextopt{#1}{#3}[#2]}%
+  	{\g@autonodetextopt{#1}{#3}[#2][]}
+}
+%
+\def\g@rootofahalf{.70710678}% square root of 0.5
+%
+\def\g@autonodetextopt#1#2[#3][#4]{
+  \def\g@doit##1##2##3;{
+    \def\g@xdisplace{0}\def\g@ydisplace{0}\def\g@torb{,0]}\def\g@lorr{[0}
+    \def\g@xdisplacec{0}\def\g@ydisplacec{0}
+    \if##2.
+      \if##1s\def\g@ydisplace{-1}\def\g@torb{,-1]}\else
+      \if##1n\def\g@ydisplace{1}\def\g@torb{,1]}\else
+      \if##1e\def\g@xdisplace{1}\def\g@lorr{[1}\else
+      \if##1w\def\g@xdisplace{-1}\def\g@lorr{[-1}\fi\fi\fi\fi
+      \edef\g@xdisplacec{\g@xdisplace}\edef\g@ydisplacec{\g@ydisplace}
+    \else
+      \if##1s\def\g@ydisplace{-1}\def\g@torb{,-1]}
+      	\def\g@ydisplacec{-\g@rootofahalf}\else
+      \if##1n\def\g@ydisplace{1}\def\g@torb{,1]}
+      	\def\g@ydisplacec{\g@rootofahalf}\else
+      \if##1e\def\g@xdisplace{1}\def\g@lorr{[1}
+      	\def\g@xdisplacec{\g@rootofahalf}\else
+      \if##1w\def\g@xdisplace{-1}\def\g@lorr{[-1}
+      	\def\g@xdisplacec{-\g@rootofahalf}\fi\fi\fi\fi
+      \if##2e\def\g@xdisplace{1}\def\g@lorr{[1}
+      	\def\g@xdisplacec{\g@rootofahalf}\else
+      \if##2w\def\g@xdisplace{-1}\def\g@lorr{[-1}
+      	\def\g@xdisplacec{-\g@rootofahalf}
+      \fi\fi
+    \fi
+    \edef\g@values{%
+      {(\g@xdisplacec,\g@ydisplacec)}{\g@lorr\g@torb}{%
+        (\g@xdisplace,\g@ydisplace)}%
+    }
+    \expandafter\g@extendtextsauto\g@values{#1}{#2}[#4]}
+  \g@doit#3...;}
+%
+%
+\def\g@extendtextsauto#1#2#3#4#5[#6]{
+	\g@extendlist\g@texts{\g@putautotext{#1}{#2}{#3}{#4}{#5}[#6]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@putautotext#1#2#3#4#5[#6]{%
+	\g@testname{#4}%
+	\edef\g@coords{\g@nodecoords{#4}}%
+	\edef\g@type{\g@nodetype{#4}}%
+	\edef\g@size{\g@thenodesize{#4}}%
+	\ifnum\g@circletype=\g@type%
+	  \def\g@draw{\g@xyput#1}%
+	  \expandafter\g@getcirclexy\g@size%
+	\else%
+	  \def\g@draw{\g@xyput#3}%
+	  \expandafter\g@getrectanglexy\g@size%
+	  \ifnum\g@rectangletype=\g@type%
+	  \else%
+	    \typeout{}%
+	    \typeout{Error in \string\putautotext: unrecognized node type}%
+	  \fi%
+	\fi%
+	\expandafter\put\g@coords{%
+	  \opaquetextfalse #6%
+	  \g@textsize{#5}%
+	  \g@xunitlength=\g@autodistance\g@xunitlength\divide\g@xunitlength by 2%
+	  \g@yunitlength=\g@autodistance\g@yunitlength\divide\g@yunitlength by 2%
+	  \ifopaquetext%
+	    \g@draw{\expandafter\g@makeautotext\g@thetextsize%
+	  	#2{\expandafter\ps@deletebox\g@thetextsize}}%
+	  \fi%
+	  \g@draw{\expandafter\g@makeautotext\g@thetextsize%
+	  	#2{\makebox(0,0){#5}}}%
+	}%
+}%
+%
+\def\g@getcirclexy[#1]{
+	\g@xunitlength=#1\unitlength\relax
+	\g@yunitlength=\g@xunitlength\relax
+}
+%
+\def\g@getrectanglexy[#1,#2]{
+	\g@xunitlength=#1\unitlength\relax
+	\g@yunitlength=#2\unitlength\relax
+}
+%
+\newcount\g@xpos
+\newcount\g@ypos
+\def\g@makeautotext(#1,#2)[#3,#4]#5{%
+	\g@oldunitlength=\unitlength%
+	\g@xpos=#1\divide\g@xpos by 2\multiply\g@xpos by #3\relax%
+	\g@ypos=#2\divide\g@ypos by 2\multiply\g@ypos by #4\relax%
+	\unitlength=1sp%
+	\edef\g@positions{(\number\g@xpos,\number\g@ypos)}%
+	\expandafter\put\g@positions{\unitlength=\g@oldunitlength{#5}}%
+}%
+%
+%
+%_________________________________________________________________%%
+% Definition of a node's text:
+%
+% Arguments:
+%
+% Node
+% Relative coordinates of the text (optional).
+%	Text is centered horizontally and vertically at this position.
+%	(Use a \makebox(0,0)[...]{Text} construction to disable the
+%	centering if necessary.)
+%	Omitting the optinal argument means the same as (0,0).
+% Text (=anything that may occur as a \put argument in a picture
+%	environment, i.e., even lines, vectors, and so on.)
+%_________________________________________________________________%%
+%
+\g@test{nodetext}
+\def\nodetext#1{
+	\@ifnextchar({\g@nodetext{#1}}{\g@nodetext{#1}(0,0)}
+}
+\def\g@nodetext#1(#2,#3)#4{
+	\@ifnextchar[{\g@nodetextb{#1}(#2,#3){#4}}%
+			{\g@nodetextb{#1}(#2,#3){#4}[]}
+}
+%
+\def\g@nodetextb#1(#2,#3)#4[#5]{
+	\g@extendlist\g@texts{\g@putnodetext{#1}(#2,#3){#4}[#5]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@putnodetext#1(#2,#3)#4[#5]{%
+	\g@testname{#1}%
+	\edef\g@coords{\g@nodecoords{#1}}%
+	\expandafter\put\g@coords{%
+	  #5%
+	  \ifopaquetext%
+	    \g@textsize{#4}%
+	    \put(#2,#3){\expandafter\ps@deletebox\g@thetextsize}%
+	  \fi%
+	  \put(#2,#3){\makebox(0,0){#4}}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of an edge's text (for straight edges only):
+%
+% Arguments:
+%
+% Both nodes incident with the edge in question
+% Text (=anything that may occur as a \put argument in a picture
+%	environment, i.e., even lines, vectors, and so on.)
+%_________________________________________________________________%%
+%
+\g@test{edgetext}
+\def\edgetext#1#2#3{
+	\@ifnextchar[{\g@edgetext{#1}{#2}{#3}}%
+			{\g@edgetext{#1}{#2}{#3}[]}
+}
+%
+\def\g@edgetext#1#2#3[#4]{
+	\g@extendlist\g@texts{\g@putedgetext{#1}{#2}{#3}[#4]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@putedgetext#1#2#3[#4]{%
+	\g@testname{#1}\g@testname{#2}%
+	\g@differentpositions{#1}{#2}{\edgetext{#1}{#2}...}%
+	\edef\g@firstcoords{\g@nodecoords{#1}}%
+	\edef\g@secondcoords{\g@nodecoords{#2}}%
+	{%
+	  #4%
+	  \g@textsize{#3}%
+	  \g@oldunitlength=\unitlength%
+	  \divide\unitlength by 2%
+	  \expandafter\put\g@firstcoords{%
+	    \ifopaquetext%
+	      \expandafter\put\g@secondcoords{%
+	        \expandafter\ps@deletebox\g@thetextsize%
+	      }%
+	    \fi%
+	    \expandafter\put\g@secondcoords{%
+	      \unitlength=\g@oldunitlength%
+	      \makebox(0,0){#3}%
+	    }%
+	  }%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a bow's text:
+%
+% Arguments:
+%
+% Both nodes and displacement factor defining the bow in question
+% Text (=anything that may occur as a \put argument in a picture
+%	environment, i.e., even lines, vectors, and so on.)
+%_________________________________________________________________%%
+%
+\g@test{bowtext}
+\def\bowtext#1#2#3#4{
+	\@ifnextchar[{\g@bowtext{#1}{#2}{#3}{#4}}%
+			{\g@bowtext{#1}{#2}{#3}{#4}[]}
+}
+%
+\def\g@bowtext#1#2#3#4[#5]{
+	\g@extendlist\g@texts{\g@putbowtext{#1}{#2}{#3}{#4}[#5]}
+}
+%
+% The actual drawing routine:
+%
+\newdimen\g@x
+\newdimen\g@y
+\newdimen\g@aux
+\def\g@putbowtext#1#2#3#4[#5]{%
+	\g@testname{#1}\g@testname{#2}%
+	\g@differentpositions{#1}{#2}{\bowtext{#1}{#2}...}%
+	\def\g@doit(##1,##2)(##3,##4){%
+	  {#5%
+	  \g@textsize{#4}%
+	  \g@oldunitlength=\unitlength%
+	  \unitlength=.5\unitlength%
+	  %
+	  % Compute the difference of coordinates:
+	  %
+	  \g@x=##3\g@oldunitlength\g@aux=##1\g@oldunitlength%
+	  \advance\g@x by -\g@aux\g@x=#3\g@x%
+	  \g@y=##4\g@oldunitlength\g@aux=##2\g@oldunitlength%
+	  \advance\g@y by -\g@aux\g@y=#3\g@y%
+	  \g@y=-\g@y%
+	  \edef\g@thirdcoords{(\number\g@y,\number\g@x)}%
+	  \put(##1,##2){%
+	    \ifopaquetext%
+	      \put(##3,##4){%
+	        \unitlength=1sp%
+	        \expandafter\put\g@thirdcoords{%
+	          \expandafter\ps@deletebox\g@thetextsize%
+	        }%
+	      }%
+	    \fi%
+	    \put(##3,##4){%
+	      \unitlength=1sp%
+	      \expandafter\put\g@thirdcoords{%
+	        \unitlength=\g@oldunitlength%
+	        \makebox(0,0){#4}%
+	      }%
+	    }%
+	  }}%
+	}%
+	\edef\g@firstcoords{\g@nodecoords{#1}}%
+	\edef\g@secondcoords{\g@nodecoords{#2}}%
+	%
+	% Expand both arguments before executing \g@doit:
+	%
+	\expandafter\expandafter\expandafter%
+		\g@doit\expandafter\g@firstcoords\g@secondcoords%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of free text:
+%
+% Arguments:
+%
+% Absolute coordinates of the text. (Text is centered horizontally
+%	and vertically at this position. Use a
+%	\makebox(0,0)[...]{Text} construction to disable the
+%	centering if necessary.)
+% Text (=anything that may occur as a \put argument in a picture
+%	environment, i.e., even lines, vectors, and so on.)
+%_________________________________________________________________%%
+%
+\g@test{freetext}
+\def\freetext(#1,#2)#3{
+	\@ifnextchar[{\g@freetext(#1,#2){#3}}%
+			{\g@freetext(#1,#2){#3}[]}
+}
+%
+\def\g@freetext(#1,#2)#3[#4]{
+	\g@extendlist\g@texts{\g@putfreetext(#1,#2){#3}[#4]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@putfreetext(#1,#2)#3[#4]{%
+	{#4%
+	\ifopaquetext%
+	  \g@textsize{#3}%
+	  \put(#1,#2){\expandafter\ps@deletebox\g@thetextsize}%
+	\fi%
+	\put(#1,#2){\makebox(0,0){#3}}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a (perhaps filled) area:
+%
+% Arguments:
+%
+% Absolute coordinates of the starting point
+% Sequence of pairs (x_i,y_i) or triples (x_i,y_i,d_i) where the
+% 	(x_i,y_i) are absolute coordinates of the next segment's
+%	end point and d_i is the displacement factor of the midpoint
+%	relative to the length of the segment. A positive number
+%	means the segment extends to the left.
+%_________________________________________________________________%%
+%
+\g@test{area}
+\def\area(#1,#2)#3{
+	\@ifnextchar[{\g@area(#1,#2){#3}}%
+			{\g@area(#1,#2){#3}[]}
+}
+%
+\def\g@area(#1,#2)#3[#4]{
+	\g@extendlist\g@specialeffects{\g@putarea(#1,#2){#3}[#4]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@putarea(#1,#2)#3[#4]{%
+	{#4%
+	\put(0,0){\ps@path(#1,#2){#3}}%
+	}%
+}
+%
+% For reasons of compatibility with older versions:
+\g@test{filledarea}\def\filledarea{\area}
+%
+%
+%_________________________________________________________________%%
+% Definition of a (perhaps filled) Bezier curve:
+%
+% Arguments:
+%
+% Normal distance of control points from points of the curve,
+%	in multiples of the segment length.
+% Sequence of triples (x_i,y_i,alpha_i), and and optional
+%	[factora_i,factorb_i]) after each of the triples:
+%	(x_i,y_i) is a point on the curve, alpha_i is the angle
+%	between the x-axis and the line through (x_i,y_i) and the
+%	next control point (the previous control point lies opposite),
+%	and factora_i (factorb_i) is overwrites the first argument
+%	for the two control points between two points.
+%_________________________________________________________________%%
+%
+\g@test{curve}
+\def\curve#1#2{
+	\@ifnextchar[{\g@curve{#1}{#2}}%
+			{\g@curve{#1}{#2}[]}
+}
+%
+\def\g@curve#1#2[#3]{
+	\g@extendlist\g@specialeffects{\g@putcurve{#1}{#2}[#3]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@putcurve#1#2[#3]{%
+	{#3%
+	\put(0,0){\ps@curve{#1}{#2}}%
+	}%
+}
+%
+%
+%_________________________________________________________________%%
+% Definition of a (perhaps filled) Bezier ``bubble'':
+%
+% Arguments:
+%
+% Normal distance (in multiples of unitlength) of control points
+%	in multiples of segment length.
+% Sequence of points (x_i,y_i).
+%_________________________________________________________________%%
+%
+\g@test{bubble}
+\def\bubble#1#2{
+	\@ifnextchar[{\g@bubble{#1}{#2}}%
+			{\g@bubble{#1}{#2}[]}
+}
+%
+\def\g@bubble#1#2[#3]{
+	\g@extendlist\g@specialeffects{\g@putbubble{#1}{#2}[#3]}
+}
+%
+% The actual drawing routine:
+%
+\def\g@putbubble#1#2[#3]{%
+	{#3%
+	\put(0,0){\ps@bubble{#1}{#2}}%
+	}%
+}
+%
+%
+%
+%
+%
+%_________________________________________________________________%%
+%_________________________________________________________________%%
+%_________________________________________________________________%%
+% The rest consists of auxiliary macros used above:
+%_________________________________________________________________%%
+%_________________________________________________________________%%
+%_________________________________________________________________%%
+%
+%
+%
+%_________________________________________________________________%%
+% Globally extend a list by another item.
+%
+% Replaces the definition of the macro #1 by the expansion of #1
+% immediately followed by #2.
+%_________________________________________________________________%%
+%
+\def\g@extendlist#1#2{
+	\expandafter\def\expandafter#1\expandafter{#1#2}
+}
+%
+%
+%_________________________________________________________________%%
+% Give the different attributes of a node.
+%_________________________________________________________________%%
+%
+\def\g@nodecoords#1{%
+	\csname g@xy@#1\endcsname%
+}
+\def\g@nodetype#1{%
+	\csname g@type@#1\endcsname%
+}
+\def\g@thenodesize#1{%
+	\csname g@size@#1\endcsname%
+}
+\def\g@testname#1{%
+	\@ifundefined{g@name@#1}{%
+		\typeout{}%
+		\typeout{! Graph package error: node #1 undefined!}%
+		\typeout{}%
+		\errmessage{}%
+	}{}%
+}
+%
+%
+%_________________________________________________________________%%
+% Give the difference between coordinate pairs the second and
+% third argument expand to and define the first as the result.
+%_________________________________________________________________%%
+%
+\def\g@defcoorddiff#1#2#3{
+	\edef#1{% Expand both arguments before expanding \g@coorddiff:
+	\expandafter\expandafter\expandafter\g@coorddiff\expandafter#2#3}
+}
+%
+\def\g@coorddiff(#1,#2)(#3,#4){(#3 #1 sub, #4 #2 sub)
+}
+%
+%
+%_________________________________________________________________%%
+% Find out the size of a box and add \g@eboxes.
+%_________________________________________________________________%%
+%
+\newdimen\g@heightplusdepth
+\newdimen\g@width
+\def\g@textsize#1{
+	\setbox0=\hbox{#1}
+	\g@heightplusdepth=\ht0
+	\advance\g@heightplusdepth by\dp0
+	\advance\g@heightplusdepth by\g@eboxes\unitlength
+	\g@width=\wd0
+	\advance\g@width by\g@eboxes\unitlength
+	\edef\g@thetextsize{%
+	  (\number\g@width,\number\g@heightplusdepth)%
+	}
+}
+%
+%
+%_________________________________________________________________%%
+% Save the information about a node in appropriate macros
+% (one macro to treat round and square nodes, one for
+% rectangular nodes, and one for text nodes):
+%_________________________________________________________________%%
+%
+\def\g@node#1#2(#3,#4)[#5]{
+	\g@nodedef{g@name@#1}{}
+	{
+	  #5
+	  \xdef\g@auxnodesize{\g@nsize}
+	}
+	\g@nodedef{g@xy@#1}{(#3,#4)}
+	\g@nodedef{g@type@#1}{#2}
+	\ifx\g@rectangletype#2
+	  \g@nodedef{g@size@#1}{[\g@auxnodesize,\g@auxnodesize]}
+	\else
+	  \g@nodedef{g@size@#1}{[\g@auxnodesize]}
+	\fi
+}
+%
+\def\g@noderect#1[#2,#3](#4,#5){
+	\g@nodedef{g@name@#1}{}
+	\g@nodedef{g@xy@#1}{(#4,#5)}
+	\g@nodedef{g@type@#1}{\g@rectangletype}
+	\g@nodedef{g@size@#1}{[#2,#3]}
+}
+%
+\def\g@nodebytext#1(#2,#3)#4[#5]{
+	\g@nodedef{g@name@#1}{}
+	\g@nodedef{g@xy@#1}{(#2,#3)}
+	\g@nodedef{g@type@#1}{\g@rectangletype}
+	{#5
+	  \g@textsize{#4}
+	  \expandafter\g@findsize\g@thetextsize
+	}
+	\g@nodedef{g@size@#1}{\g@auxtextsize}
+}
+%
+\def\g@nodedef#1#2{\expandafter\edef\csname #1\endcsname{#2}}
+%
+%
+%
+%_________________________________________________________________%%
+% Compare the coordinates of nodes and give an error message if they
+% coincide. (Used to prevent the definition of edges of length 0.)
+%_________________________________________________________________%%
+%
+%
+\def\g@differentpositions#1#2#3{%
+	\edef\g@firstname{#1}%
+	\edef\g@secondname{#2}%
+	\ifx\g@firstname\g@secondname%
+	  \typeout{}%
+	  \typeout{! Graph package error: Node #1 used twice
+	  in \string#3.}%
+	  \typeout{}%
+	  \errmessage{}
+	\else
+	  \edef\g@firstposition{\g@nodecoords{#1}}%
+	  \edef\g@secondposition{\g@nodecoords{#2}}%
+	  \ifx\g@firstposition\g@secondposition%
+	    \typeout{}%
+	    \typeout{! Graph package error: Coordinates of nodes
+	    #1 and #2 in}%
+	    \typeout{\string#3 coincide.}%
+	    \typeout{}%
+	    \errmessage{}	    
+	  \fi%
+	\fi%
+}
+%
+%
+%
+%_________________________________________________________________%%
+% Nasty procedure to compute the necessary size of the node. We need
+% something that computes
+%            textdimension / \unitlength + 2 * \g@lwidth
+% with high precision. So we can't simply use the \divide macro of
+% TeX (yielding an integer value), but must explicitely construct a
+% number showing some (I chose three) digits after the period.
+% (I don't know whether there's a more elegant way of doing this.
+% Sorry to anybody who might be bothered.)
+%_________________________________________________________________%%
+%
+%
+\newcount\g@xsizeA
+\newcount\g@xsizeB
+\newcount\g@ysizeA
+\newcount\g@ysizeB
+\newcount\g@help
+\newdimen\g@helpB
+\def\g@findsize(#1,#2){
+	\g@xsizeA=#1\relax
+	\g@helpB=\g@lwidth\unitlength\multiply\g@helpB by 2\relax
+	\advance\g@xsizeA by \g@helpB\relax
+	\g@xsizeB=\g@xsizeA
+	\divide\g@xsizeA by\unitlength\relax
+	\g@help=\unitlength\multiply\g@help by -\g@xsizeA\relax
+	\advance\g@xsizeB by \g@help\relax
+	\g@help=\unitlength\advance\g@help by 999\divide\g@help by 1000
+							\multiply\g@help by 1000
+	\advance\g@xsizeB by \g@help\relax
+	\divide\g@help by 1000
+	\divide\g@xsizeB by \g@help
+	%
+	\g@ysizeA=#2\relax
+	\advance\g@ysizeA by \g@helpB\relax
+	\g@ysizeB=\g@ysizeA
+	\divide\g@ysizeA by\unitlength\relax
+	\g@help=\unitlength\multiply\g@help by -\g@ysizeA\relax
+	\advance\g@ysizeB by \g@help\relax
+	\g@help=\unitlength\advance\g@help by 999\divide\g@help by 1000
+							\multiply\g@help by 1000
+	\advance\g@ysizeB by \g@help\relax
+	\divide\g@help by 1000
+	\divide\g@ysizeB by \g@help
+	\xdef\g@auxtextsize{%
+	  [\expandafter\g@mkpoint\number\g@xsizeB;{\number\g@xsizeA},%
+	   \expandafter\g@mkpoint\number\g@ysizeB;{\number\g@ysizeA}]}
+}
+%
+\def\g@mkpoint#1#2;#3{
+	#3.#2
+}
+%
+%
+%_________________________________________________________________%%
+% \put with separated x- and y-\unitlengths
+% (modified definition from LaTeX):
+%_________________________________________________________________%%
+%
+\newdimen\g@xunitlength\g@xunitlength=\unitlength
+\newdimen\g@yunitlength\g@yunitlength=\unitlength
+\long\def\g@xyput(#1,#2)#3{\@killglue\raise#2\g@yunitlength\hbox to\z@{\kern
+#1\g@xunitlength #3\hss}\ignorespaces}

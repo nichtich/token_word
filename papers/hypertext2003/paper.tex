@@ -7,6 +7,7 @@
 
 
 \documentclass{acm_proc_article-sp}
+\usepackage{graphs}
 
 \newcommand{\tw}{token\_word}
 
@@ -246,31 +247,84 @@ For an example of quotes used to link, see Figure \ref{fig:quotesAsLinks}.
 
 \subsection{Implementation Details}
 
+\subsubsection{Data Model}
 Keeping with the Xanadu model, \tw \ separates documents from the text they contain.
 There are two types of data objects in \tw:  documents and chunks.
 A chunk contains a raw block of contiguous text, while a document is a list of reference to text chunks.
 Some of the referenced chunks in a document may have been created at the same time as the document (for new text in the document), while others may be part of quotes taken from other documents.
+
+Each reference in a document contains a pointer to text chunk region and an optional pointer to a document context region.
+The document context pointer tracks which document the material was quoted from and is used for quote reference chasing.
+If a document refers to a new text chunk that has not appeared in any previous documents, the document context pointer is omitted:  such chunks are not part of quotes and have no references that can be chased.
+With this two-pointer model, we can distinguish ``original'' material in a document from quoted material and support recursive reference chasing.
+When following a quote reference, a chain of referneces may need to be chased before the original context of the text is found. 
+
+For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote original material, residing in chunk $k$, from document $C$.  
+$A$'s reference will contain both a pointer to the text chunk $k$ and to the document context $B$.  
+$B$'s reference will point to both chunk $k$ and document $C$.  
+At the end of this reference chain, $C$'s reference will point only to $k$.   
+
+
+
+\begin{figure*}[t]
+\begin{center}
+
+\begin{graph}(8,4)(-4,-1.65)
+\graphnodesize{0.6}
+\graphnodecolour{1}
+\opaquetextfalse
+
+\rectnode{A}[1.5,2](-6,0)[\fillednodesfalse]     
+\autonodetext{A}[n]{Document $A$}
+\roundnode{kInAAnchor}(-5.45,.25)[\graphnodecolour{0}\graphnodesize{0.1}]
+\rectnode{AQuote}[1.5,0.75](-6,.25)[\graphnodecolour{0.5}]  
+\rectnode{kInA}[1.5,0.5](-6,.25)[\graphnodecolour{0.85}]
+
+
+\rectnode{B}[1.5,2](-2,0)[\fillednodesfalse]
+\autonodetext{B}[s]{Document $B$}
+\roundnode{kInBAnchor}(-1.45,-.5)[\graphnodecolour{0}\graphnodesize{0.1}]
+\rectnode{AQuoteInB}[1.5,0.75](-2,-.5)[\graphnodecolour{0.5}]
+\rectnode{BQuote}[1.5,0.5](-2,-.5)[\graphnodecolour{0.85}]
+
+
+
+\rectnode{C}[1.5,2](2,0)[\fillednodesfalse]      
+\autonodetext{C}[n]{Document $C$}
+\rectnode{kInC}[1.5,1](2,0)[\graphnodecolour{.85}]
+\rectnode{BQuoteInC}[1.5,0.5](2,.125)[\graphnodecolour{0.85}]
+
+
+\rectnode{k}[1.5,1](6,0)[\graphnodecolour{.85}]      
+\autonodetext{k}[n]{Chunk $k$}
+
+
+\diredge{AQuote}{AQuoteInB}[\graphlinedash{4 4}\grapharrowtype{2}]
+\dirbow{kInAAnchor}{k}{0.17}[\grapharrowtype{1}]
+
+\diredge{BQuote}{BQuoteInC}[\graphlinedash{4 4}\grapharrowtype{2}]
+\dirbow{kInBAnchor}{k}{-0.17}[\grapharrowtype{1}]
+
+\diredge{kInC}{k}[\grapharrowtype{1}]
+
+
+\end{graph}
+
+\caption{An example reference chain.  Dotted arrows represent document pointers, and solid arrows represent chunk pointers.  Light gray regions represent text from chunk $k$.  Dark gray regions in $A$ and $B$ represent portions of $A$'s quote from $B$ that do not come from chunk $k$ (other chunks are omitted from this diagram for clarity).}
+\label{fig:referenceChain}
+
+\end{center}
+
+\end{figure*}
+
+
+
+
+
 Quote clipboards, like documents, contain a list of references.
 However, to support showing the context of a quote, the references are not to chunks, but to the context documents themselves.
 The chunks associated with a quote are only resolved when the quote is used as part of a new document.
 
-\subsubsection{Development}
-The entire \tw \  system is implemented as a single CGI script written in Perl, though the script is broken up into eight modules for organization purposes.
-Perl's built-in support for regular expressions was very useful for the rather complicated text processing done by \tw.
-Many of these text processing operations could be expressed in succinct and elegant ways using Perl.
-For example, highlighting possible misspellings in preview mode was a minor addition that required less than fifteen lines of code.
-
-CGI programming is well-supported in Perl, and HTML made user interface layout and user action processing easy to implement.
-Perl-based CGI programming seems to be the modern method of choice for rapidly developing complex, multi-user applications.
-Other systems that have used this development method successfully are discussed in Section \ref{sec:RelatedWork}.
-
-Even though the full development cycle was short, we used an iterative process.
-Features were added one at a time to the system, and the system was maintained in a usable form at all times.
-For example, we started with a system that managed text chunks, then added document management, then added quotes, then added tokens transfers, {\it etc.}
-Final iterations added features such as spell checking and index-based searching.
-From our understanding of previous xanalogical implementation efforts, this iterative process may have been key to our success.
-The Xanadu model is complex and subtle, and it is easy to get bogged down by details without ever producing a working system.
-Our system started out simple and grew in complexity, feature by feature.
 
 
 \subsubsection{Data Representation}
@@ -300,6 +354,26 @@ When a new chunk is created as part of a document, the context portion of the re
 Since documents and text chunks are static, full text searches can be implemented using an index that is updated in real time as documents are created.
 Each word in the index is associated with a list of documents containing that word.
 When a document is added to the system, it is appended to the end of the index list for each word that it contains.
+
+
+\subsubsection{Development}
+The entire \tw \  system is implemented as a single CGI script written in Perl, though the script is broken up into eight modules for organization purposes.
+Perl's built-in support for regular expressions was very useful for the rather complicated text processing done by \tw.
+Many of these text processing operations could be expressed in succinct and elegant ways using Perl.
+For example, highlighting possible misspellings in preview mode was a minor addition that required less than fifteen lines of code.
+
+CGI programming is well-supported in Perl, and HTML made user interface layout and user action processing easy to implement.
+Perl-based CGI programming seems to be the modern method of choice for rapidly developing complex, multi-user applications.
+Other systems that have used this development method successfully are discussed in Section \ref{sec:RelatedWork}.
+
+Even though the full development cycle was short, we used an iterative process.
+Features were added one at a time to the system, and the system was maintained in a usable form at all times.
+For example, we started with a system that managed text chunks, then added document management, then added quotes, then added tokens transfers, {\it etc.}
+Final iterations added features such as spell checking and index-based searching.
+From our understanding of previous xanalogical implementation efforts, this iterative process may have been key to our success.
+The Xanadu model is complex and subtle, and it is easy to get bogged down by details without ever producing a working system.
+Our system started out simple and grew in complexity, feature by feature.
+
 
 \subsubsection{Implementation Limitations}
 The main limitation of our implementation is the use of a filesystem as a data backend.
