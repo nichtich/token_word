@@ -83,7 +83,7 @@ Ironically, this decision was made just when the world was ripe for the first gl
 We are scared of Xanadu.  
 We hear its siren song and are tempted, but we know that many have tried and many have failed.  
 The most frustrating factor is that none of us really know how useful Xanadu would be, even if it {\it did} exist.  
-We can look at architecture drawings and pictures of cardboard mock-ups \cite{Nelson1999}, but these do not give us a true sense of what it would be like to use a xanalogical system.  
+We can look at architecture diagrams and photgraphs of cardboard mock-ups \cite{Nelson1999}, but these do not give us a true sense of what it would be like to use a xanalogical system.  
 Few of us have ever played with a xanalogical user interface prototype, even fewer have paid or received a true micropayment (xanalogical or otherwise), and almost none have transcluded the work of another or had our work transcluded.
 
 What is using a xanalogical system really like?
@@ -116,7 +116,7 @@ All of the design choices and complications in the Xanadu model can be seen as m
 When trying to implement unrestricted reuse in a way that works with copyright, we are faced with the following issue:  {\it copyright forbids unrestricted copying}.
 
 Xanadu's central mechanism is {\it transclusion}, a form of quotation.  
-Transclusion differs from quotation in that it does not involve copying of any kind.  
+Transclusion differs from standard quotation in that it does not involve copying of any kind.  
 When document $A$ transcludes a quote from document $B$, the quote is stored as a deep reference to the quoted material in $B$:  words from $B$ are not copied into $A$. 
 Whenver $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the necessary words from $B$ are fetched from $B$'s owner.
 Thus, even though $A$'s owner has quoted document $B$, the quoted owner still retains control over the distribution and licensing of his or her words.
@@ -126,16 +126,16 @@ Transclusion creates a serious problem, at least in combination with how we comm
 Electronic documents change constantly.
 If $B$ changes or is deleted, $A$'s quote can break.
 Xanadu's solution is to forbid document change but encourage document versioning.
-Thus, as $B$ changes, all previous versions are maintained, and $A$'s quote can point to the particular version that $A$'s owner quoted.
+Thus, as $B$ is updated, all previous versions are maintained, and $A$'s quote can point to the particular version that $A$'s owner quoted.
 A particular version of $B$ is immutable, so $A$'s quote will never break.
 
 The Xanadu model refines versioning further by describing an ever-growing, add-only, content space.  
 When a document is created, its text is added to this space.
-When a document quotes another document, it points not to the document itself, but to the quoted words in the content space.
+When a document transcludes from another document, it points not to the document itself, but to the transcluded words in the content space.
 Thus, a document in Xanadu is a list of pointers to regions in the content space---no text is contained in the documents themselves.
-Versioning with this mechanism is particularly space-efficient:  unchanged portions of a new document version can be quoted from the content space instead of being duplicated.
+Versioning with this mechanism is particularly space-efficient:  unchanged portions of a new document version can be transcluded from the content space instead of being duplicated.
 
-Along with complicating document maintenance, transclusion complicates the licensing of copyrighted material.
+Along with requiring a new model for document maintenance, transclusion pushes us toward a new model for licensing copyrighted material.
 We commonly think about licensing documents only in their entirety.
 For example, we may assign monetary value to a printed copy of a book, but we have difficulty imagining how much a chapter, page, or paragraph of that book is worth.
 In the Xanadu model, when users read a quote from document $B$ embedded in document $A$, they may only be accessing a small portion of $B$ (for example, a single sentence from a 10,000-word document).
@@ -151,7 +151,7 @@ Each user accumulates a ``library'' of acquired text regions over time and pays 
 
 When a document is accessed that contains quotes from multiple authors, the micropayments are divided and routed to the original authors on a per-character basis. 
 Though reading content requires payment, quoting is essentially free, since the content is not accessed during the act of quoting.
-In practice, an author will need to read a document before quoting it, but this reading requires the normal first-access payment, no matter how widely the new document is expected to be read.
+In practice, an author will need to read a document before quoting it, but this reading requires only the normal first-access payment, no matter how widely the new, quoting document is expected to be read.
 In fact, the more a document is quoted and read in quoted form, the more micropayments the original author will receive.
 Thus, authors benefit from the unrestricted quotation and reuse of their work:  they have no financial motivation for imposing any limits.
 
@@ -168,6 +168,7 @@ The central technologies that made \tw \  development possible were the web, CGI
 Our system, though full-featured, was not designed to be ``the'' scalable xanalogical system that will carry us all into the future.
 Instead, we focused on building a usable implemenation of xanalogical features for the purpose of experimentation.
 Though scalability was not a design goal, \tw \ was built on top of technolgies that have scaled well for other web-based projects \cite{Everything2, WikiWikiWeb, Wikipedia}.
+We claim that \tw \  could be scaled into a globally accessible system, albeit with minor code modifications and a sufficient hardware investment. 
 
 \subsection{User Perspective}
 In describing the \tw \ user experience, we are faced with the very issue that motivated \tw \ development in the first place:  descriptions in words and pictures do not give us a true sense of what it is like to {\it use} a system.
@@ -176,8 +177,8 @@ Since this paper's focus is on a real-world implementation and not just a paper 
 From the end-user's perspective, \tw \ has many sal\-ient features.
 Users access \tw \ with a web browser, and they must create accounts and log in to use the system.  
 The central elements of the system are documents, which can contain quotes of other documents.
-Quote markers can be hidden or displayed, and a quote can be followed to see the context from which it was taken.
-Each document also features a list of documents that quote it.
+Quote markers can be hidden or displayed, and quotes can be followed to see the context from which they were taken.
+Each document also features a list of documents that quote it, so references can be chased in both directions.
 The \tw \  document display interface can be seen in Figure \ref{fig:mainScreen}.
 
 % opera window size for figures:
@@ -254,12 +255,14 @@ However, to support showing the context of a quote, the references are not to ch
 The chunks associated with a quote are only resolved when the quote is used as part of a new document.
 
 \subsubsection{Development}
-The entire \tw \  system is implemented as a single CGI script written in Perl.
+The entire \tw \  system is implemented as a single CGI script written in Perl, though the script is broken up into eight modules for organization purposes.
 Perl's built-in support for regular expressions was very useful for the rather complicated text processing done by \tw.
 Many of these text processing operations could be expressed in succinct and elegant ways using Perl.
-For example, highlighting of possible misspellings in preview mode was a minor addition that required less than ten lines of code.
+For example, highlighting possible misspellings in preview mode was a minor addition that required less than ten lines of code.
 
-CGI programming is well-supported in Perl, and HTML may user interface layout and user action processing easy to implement.
+CGI programming is well-supported in Perl, and HTML made user interface layout and user action processing easy to implement.
+Perl-based CGI programming seems to be the modern method of choice for rapidly developing complex, multi-user applications.
+Other systems that have used this development method successfully are discussed in Section \ref{sec:RelatedWork}.
 
 \subsubsection{Data Representation}
 The system data is stored in a directory tree on the filesystem.
@@ -281,9 +284,9 @@ In this example, the reference included in $A$ might look like this:
 \end{center}
 Note that {\tt length} is not specified for the document context of a reference, since it would be redundant.
 
-Thus, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
+With this representation, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
 By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
-When a new chunk is created as part of a document, the context portion of the reference is ommited.
+When a new chunk is created as part of a document, the context portion of the reference is ommited, indicating that the document is the first context in which this chunk was used.
 
 Since documents and text chunks are static, full text searches can be implemented using an index that is updated in real time as documents are created.
 Each word in the index is associated with a list of documents containing that word.
@@ -307,7 +310,8 @@ The main limitation of our implementation is the use of a filesystem as a data b
 
 
 
-\section{Related work}
+\section{Related Work}
+\label{sec:RelatedWork}
 
 Wikis
 \cite{WikiWikiWeb}
