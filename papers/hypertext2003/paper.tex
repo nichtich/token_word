@@ -26,6 +26,8 @@
 %
 % 2003-April-1 Jason Rohrer
 % Fixed a typo.
+% Fixed mistakes pointed out by Nelson.  
+% Added comments for Nelson's suggestions.
 %
 
 
@@ -101,7 +103,8 @@ Xanadu system. \cite{AutodeskPress}
 
 In the same press release, Autodesk claimed 1987 sales figures topping \$79 million.  
 Indeed, Autodesk had extraordinary resources for its time.  
-In 1992, after four years of development and \$5 million spent \cite{AutodeskCost},  Autodesk ceased development of Xanadu \cite{AutodeskPressDrop}.  
+In 1992, after four years of development and \$5 million spent \cite{AutodeskCost},  Autodesk ceased development of Xanadu \cite{AutodeskPressDrop}.
+% Add reasons here?  Factional disputes, restarts with a fresh code base, etc.
 Ironically, this decision was made just when the world was ripe for the first global hypertext system \cite{BernersLee92}.
 
 We are scared of Xanadu.  
@@ -252,7 +255,7 @@ Once submitted, the work becomes a full-fledged \tokenWord \  document, making i
 
 
 Each user has a token balance, where one token is worth one character.
-The current exchange rate is 1,000,000 tokens for \$1, and PayPal is integrated for token deposits and withdrawls.
+The current exchange rate is 1,000,000 tokens for \$1, and PayPal is integrated for token deposits and withdrawals.
 When a reader views a document that contains as of yet unviewed text regions, tokens are transfered from the reader to the original authors of the regions.
 Users only pay for each piece of text once---repeat viewings of the same text, in any context, are free.
 \begin{figure}[t]
@@ -273,7 +276,7 @@ Full text searches are supported across the entire document space, and search te
 Search results (and other lists in \tokenWord) are sorted with most-quoted documents first, since frequently quoted documents are likely to contain the best information.
 This ranking mechanism is similar to Google's PageRank algorithm \cite{Brin1998}. 
 
-\tokenWord \  provides no explicit document linking mechanism.
+The \tokenWord \  system provides no explicit document linking mechanism.
 However, since quote context can be obtained easily, brief quotes can be used to emulate links between documents.
 For example, to link to a target document called ``frequently asked questions,'' the title words of the document can be quoted.
 When quote markers are shown in the linking document, the words ``frequently asked questions'' will be marked, and clicking on the words will lead to the context of the quote (in other words, to the target document ``frequently asked questions'').
@@ -561,7 +564,7 @@ With this approach, we could tailor the storage system to our specific needs, th
 All filesystem operations in \tokenWord \  are wrapped by a single module with only a handful of interface functions.
 By modifying the implementation of these module functions, either of the scalable backends mentioned above could be added to \tokenWord \  with no changes to the rest of the code. 
 
-We chose a filesystem backend, despite its scalability limitations, because of its simplicity.
+We chose a directory tree backend, despite its scalability limitations, because of its simplicity.
 This choice fits into our implementation philosophy, since the focus was on producing a working system and adding features iteratively.
 A scalable backend might be seen as a feature to be added in a future iteration.
 Our system, in its current form, is still functional in terms of its goal, which is to support exploration of a multi-user xanalogical system.
@@ -579,12 +582,12 @@ By handling real-world currency exclusively through PayPal, instead of through o
 However, PayPal's currency model does not support the microdollar resolution that we need, so we cannot rely on this service alone for transferring tokens between users.
 Even if PayPal did support high-resolution payments, it does not allow a third party to initiate transfers between account holders in a transparent and frictionless way (and for good reason, given the security issues).
 
-To deal with these issues, we built an internal token balance system and used PayPal integration only for deposits and withdrawls of real-world currency.
+To deal with these issues, we built an internal token balance system and used PayPal integration only for deposits and withdrawals of real-world currency.
 With this configuration, a deposit is by no means frictionless (logging in to PayPal is required), but after the deposit has been made, token payments are completely transparent as the user accesses \tokenWord \  documents.
 Similarly, withdrawing tokens in exchange for real-world currency is not frictionless: 
-PayPal does not support an automated payment mechanism, so withdrawl requests must be queued for manual processing by the \tokenWord \  system administrator.
+PayPal does not support an automated payment mechanism, so withdrawal requests must be queued for manual processing by the \tokenWord \  system administrator.
 Whereas deposits take effect immediately (using PayPal's ``Instant Payment Notification'' service), withdrawn token refunds are delayed by the response of the human administrator.
-From the administrator's point of view, the withdrawl queue can be used to increase security, since any suspicious activity can be investigated before real-world payments are made.  
+From the administrator's point of view, the withdrawal queue can be used to increase security, since any suspicious activity can be investigated before real-world payments are made.  
 
 In our live system, we chose an exchange rate of 1,000,000 tokens for \$1, though this parameter can be changed on a site-by-site basis.
 With this exchange rate, we tried to minimize the financial burden on readers while still assigning appreciable value to content.
@@ -598,9 +601,9 @@ Even the main page displayed after login is a first-class \tokenWord \  document
 One way of dealing with this adoption barrier would be to give each new user a small number of ``free'' tokens to start with (for example, at least enough tokens to read the main page).
 This solution would allow new users to try the system with no monetary investment, but it carries an enormous risk for the \tokenWord \  system administrators.
 A small group of users could create many fake accounts and then use each account to read a large dummy document owned by one user.
-This kind of scam could be used to consolidate the free starting tokens from many accounts into one account, and then a withdrawl could be made in exchange for a large amount of real-world currency.
+This kind of scam could be used to consolidate the free starting tokens from many accounts into one account, and then a withdrawal could be made in exchange for a large amount of real-world currency.
 Even if users are not trying to intentionally scam the system, doling out free tokens poses considerable risk.
-One user might write documents that are popular with new users (for example, a collection of how-to documents) and amass a large number of free tokens over time---the withdrawl of these tokens could financially devastate the \tokenWord \  administrators.
+One user might write documents that are popular with new users (for example, a collection of how-to documents) and amass a large number of free tokens over time---the withdrawal of these tokens could financially devastate the \tokenWord \  administrators.
 
 We have devised a risk-free mechanism that deals with the adoption barrier.  
 Our approach uses two token types.
@@ -658,6 +661,8 @@ A user that actively publishes popular content in \tokenWord \  could effectivel
 Much of the existing work on xanalogical systems was discussed in Sections \ref{sec:Introduction} and \ref{sec:Xanadu}, so we will focus on related non-xanalogical systems here.
 
 However, we should mention that interest in Xanadu has not waned in recent years, even though development work on Udanax, the last official (and most ambitious) Xanadu implementation effort, ceased in 1995 \cite{Udanax}.
+% Two code bases, Green which stopped in 1988, and Gold which stopped in 1995
+% Still worked on sporadically by enthusiasts.
 For example, Lukka and Fallenstein describe a system that uses ideas taken from Freenet for xanalogical content storage and retrieval \cite{FreenetXanadu}.
 As another example, recent work with XLink has focused on adding transclusion capabilities to the web \cite{Lowe2001}, but support is limited to embedding entire documents.
 XPointer can be used in conjunction with XLink to refer to document spans \cite{Vitali2002}, though nothing prevents these references from breaking when documents change.
@@ -732,7 +737,7 @@ We aimed to build a system that supported deep quotation, unbreakable references
 However, \textit{Literary Machines} is over 250 pages long, and it is chocked full of features that an ideal xanalogical system might have \cite{NelsonLiteraryMachines}.
 Perhaps previous Xanadu efforts aimed to support this entire feature set, and perhaps that is why they failed.
 
-\tokenWord \  is by no means an ideal xanalogical system, and many features are missing.
+The \tokenWord \  architecture is by no means an ideal xanalogical system, and many features are missing.
 However, it is still the first system to implement the core features of the Xanadu architecture.
 Though one would be hard-pressed to argue that the features included in \tokenWord \  are not crucial, three important features are missing.
 First, \tokenWord \  does not explicitly support document versioning.
