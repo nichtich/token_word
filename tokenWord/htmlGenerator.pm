@@ -468,7 +468,7 @@ sub generateQuoteListPage {
     print "<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>\n";
 
     if( scalar( @quotes ) > 0 ) {
-        print "<H1>Quotes:</H1>\n";
+        print "<H1>quotes:</H1>\n";
     
         print "<TABLE CELLPADDING=5 BORDER=1>\n";
         
