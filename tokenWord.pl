@@ -888,7 +888,8 @@ else {
 
             if( scalar( @quoteNumbersToDelete ) > 0 ) {
                 foreach my $quoteNumber ( @quoteNumbersToDelete ) {
-                    deleteQuote( $loggedInUser, $quoteNumber );
+                    tokenWord::quoteClipboard::deleteQuote( $loggedInUser, 
+                                                            $quoteNumber );
                 }
             }
 
