@@ -20,6 +20,7 @@ package tokenWord::userWorkspace;
 # Added support for trial tokens.
 # Added check for bad abstract quote.
 # Added stripping of HTML tags from documents.
+# Added document preview.
 #
 
 
@@ -171,6 +172,74 @@ sub submitAbstractDocument {
     
 
     return $newDocID;
+}
+
+
+
+##
+# Previews the rendered text of an abstract document (text and quote tags).
+#
+# @param0 the username.
+# @param1 the text of the abstract document.
+#
+# @return a preview of the rendered text.
+#
+# Example:
+# my $text = previewAbstractDocument( "jj55", "I am quoting here: <q 10>" );
+##
+sub previewAbstractDocument {
+    ( my $username, my $docText ) = @_;
+    
+    # replace < and > with @< and >@
+    $docText =~ s/</@</g;
+    $docText =~ s/>/>@/g;
+    
+        
+    my @docSections = split( /@/, $docText );
+
+
+    if( $docSections[0] eq "" ) {
+        # avoid blank first section if doc starts with a quote
+        shift( @docSections );
+    }
+
+    my @docTextElements = ();
+
+
+    foreach my $section ( @docSections ) {
+        if( $section =~ m/<\s*q\s*\d+\s*>/ ) {
+            # a quote
+            
+            #extract the quote number
+            $section =~ s/[<q>]//g;
+            $section =~ s/\s//g;
+
+            my $quoteNumber = $section;
+            
+            # untaint
+            ( $quoteNumber ) = ( $quoteNumber =~ /(\d+)/ );
+
+            my $quoteText = 
+                tokenWord::quoteClipboard::renderQuoteText( $username,  
+                                                            $quoteNumber );
+            
+            push( @docTextElements, $quoteText );
+        }
+        else {
+            # a new chunk
+
+            # strip out any lingering HTML brackets
+            $section =~ s/>//g;
+            $section =~ s/<//g;
+            
+            push( @docTextElements, $section );
+        }
+        
+    }
+
+    my $docRenderedText = join( "", @docTextElements ); 
+
+    return $docRenderedText;
 }
 
 

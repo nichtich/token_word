@@ -18,6 +18,7 @@ package tokenWord::htmlGenerator;
 # 2003-January-16   Jason Rohrer
 # Added support for trial balances.
 # Added a failed withdraw page.
+# Added document preview.
 #
 
 
@@ -285,14 +286,53 @@ sub generateFailedPurchasePage {
 # Generates a form for creating a document.
 #
 # @param0 the currently logged-in user.
+# @param1 1 to show a document preview, or 0 otherwise.
+# @param2 the preview rendered text for this document.
+# @param3 the abstract document representation to fill
+#   the creation text box with.
 ##
 sub generateCreateDocumentForm {
-    ( my $loggedInUser ) = @_;
+    ( my $loggedInUser,
+      my $showPreview, my $docTextPreview, 
+      my $abstractDocPrefill ) = @_;
 
     generateFullHeader( "create document" );
 
     my $formText = readFileValue( "$htmlDirectory/createDocumentForm.html" );
     
+    if( not $showPreview ) {
+
+        $formText =~ s/<!--#ABSTRACT_DOC_PREFILL-->//g;
+        
+    }
+    else {
+        my $previewBlockText = 
+            readFileValue( "$htmlDirectory/documentPreview.html" );
+        
+        my @docElements = split( /\n\n/, $docTextPreview );
+        
+        my $docTitlePreview = shift( @docElements );
+
+        $previewBlockText =~ s/<!--#DOC_TITLE-->/$docTitlePreview/g;
+        $previewBlockText =~ s/<!--#DOC_OWNER-->/$loggedInUser/g;
+
+        my @bodyTextElements = ();
+
+        foreach $paragraph ( @docElements ) {
+            push( @bodyTextElements, "$paragraph<BR><BR>\n" );
+        }
+    
+        my $bodyText = join( "", @bodyTextElements );
+
+        $previewBlockText =~ s/<!--#DOC_BODY-->/$bodyText/;
+
+        
+        # insert the preview block into the form
+        $formText =~ s/<!--#DOCUMENT_PREVIEW-->/$previewBlockText/;
+        
+        # fill in the text area
+        $formText =~ s/<!--#ABSTRACT_DOC_PREFILL-->/$abstractDocPrefill/;
+    }
     print $formText;
 
 

@@ -31,6 +31,7 @@
 # Added MD5 user session ID cookie with corresponding local file.
 # Added check for badly-formatted quote extraction.
 # Improved behavior on document creation.
+# Added document preview.
 #
 
 
@@ -319,52 +320,89 @@ else {
         if( $action eq "test" ) {
             print "test for user $loggedInUser\n";
         }
-        elsif( $action eq "createDocumentForm" ) {
+        elsif( $action eq "createDocumentForm" ) {            
             tokenWord::htmlGenerator::generateCreateDocumentForm( 
-                                                        $loggedInUser );
+                                                        $loggedInUser,
+                                                        0, "", "" );
         }
         elsif( $action eq "createDocument" ) {
+            my $buttonSubmit = $cgiQuery->param( "buttonSubmit" ) || '';
+            my $buttonPreview = $cgiQuery->param( "buttonPreview" ) || '';
             my $abstractDoc = $cgiQuery->param( "abstractDoc" ) || '';
             
             
-            # fix "other" newline style.
-            $abstractDoc =~ s/\r/\n/g;
+            if( $buttonPreview ne "" ) {
+                # preview mode
+                
+                # fix "other" newline style.
+                $abstractDoc =~ s/\r/\n/g;
             
             
-            # convert non-standard paragraph breaks (with extra whitespace)
-            # to newline-newline breaks
-            $abstractDoc =~ s/\s*\n\s*\n/\n\n/g;
-            
-            my $docID = 
-              tokenWord::userWorkspace::submitAbstractDocument(
-                       $loggedInUser, 
-                       $abstractDoc );
+                # convert non-standard paragraph breaks (with extra whitespace)
+                # to newline-newline breaks
+                $abstractDoc =~ s/\s*\n\s*\n/\n\n/g;
 
-            
-            # show the new document
-            
-            # still need to purchase it, just incase quoted material
-            # is not owned yet
-            ( my $success, my $amount ) =
-                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                            $loggedInUser,
-                                                            $docID );
-            if( $success ) {
-                my $text = 
-                    tokenWord::documentManager::renderDocumentText(
-                                                               $loggedInUser, 
-                                                               $docID );
-            
-                tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
-                                                           $loggedInUser,
-                                                           $docID, $text, 0 );
+                
+                # note that there is a potential payment hole here,
+                # since we don't force the user to pay for the quotes
+                # before we display them...
+                # However, these are the user's quotes, so they paid
+                # for them when extracting them...
+                # Don't worry about this unless it's a problem in practice.
+                my $docTextPreview = 
+                    tokenWord::userWorkspace::previewAbstractDocument( 
+                                                                $loggedInUser,
+                                                                $abstractDoc );
+
+                tokenWord::htmlGenerator::generateCreateDocumentForm( 
+                                                        $loggedInUser,
+                                                        1, 
+                                                        $docTextPreview, 
+                                                        $abstractDoc );
             }
             else {
-                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                # submit mode
+
+                # fix "other" newline style.
+                $abstractDoc =~ s/\r/\n/g;
+            
+            
+                # convert non-standard paragraph breaks (with extra whitespace)
+                # to newline-newline breaks
+                $abstractDoc =~ s/\s*\n\s*\n/\n\n/g;
+                
+                my $docID = 
+                    tokenWord::userWorkspace::submitAbstractDocument(
+                                                                $loggedInUser, 
+                                                                $abstractDoc );
+
+            
+                # show the new document
+            
+                # still need to purchase it, just incase quoted material
+                # is not owned yet
+                ( my $success, my $amount ) =
+                    tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                                $loggedInUser,
+                                                                $docID );
+                if( $success ) {
+                    my $text = 
+                        tokenWord::documentManager::renderDocumentText(
+                                                              $loggedInUser, 
+                                                              $docID );
+            
+                  tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                             $loggedInUser,
+                                                             $docID, 
+                                                             $text, 0 );
+                }
+                else {
+                  tokenWord::htmlGenerator::generateFailedPurchasePage(
                                                                $loggedInUser,
                                                                $loggedInUser,
                                                                $docID,
                                                                $amount );
+                }
             }
         }
         elsif( $action eq "showDocument" ) {
