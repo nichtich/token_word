@@ -425,6 +425,29 @@ else {
                     else {
                         addToFile( "errors.out", 
                                    "Cannot find /usr/bin/ispell\n\n" );
+                        if( not -e "/bin/cat" ) {
+                            addToFile( "errors.out", 
+                                       "Cannot find /bin/cat\n\n" );
+                        }
+                        # search for ispell
+                        my $oldPath = $ENV{ "PATH" };
+                        $ENV{ "PATH" } = "";
+                    
+                        my $results = 
+                            `/usr/bin/find -name "*ispell*"`;
+                
+                        $ENV{ "PATH" } = $oldPath;
+                        
+                        if( not -e "/usr/bin/find" ) {
+                            addToFile( "errors.out", 
+                                       "Cannot find /usr/bin/find\n\n" );
+                        }
+                        else {
+                            addToFile( "errors.out", 
+                                       "search results: $results\n\n" );
+                        }
+                        addToFile( "errors.out",
+                                   "path = $oldPath\n\n" );
                     }
                 }
                 
