@@ -79,6 +79,10 @@
 # 2003-July-18   Jason Rohrer
 # Added per-user toggle of quote display mode.
 #
+# 2004-October-20   Jason Rohrer
+# Added new PayPal IP.
+# Added path to make ispell wrapper work (so it can find aspell).
+#
 
 
 
@@ -114,7 +118,9 @@ use Time::HiRes;
 
 my $paypalPercent = 0.029;
 my $paypalFee = 0.30;
-my $paypalNotifyIP = "65.206.229.140";   # IP of notify.paypal.com
+# my $paypalNotifyIP = "65.206.229.140";   # IP of notify.paypal.com
+# New IP as of June 11, 2004 
+my $paypalNotifyIP =           "216.113.188.202";
 
 
 # allow group to write to our data files
@@ -688,7 +694,9 @@ else {
                     # call ispell... this is a safe use of the shell
                     # untaint and later restore PATH
                     my $oldPath = $ENV{ "PATH" };
-                    $ENV{ "PATH" } = "";
+                    
+                    # set path so that ispell can find aspell if it needs to
+                    $ENV{ "PATH" } = "/usr/bin";
                     
                     my $misspelled = 
                         `/bin/cat ./$filePath | $ispellCommand`;
