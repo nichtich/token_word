@@ -12,6 +12,10 @@ package tokenWord::common;
 # 2003-January-8   Jason Rohrer
 # Fixed an extra newline bug in readFileValue.
 #
+# 2003-January-17   Jason Rohrer
+# Moved data directory to a safer location (so tw directory does not
+# have to be world-writeable).
+#
 
 
 # define our exported variables and subroutines
@@ -32,7 +36,7 @@ sub BEGIN {
 
 
 
-$dataDirectory = "tokenWordData";
+$dataDirectory = "../../cgi-data/tokenWordData";
 $htmlDirectory = "htmlTemplates";
 
 
