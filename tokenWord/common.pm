@@ -241,7 +241,7 @@ sub writeFile {
     
     if( $useDB ) {
         tie my %db_hash, 
-            "DB_File", $dbFile, O_CREAT | O_RDWR | O_EXLOCK, 
+            "DB_File", $dbFile, O_CREAT | O_RDWR, # | O_EXLOCK, 
             0666, $DB_HASH;
         $db_hash{ $fileName } = $stringToPrint;
         untie %db_hash;
@@ -291,7 +291,7 @@ sub addToFile {
         
     if( $useDB ) {
         tie my %db_hash, 
-            "DB_File", $dbFile, O_CREAT | O_RDWR | O_EXLOCK, 
+            "DB_File", $dbFile, O_CREAT | O_RDWR, # | O_EXLOCK, 
             0666, $DB_HASH;
         my $oldValue = $db_hash{ $fileName };
         $db_hash{ $fileName } = "$oldValue$stringToPrint";
@@ -343,7 +343,7 @@ sub makeDirectory {
     
     if( $useDB ) {
         tie my %db_hash, 
-            "DB_File", $dbFile, O_CREAT | O_RDWR | O_EXLOCK, 
+            "DB_File", $dbFile, O_CREAT | O_RDWR, # | O_EXLOCK, 
             0666, $DB_HASH;
         # marker entry
         $db_hash{ $fileName } = "directory";
