@@ -22,6 +22,9 @@ package tokenWord::common;
 # Added function for populating database from a tarball.
 # Switched to gtar to support the O flag.
 #
+# 2003-June-1   Jason Rohrer
+# Added functions for deleting files.
+#
 
 
 
@@ -50,6 +53,8 @@ sub BEGIN {
                  bypass_writeFile
                  addToFile
                  bypass_addToFile
+                 deleteFile
+                 bypass_deleteFile
                  makeDirectory
                  bypass_makeDirectory
                  updateDatabaseFromDataTarball
@@ -330,6 +335,47 @@ sub bypass_addToFile {
     print FILE $stringToPrint;
         
     close FILE;
+}
+
+
+
+##
+# Deletes a file.
+#
+# @param0 the name of the file.
+#
+# Example:
+# deleteFile( "myFile.txt" );
+##
+sub deleteFile {
+    my $fileName = $_[0];
+    
+    if( $useDB ) {
+        tie my %db_hash, 
+            "DB_File", $dbFile, O_CREAT | O_RDWR, # | O_EXLOCK, 
+            0666, $DB_HASH;
+        delete( $db_hash{ $fileName } );
+        untie %db_hash;
+    }
+    else {
+        bypass_deleteFile( $fileName );
+    }
+}
+
+
+
+##
+# Deletes a file in the filesystem, bypassing any db.
+#
+# @param0 the name of the file.
+#
+# Example:
+# bypass_deleteFile( "myFile.txt" );
+##
+sub bypass_deleteFile {
+    my $fileName = $_[0];
+    
+    unlink( $fileName );
 }
 
 

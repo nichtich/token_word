@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -wT
+#!/usr/bin/perl -wT
 
 #!/usr/bin/perl -wT
 
@@ -68,6 +68,9 @@
 # Changed to use subroutine to make directories.
 # Added bypassed file access where appropriate.
 # Added function for populating database from a tarball.
+#
+# 2003-June-1   Jason Rohrer
+# Added functions for deleting files.
 #
 
 
@@ -614,7 +617,7 @@ else {
                     $ENV{ "PATH" } = $oldPath;
                     
                     # delete temp file
-                    unlink( $filePath );
+                    bypass_deleteFile( $filePath );
 
                     
                     @misspelledWords = split( /\s+/, $misspelled );
