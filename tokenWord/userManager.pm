@@ -20,6 +20,7 @@ package tokenWord::userManager;
 #
 # 2003-April-30   Jason Rohrer
 # Changed to use subroutine to check for file existence.
+# Changed to use subroutine to make directories.
 #
 
 
@@ -52,13 +53,13 @@ sub addUser {
     
     if( not doesFileExist( $userDirName ) ) {
    
-        mkdir( "$userDirName", oct( "0777" ) );
-        mkdir( "$userDirName/text", oct( "0777" ) );
-        mkdir( "$userDirName/text/chunks", oct( "0777" ) );
-        mkdir( "$userDirName/text/documents", oct( "0777" ) );
+        makeDirectory( "$userDirName", oct( "0777" ) );
+        makeDirectory( "$userDirName/text", oct( "0777" ) );
+        makeDirectory( "$userDirName/text/chunks", oct( "0777" ) );
+        makeDirectory( "$userDirName/text/documents", oct( "0777" ) );
         
-        mkdir( "$userDirName/purchasedRegions", oct( "0777" ) );
-        mkdir( "$userDirName/quoteClipboard", oct( "0777" ) );
+        makeDirectory( "$userDirName/purchasedRegions", oct( "0777" ) );
+        makeDirectory( "$userDirName/quoteClipboard", oct( "0777" ) );
 
         writeFile( "$userDirName/password", 
                    "$password" );

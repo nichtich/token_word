@@ -12,6 +12,7 @@ package tokenWord::indexSearch;
 #
 # 2003-April-30   Jason Rohrer
 # Changed to use subroutine to check for file existence.
+# Changed to use subroutine to make directories.
 #
 
 use tokenWord::common;
@@ -68,7 +69,7 @@ sub addToIndex {
             my $letterDirectory = "$indexDirectory/$firstLetter";
 
             if( not doesFileExist( "$letterDirectory" ) ) {
-                mkdir( "$letterDirectory", oct( "0777" ) );
+                makeDirectory( "$letterDirectory", oct( "0777" ) );
             }
             addToFile( "$letterDirectory/$word", "$docRegion\n" );
         }

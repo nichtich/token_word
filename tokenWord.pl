@@ -68,6 +68,7 @@
 #
 # 2003-April-30   Jason Rohrer
 # Changed to use subroutine to check for file existence.
+# Changed to use subroutine to make directories.
 #
 
 
@@ -1134,14 +1135,14 @@ sub showMainPage {
 sub setupDataDirectory {
     if( not -e "$dataDirectory" ) {
         
-        mkdir( "$dataDirectory", oct( "0777" ) );
-        mkdir( "$dataDirectory/users", oct( "0777" ) );
+        makeDirectory( "$dataDirectory", oct( "0777" ) );
+        makeDirectory( "$dataDirectory/users", oct( "0777" ) );
 
-        mkdir( "$dataDirectory/topDocuments", oct( "0777" ) );
+        makeDirectory( "$dataDirectory/topDocuments", oct( "0777" ) );
 
-        mkdir( "$dataDirectory/index", oct( "0777" ) );
-        mkdir( "$dataDirectory/temp", oct( "0777" ) );
-        mkdir( "$dataDirectory/accounting", oct( "0777" ) );
+        makeDirectory( "$dataDirectory/index", oct( "0777" ) );
+        makeDirectory( "$dataDirectory/temp", oct( "0777" ) );
+        makeDirectory( "$dataDirectory/accounting", oct( "0777" ) );
 
         writeFile( "$dataDirectory/topDocuments/mostQuoted", "" );
         writeFile( "$dataDirectory/topDocuments/mostRecent", "" );

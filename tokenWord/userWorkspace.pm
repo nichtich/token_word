@@ -28,6 +28,7 @@ package tokenWord::userWorkspace;
 #
 # 2003-April-30   Jason Rohrer
 # Changed to use subroutine to check for file existence.
+# Changed to use subroutine to make directories.
 #
 
 
@@ -495,7 +496,7 @@ sub purchaseDocument {
 
             if( not doesFileExist( "$purchasedDirName/$owner" ) ) {
                 # make purchased dir
-                mkdir( "$purchasedDirName/$owner", oct( "0777" ) );
+                makeDirectory( "$purchasedDirName/$owner", oct( "0777" ) );
             
                 writeFile( $purchasedChunkFile,
                            "$purchaseString\n" );
