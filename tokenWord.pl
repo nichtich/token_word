@@ -25,6 +25,9 @@
 # Added support for withdraw page.
 # Added support for paypal instant payment notification.
 #
+# 2003-January-16   Jason Rohrer
+# Added check for correct remote host address.
+#
 
 
 use lib '.';
@@ -45,6 +48,7 @@ use tokenWord::htmlGenerator;
 
 my $paypalPercent = 0.029;
 my $paypalFee = 0.30;
+my $paypalNotifyIP = "65.206.229.140";   # IP of notify.paypal.com
 
 
 # make sure data directories exist
@@ -81,6 +85,15 @@ my $paymentDate = $cgiQuery->param( "payment_date" ) || '';
 if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
     print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
 
+
+    # we encode the token_word username and num tokens deposited
+    # in paypal's custom field
+    ( my $user, my $numTokens ) = split( /\|/, $paypalCustom );
+    
+    ( $user ) = ( $user =~ /(\w+)/ );
+    ( $numTokens ) = ( $numTokens =~ /(\d+)/ );
+
+
     if( $loggedInUser ne "" ) {
         # cookie is here, so this request isn't coming from paypal
         
@@ -90,49 +103,56 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
     else {
         # no cookie, assume request is coming from paypal
 
-        # we encode the token_word username and num tokens deposited
-        # in paypal's custom field
-        ( my $user, my $numTokens ) = split( /\|/, $paypalCustom );
+        # make sure host address matches
+
+        my $remoteAddress = $cgiQuery->remote_host();
+
+        if( $remoteAddress eq $paypalNotifyIP ) {
+
+            my $correctEmail = tokenWord::userManager::getPaypalEmail( $user );
+
+            my $dollarsAfterFees = 
+                ( $paymentGross * ( 1 - $paypalPercent ) ) - $paypalFee;
+            # round down by one cent
+            $dollarsAfterFees = $dollarsAfterFees * 100;
+            $dollarsAfterFees = int( $dollarsAfterFees - 1 );
+            $dollarsAfterFees = $dollarsAfterFees / 100;
     
-        ( $user ) = ( $user =~ /(\w+)/ );
-        ( $numTokens ) = ( $numTokens =~ /(\d+)/ );
+            my $estimatedNumTokens = $dollarsAfterFees * 1000000;
 
-
-
-        my $correctEmail = tokenWord::userManager::getPaypalEmail( $user );
-
-        my $dollarsAfterFees = 
-            ( $paymentGross * ( 1 - $paypalPercent ) ) - $paypalFee;
-        # round down by one cent
-        $dollarsAfterFees = $dollarsAfterFees * 100;
-        $dollarsAfterFees = int( $dollarsAfterFees - 1 );
-        $dollarsAfterFees = $dollarsAfterFees / 100;
-    
-        my $estimatedNumTokens = $dollarsAfterFees * 1000000;
-
-        if( abs( $estimatedNumTokens - $numTokens ) > 10000 ) {
-            # discrepancy between payment and num tokens is more than $0.01
-            
-            # note mismatch
-            addToFile( "$dataDirectory/accounting/paymentNotifications", 
-                       "Payment mismatch:  $paymentDate  $user  ".
-                       "$payerEmail  $paymentGross  $numTokens\n" );
-        }
-        elsif( $correctEmail ne $payerEmail ) {
-            # note mismatch
-            addToFile( "$dataDirectory/accounting/paymentNotifications", 
-                       "Email mismatch:  $paymentDate  $user  ".
-                       "$payerEmail  $paymentGross  $numTokens\n" );
+            if( abs( $estimatedNumTokens - $numTokens ) > 10000 ) {
+                # discrepancy between payment and num tokens is more than $0.01
+                
+                # note mismatch
+                addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                           "Payment mismatch:  $paymentDate  $user  ".
+                           "$payerEmail  $paymentGross  $numTokens\n" );
+            }
+            elsif( $correctEmail ne $payerEmail ) {
+                # note mismatch
+                addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                           "Email mismatch:  $paymentDate  $user  ".
+                           "$payerEmail  $paymentGross  $numTokens\n" );
+            }
+            else {
+                # emails match and token count is close enough, deposit
+                tokenWord::userManager::depositTokens( $user, $numTokens );
+                
+                # note correct transaction
+                addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                           "Transaction complete:  $paymentDate  $user  ".
+                           "$payerEmail  $paymentGross  $numTokens\n" );
+            }
         }
         else {
-            # emails match and token count is close enough, deposit
-          tokenWord::userManager::depositTokens( $user, $numTokens );
-            
-            # note correct transaction
+            # remote host does not match what we expect from 
+            # paypal
+            # note this mismatch
             addToFile( "$dataDirectory/accounting/paymentNotifications", 
-                       "Transaction complete:  $paymentDate  $user  ".
+                       "Bad remote address ($remoteAddress):  ".
+                       "$paymentDate  $user  ".
                        "$payerEmail  $paymentGross  $numTokens\n" );
-        }
+        }            
     }
 }
 elsif( $action eq "createUserForm" ) {
