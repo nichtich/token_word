@@ -11,9 +11,8 @@ package tokenWord::chunkManager;
 use tokenWord::common;
 
 
-
 ##
-# Adds a user.
+# Adds a chunk.
 #
 # @param0 the username.
 # @param1 the chunk string.
@@ -25,11 +24,7 @@ sub addChunk {
     my $username = $_[0];
     my $chunkText = $_[1];
     
-    # use regexp to untaint username
-    my ( $safeUsername ) = 
-        ( $username =~ /(\w+)$/ );
-    
-    my $chunkDirName = "$dataDirectory/users/$safeUsername/text/chunks";
+    my $chunkDirName = "$dataDirectory/users/$username/text/chunks";
 
     my $nextID = readFileValue( "$chunkDirName/nextFreeID" );
 

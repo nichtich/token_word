@@ -15,6 +15,7 @@ use strict;
 
 use tokenWord::common;
 use tokenWord::chunkManager;
+use tokenWord::documentManager;
 use tokenWord::userManager;
 
 
@@ -34,6 +35,12 @@ my $region =
   tokenWord::chunkManager::getRegion( "jj55", 0, 10, 4 );
 print "Region = $region\n";
 
+tokenWord::documentManager::addDocument( "jj55", 
+                                         "<jj55, 0, 0, 5>\n<jj55, 0, 10, 4>" );
+
+$region = 
+  tokenWord::documentManager::getRegionText( "jj55", 0, 0, 9 );
+print "Region = $region\n";
 
 
 sub setupDataDirectory {
