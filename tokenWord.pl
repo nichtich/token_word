@@ -15,6 +15,10 @@
 # 2003-January-13   Jason Rohrer
 # Fixed behavior when main page document does not exist.
 #
+# 2003-January-14   Jason Rohrer
+# Fixed holes that would allow a user to read a document without purchasing
+# it first.
+#
 
 
 use lib '.';
@@ -131,8 +135,13 @@ elsif( $action eq "logout" ) {
                              -expires=>'now',
                              -cookie=>$cookie );
     
-    tokenWord::htmlGenerator::generateLoginForm( 
-                                     "$loggedInUser has logged out\n" );
+    if( $loggedInUser ne '' ) {
+        tokenWord::htmlGenerator::generateLoginForm( 
+                                      "$loggedInUser has logged out\n" );
+    }
+    else {
+        tokenWord::htmlGenerator::generateLoginForm( "" );
+    }
 }
 else {
     
@@ -283,6 +292,10 @@ else {
             ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
             ( $docID ) = ( $docID =~ /(\d+)/ );
 
+            #first, purchase the document
+            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                        $docOwner,
+                                                        $docID );
             my $text = 
                 tokenWord::documentManager::renderDocumentText( $docOwner, 
                                                                 $docID );
@@ -313,6 +326,15 @@ else {
             # convert non-standard paragraph breaks (with extra whitespace)
             # to newline-newline breaks
             $abstractQuote =~ s/\s*\n\s*\n/\n\n/g;
+            
+            # since abstract quote string contains entire document
+            # text, forcing user to purchase document when extracting
+            # quote makes sense
+
+            #first, purchase the document
+            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                        $docOwner,
+                                                        $docID );
 
 
             tokenWord::userWorkspace::extractAbstractQuote( $loggedInUser,
@@ -340,6 +362,10 @@ sub showMainPage {
     
     if( -e "$dataDirectory/users/jcr13/text/documents/0" ) {
 
+        #first, purchase the document
+        tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                    "jcr13",
+                                                    0 );
         my $text = 
           tokenWord::documentManager::renderDocumentText( "jcr13", 
                                                           0 );
