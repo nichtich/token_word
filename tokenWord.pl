@@ -60,6 +60,7 @@
 #
 # 2003-January-19   Jason Rohrer
 # Set up a local error log.  Changed to work with apnrecords.org server.
+# Changed to log user in immediately after account creation.
 #
 
 
@@ -241,18 +242,22 @@ elsif( $action eq "createUser" ) {
     ( $paypalEmail ) = ( $paypalEmail =~ /(\S+@\S+)/ );
 
     
-    print $cgiQuery->header( -type=>'text/html', -expires=>'now',
-                             -Cache_control=>'no-cache' );
-
+    
     if( $user eq '' ) {
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
         tokenWord::htmlGenerator::generateCreateUserForm( 
                         "invalid username" );
     }
     elsif( length( $password ) < 4 ) {
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                             -Cache_control=>'no-cache' );
         tokenWord::htmlGenerator::generateCreateUserForm( 
                         "password must be at least 4 characters long" );
     }
     elsif( not ( $paypalEmail =~ /\S+@\S+/ ) ) {
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                             -Cache_control=>'no-cache' );
         tokenWord::htmlGenerator::generateCreateUserForm( 
                         "invalid email address" );
     }
@@ -262,12 +267,42 @@ elsif( $action eq "createUser" ) {
                                            50000 );
     
         if( not $success ) {
+            print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                             -Cache_control=>'no-cache' );
             tokenWord::htmlGenerator::generateCreateUserForm( 
                                                  "username already exists" );
         }
         else {
-            tokenWord::htmlGenerator::generateLoginForm( 
-                                        "user $user created, please log in" );
+            # the user has been created... 
+            # set cookie and show the main page (same as code
+            # for user login)
+
+            my $userCookie = $cgiQuery->cookie( -name=>"loggedInUser",
+                                            -value=>"$user",
+                                            -expires=>'+1h' );
+        
+            # take the MD5 hash of the username, password, 
+            # and current system time 
+            my $md5 = new MD5;
+            $md5->add( $user, $password, time() ); 
+            my $newSessionID = $md5->hexdigest();
+            
+            my $sessionIDCookie = $cgiQuery->cookie( -name=>"sessionID",
+                                                     -value=>"$newSessionID",
+                                                     -expires=>'+1h' );
+        
+            print $cgiQuery->header( -type=>'text/html',
+                                     -expires=>'now',
+                                     -Cache_control=>'no-cache',
+                                     -cookie=>[ $userCookie, 
+                                                $sessionIDCookie ] );
+            $loggedInUser = $user;
+
+            # save the new session ID
+            writeFile( "$dataDirectory/users/$user/sessionID",
+                       $newSessionID );
+
+            showMainPage();
         }
     }
 }
