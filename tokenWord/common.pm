@@ -80,7 +80,7 @@ sub printFile {
 
     if( $useDB ) {
         tie my %db_hash, 
-            "DB_File", $dbFile, O_CREAT | O_RDONLY | O_SHLOCK, 
+            "DB_File", $dbFile, O_CREAT | O_RDONLY, # | O_SHLOCK, 
             0666, $DB_HASH;
         my $value = $db_hash{ $fileName };
         untie %db_hash;
@@ -132,7 +132,7 @@ sub readFileValue {
     
     if( $useDB ) {
         tie my %db_hash, 
-            "DB_File", $dbFile, O_CREAT | O_RDONLY | O_SHLOCK, 
+            "DB_File", $dbFile, O_CREAT | O_RDONLY, # | O_SHLOCK, 
             0666, $DB_HASH;
         my $value = $db_hash{ $fileName };
         untie %db_hash;
@@ -187,7 +187,7 @@ sub doesFileExist {
         
     if( $useDB ) {
         tie my %db_hash, 
-            "DB_File", $dbFile, O_CREAT | O_RDONLY | O_SHLOCK, 
+            "DB_File", $dbFile, O_CREAT | O_RDONLY, # | O_SHLOCK, 
             0666, $DB_HASH;
         my $exists = 0;
         if( $db_hash{ $fileName } ) {
