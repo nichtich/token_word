@@ -84,13 +84,13 @@
         <dia:point val="8,6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="7.95,5.95;33.09,11.25"/>
+        <dia:rectangle val="7.95,5.95;34.5444,11.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="8,6"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="25.04"/>
+        <dia:real val="26.4944"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="5.2"/>
@@ -124,6 +124,53 @@
       </dia:attribute>
       <dia:attribute name="attributes"/>
       <dia:attribute name="operations">
+        <dia:composite type="umloperation">
+          <dia:attribute name="name">
+            <dia:string>#addQuote#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#int#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="parameters">
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#user#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#string#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string/>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#region#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#list#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string/>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+          </dia:attribute>
+        </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
             <dia:string>#getQuoteCount#</dia:string>
@@ -206,7 +253,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#getQuoteText#</dia:string>
+            <dia:string>#renderQuoteText#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>#string#</dia:string>
@@ -241,53 +288,6 @@
               </dia:attribute>
               <dia:attribute name="type">
                 <dia:string>#int#</dia:string>
-              </dia:attribute>
-              <dia:attribute name="value">
-                <dia:string/>
-              </dia:attribute>
-              <dia:attribute name="kind">
-                <dia:enum val="0"/>
-              </dia:attribute>
-            </dia:composite>
-          </dia:attribute>
-        </dia:composite>
-        <dia:composite type="umloperation">
-          <dia:attribute name="name">
-            <dia:string>#addQuote#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="type">
-            <dia:string/>
-          </dia:attribute>
-          <dia:attribute name="visibility">
-            <dia:enum val="0"/>
-          </dia:attribute>
-          <dia:attribute name="abstract">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="class_scope">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="parameters">
-            <dia:composite type="umlparameter">
-              <dia:attribute name="name">
-                <dia:string>#user#</dia:string>
-              </dia:attribute>
-              <dia:attribute name="type">
-                <dia:string>#string#</dia:string>
-              </dia:attribute>
-              <dia:attribute name="value">
-                <dia:string/>
-              </dia:attribute>
-              <dia:attribute name="kind">
-                <dia:enum val="0"/>
-              </dia:attribute>
-            </dia:composite>
-            <dia:composite type="umlparameter">
-              <dia:attribute name="name">
-                <dia:string>#region#</dia:string>
-              </dia:attribute>
-              <dia:attribute name="type">
-                <dia:string>#list#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string/>
@@ -707,16 +707,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O5">
       <dia:attribute name="obj_pos">
-        <dia:point val="21.15,11.2"/>
+        <dia:point val="21.2472,11.2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="16.6156,11.2;21.2,15"/>
+        <dia:rectangle val="21.1972,11.2;33.8532,22"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="21.15,11.2"/>
-        <dia:point val="21.15,13"/>
-        <dia:point val="17.0656,13"/>
-        <dia:point val="17.0656,15"/>
+        <dia:point val="21.2472,11.2"/>
+        <dia:point val="21.2472,13"/>
+        <dia:point val="33.4032,13"/>
+        <dia:point val="33.4032,22"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -734,7 +734,7 @@
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O1" connection="6"/>
-        <dia:connection handle="1" to="O3" connection="1"/>
+        <dia:connection handle="1" to="O7" connection="2"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O6">
