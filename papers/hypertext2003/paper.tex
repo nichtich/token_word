@@ -187,7 +187,8 @@ The central technologies that made \tw \   development possible were the web, CG
 Our system, though full-featured, was not designed to be ``the'' scalable xanalogical system that will carry us all into the future.
 Instead, we focused on building a usable implementation of core xanalogical features for the purpose of experimentation.
 Though scalability was not a design goal, \tw \  was built on top of technologies that have scaled well for other web-based projects \cite{Everything2, WikiWikiWeb, Wikipedia}.
-Given these precedents, we believe that \tw \   could be scaled into a globally accessible system, albeit with minor code modifications and a sufficient hardware investment. 
+Given these precedents, our architecture could potentially be scalled to support large document collections.
+Section \ref{sec:Scalability} discusses these scalability issues in more detail.
 
 \subsection{User Perspective}
 In describing the \tw \  user experience, we are faced with the very issue that motivated \tw \  development in the first place:  descriptions in words and pictures do not give us a true sense of what it is like to \textit{use} a system.
@@ -210,11 +211,16 @@ The \tw \   document display interface can be seen in Figure \ref{fig:mainScreen
 \end{figure}  
 
 Quotes can be extracted from documents and saved to a user's quote clipboard for later reference or use.
+To extract a document region as a quote, the user inserts $<$\texttt{q}$>$ $<$$/$\texttt{q}$>$ tags around the desired region in a text area.
+This interaction mechanism is arguably more elegant and less error-prone than mouse-based selection highlighting, especially when extracting large regions that span several screens full of text.
 Figure \ref{fig:extractQuote} shows the interface for quote extraction. 
-Quote references on a clipboard can be followed to see a quote's context.
+Each quote is assigned a $<$\texttt{q N}$>$ tag to be used when inserting the quote into new documents---$<$\texttt{q 3}$>$ refers to the quote at index three on the clipboard.
+The use of these abreviated handles hides the complexity of references and document regions from the user.
+After extracting a quote, the user never needs to deal directly with the document region again, though the original context of a quote can be seen with a single click from the quote clipboard.
 The clipboard interface is shown in Figure \ref{fig:quoteClipboard}.
-When creating a new document, a user can enter new text along with references to quotes from his or her quote clipboard, as seen in Figure \ref{fig:docCreate}.
+When creating a new document, a user can enter new text along with handle tags for quotes from his or her quote clipboard, as seen in Figure \ref{fig:docCreate}.
 A preview mode shows the new document with all quote references expanded, as seen in Figure \ref{fig:docPreview}.
+
 
 \begin{figure}[t]
 \centering
@@ -226,9 +232,13 @@ A preview mode shows the new document with all quote references expanded, as see
 \begin{figure}[t]
 \centering
 \epsfig{file=images/quoteClipboard.eps, width=20pc}
-\caption{The quote clipboard interface.}
+\caption{The quote clipboard interface.  Each quote is associated with a $<$\texttt{q N}$>$ reference tag, where \texttt{N} is the quote's index on the clipboard.}
 \label{fig:quoteClipboard}
 \end{figure}
+
+Figures \ref{fig:extractQuote} through \ref{fig:docPreview} show a sequence of actions from a common usage scenareo:  extracting a quote, viewing the quote on the clipboard, creating a new document that uses the quote, and previewing the document.
+After correcting the spelling mistake highlithed in Figure \ref{fig:docPreview}, the final step would be to submit the document.
+Once submitted, the work becomes a full-fledged \tw \  document, making it readable and quotable by other users in the system.
 
 
 Each user has a token balance, where one token is worth one character.
@@ -255,12 +265,15 @@ This ranking mechanism is similar to Google's PageRank algorithm \cite{Brin1998}
 
 \tw \  provides no explicit document linking mechanism.
 However, since quote context can be obtained easily, brief quotes can be used to emulate links between documents.
+For example, to link to a target document called ``frequently asked questions,'' the title words of the document can be quoted.
+When quote markers are shown in the linking document, the words ``frequently asked questions'' will be marked, and clicking on the words will lead to the context of the quote (in other words, to the target document ``frequently asked questions'').
+If the title words are not appropriate for use as a link anchor, another more relevant phrase from the body of the target document can be quoted to form a link.
 For an example of quotes used as links, see Figure \ref{fig:quotesAsLinks}.
 
 \begin{figure}[t]
 \centering
 \epsfig{file=images/quotesAsLinks.eps, width=20pc}
-\caption{Brief portions of documents can be quoted to emulate links.}
+\caption{Brief portions of documents can be quoted to emulate links.  Here, the titles of two documents, ``frequently asked questions'' and ``\tw \  history,'' have been quoted.}
 \label{fig:quotesAsLinks}
 \end{figure}
 
@@ -278,13 +291,6 @@ If a document refers to a new text chunk that has not appeared in any previous d
 With this two-pointer model, we can distinguish ``original'' material in a document from quoted material.  % and support recursive reference chasing.
 By following references recursively for a nested quotation, the original author and document context of particular words can be obtained.
 %When following a quote reference, a chain of references may need to be chased before the original context of the text is found. 
-
-For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote of original material, residing in chunk $k$, from document $C$.  
-$A$'s reference will contain both a pointer to the text chunk $k$ and to the document context $B$.  
-$B$'s reference will point to both chunk $k$ and document $C$.  
-At the end of this reference chain, $C$'s reference will point only to $k$.
-Figure \ref{fig:referenceChain} shows a diagram of our model applied to this reference chain.
-
 
 
 \begin{figure*}[t]
@@ -368,6 +374,17 @@ Figure \ref{fig:referenceChain} shows a diagram of our model applied to this ref
 \end{center}
 
 \end{figure*}
+
+
+
+For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote of original material, residing in chunk $k$, from document $C$.  
+$A$'s reference will contain both a pointer to the text chunk $k$ and to the document context $B$.  
+$B$'s reference will point to both chunk $k$ and document $C$.  
+At the end of this reference chain, $C$'s reference will point only to $k$.
+Figure \ref{fig:referenceChain} shows a diagram of our model applied to this reference chain.
+
+
+
 
 
 
@@ -504,6 +521,7 @@ Our system started out simple and grew in complexity, feature by feature.
 
 
 \subsubsection{Scalability Limitations}
+\label{sec:Scalability}
 The main scalability limitation of our implementation is the use of a filesystem as a data backend.
 Each text chunk and document are stored in a separate file, and these data objects can be quite small.
 A chunk file will be as large as the text it contains, but a document file stores only references.
@@ -714,4 +732,5 @@ Thanks are due to Ted Nelson and Jim Whitehead for their contributions to intere
 
 \bibliographystyle{abbrv}
 \bibliography{paper}
+
 \end{document}

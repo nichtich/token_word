@@ -31,7 +31,6 @@ already developed a system that incorporates the majority of the Xanadu
 ideas. I certainly don't know of any that support transclusion and
 micropayments at the same time, though.
 
-GOT HERE
 
 * Section 3: "Given these
 precedents, we believe that token word could be scaled into
@@ -43,20 +42,27 @@ systems that didn't. I recommend softening this claim, since it isn't
 central, saying something like, "Thus the current architecture shows promise
 for scaling to large document collections."
 
+
 * Section 3.1 -- since you have the room, in the text add a description of
 the process of taking a quotation from a document (i.e., expanding a little
 bit on the caption of Figure 2)
+
 
 * Section 3.1 -- provide more detail on Figure 3 in the text. You might also
 want to provide some motivating text -- why is this the best possible
 interface for the quotations?
 
+
 * Since you have an implicit scenario in your figures 1-5, you might want to
 make this scenario explicit in the text.
+
 
 * You need to provide a little more detail on how quote contexts emulate
 links (last paragraph before 3.2). If I hadn't seen the system demo, I
 wouldn't have understood the text in this section.
+
+GOT HERE
+
 
 --- end of first batch of comments ---
 
