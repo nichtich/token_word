@@ -43,3 +43,17 @@ I am also quoting David's father, who said:
  
 
 
+Tuesday, January 8, 2003
+
+Format for user abstract quote extraction:
+
+plain text of document being quoted, including <q> and </q> tags.
+
+Example:
+
+Original document:
+This is a test document.
+
+Abstract quote extraction:
+This is <q>a test</q> document.
+
