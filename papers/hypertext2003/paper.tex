@@ -37,7 +37,10 @@ To our knowledge, \tw \ is the first xanalogical system implementation to includ
 Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \ was implented from scratch in nine days by one person.  
 We attribute this success to the maturity of modern technology and design techniques.  
 In particular, choosing Perl as the implementation language allowed the rather complex xanalogical text processing operations to be expressed in elegant ways.
-
+A live \tw \ system is running at
+\begin{center}
+http://hypertext.sf.net/token\_word
+\end{center}
 \end{abstract}
 
 \category{H.5.4}{Information Interfaces and Applications}{Hypertext/Hypermedia}[Architectures]
@@ -147,17 +150,125 @@ We can summarize the Xanadu model with the following feature list:  deep quotati
 
 
 \section{System Architecture}
-We built \tw, a full-featured xanalogical system, from scratch in only nine days.
+We designed and built \tw, a full-featured xanalogical system, from scratch in only nine days.
 To acheive this kind rapid development, we relied heavily on modern technology and design techniques.
 We do not view past Xanadu failures with disdain.
-We acknowledge that those early attempts were too far ahead of their time:  the technology of the day was simly not ready for Xanadu.
-The central technologies that made \tw \  development possible were the web, CGI, and Perl.
+We acknowledge that those early attempts were simply ahead of their time:  the technology of the day was not ready for Xanadu.
+The central technologies that made \tw \  development possible were the web, CGI, Perl, and PayPal \cite{paypal}.
 
 Our system, though full-featured, was not designed to be ``the'' scalable xanalogical system that will carry us all into the future.
 Instead, we focused on building a usable implemenation of xanalogical features for the purpose of experimentation.
-Though scalability was not a design goal, \tw \ was built on top of technolgies that have scaled well for other projects.
+Though scalability was not a design goal, \tw \ was built on top of technolgies that have scaled well for other web-based projects \cite{Everything2}.
+
+\subsection{User Perspective}
+From the end-user's perspective, \tw \ has several sal\-ient features.
+Users access \tw \ with a web browser, and they must create accounts and log in to use the system.  
+The central elements of the system are documents, which can contain quotes of other documents.
+Quote markers can be hidden or displayed, and a quote can be followed to see the context from which it was taken.
+Each document also features a list of documents that quote it.
+The \tw \  document display interface can be seen in Figure \ref{fig:mainScreen}.
+
+\begin{figure}[t]
+\label{fig:mainScreen}
+\centering
+\epsfig{file=images/mainScreen.eps, width=20pc}
+\caption{The document display interface.}
+\end{figure}  
+
+Quotes can be extracted from documents and saved to a user's quote clipboard for later reference or use.
+Quotes on a clipboard can be followed to see quote context.
+The clipboard interface is shown in Figure \ref{fig:quoteClipboard}.
+When creating a new document, a user can enter new text along with references to quotes from his or her quote clipboard, as seen in Figure \ref{fig:docCreate}.
+A preview mode shows the new document with all quote reference expanded, as seen in Figure \ref{fig:docPreview}.
+
+\begin{figure}[t]
+\label{fig:quoteClipboard}
+\centering
+\epsfig{file=images/quoteClipboard.eps, width=20pc}
+\caption{The quote clipboard interface.}
+\end{figure}
 
 
+Each user has a token balance, where one token is worth one character.
+The current exchange rate is 1,000,000 tokens for \$1, and Paypal is integrated for token deposits and withdrawls.
+Viewing a document that contains as of yet unviewed text transfers tokens from the reader to the authors of the unviewed text.
+Users only pay for each piece of text once---repeat viewings of the same text, in any context, are free.
+\begin{figure}[t]
+\label{fig:docCreate}
+\centering
+\epsfig{file=images/docCreate.eps, width=20pc}
+\caption{The document creation interface. Quote 1 from the clipboard is used.}
+\end{figure}
+
+\begin{figure}[t]
+\label{fig:docPreview}
+\centering
+\epsfig{file=images/docPreview.eps, width=20pc}
+\caption{The document preview interface.  Quotes are expanded, and possible spelling mistakes are highlighed.}
+\end{figure}
+
+Full text searches are supported across the entire document database, and search terms are highlighted when result documents are displayed.
+Search results (and other lists in \tw) are sorted with most-quoted documents first, since frequently quoted documents are likely to contain the best information. 
+
+\tw \ does provides no explicit linking mechanism.
+However, since quote context can be obtained easily, brief quotes can be used as links between documents.
+For an example of quotes used to link, see Figure \ref{fig:quotesAsLinks}.
+
+\begin{figure}[t]
+\label{fig:quotesAsLinks}
+\centering
+\epsfig{file=images/quotesAsLinks.eps, width=20pc}
+\caption{Brief portions of documents can be quoted to form links.}
+\end{figure}
+
+\subsection{Implementation Details}
+
+Keeping with the Xanadu model, \tw \ separates documents from the text they contain.
+There are two types of data objects in \tw:  documents and chunks.
+A chunk contains a raw block of contiguous text, while a document is a list of reference to text chunks.
+Some of the referenced chunks in a document may have been created at the same time as the document (for new text in the document), while others may be part of quotes taken from other documents.
+Quote clipboards, like documents, contain a list of references.
+However, to support showing the context of a quote, the references are not to chunks, but to the context documents themselves.
+The chunks associated with a quote are only resolved when the quote is used as part of a new document.
+
+\subsubsection{Development}
+The entire \tw \  system is implemented as a single CGI script written in Perl.
+Perl's built-in support for regular expressions was very useful for the rather complicated text processing done by \tw.
+Many of these text processing operations could be expressed in succinct and elegant ways using Perl.
+For example, highlighting of possible misspellings in preview mode was a minor addition that required less than ten lines of code.
+
+CGI programming is well-supported in Perl, and HTML may user interface layout and user action processing easy to implement.
+
+\subsubsection{Data Representation}
+The system data is stored in a directory tree on the filesystem.
+Each user has directory that stores that user's chunk files, document files, and quote clipboard files, along with a list of previously purchased chunk regions.
+To support two-way reference chasing, each document has a file that tracks the documents that quote it.
+
+References throughout the system are stored in the following form:
+\begin{center}
+{\tt <chunkUserID, chunkID, startOffset, length;\\ 
+docUserID, docID, startOffset>} 
+\end{center}
+The portion of the reference befor the ``;'' describes the text chunk of the reference.  
+The second portion, which is optional, describes the quote context of the reference.  
+Note that {\tt chunkUserID} may differ from {\tt docUserID}, since the quote context may be part of a quote in another document.
+For example, document $A$ may quote from document $B$, but the portion that $A$ quotes may be part of $B$'s quote from document $C$.
+In this example, the reference included in $A$ might look like this:
+\begin{center}
+{\tt <userC, C, 105, 38; userB, B, 421>} 
+\end{center}
+Note that {\tt length} is not specified for the document context of a reference, since it would be redundant.
+
+Thus, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
+By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
+When a new chunk is created as part of a document, the context portion of the reference is ommited.
+
+Since documents and text chunks are static, full text searches can be implemented using an index that is updated in real time as documents are created.
+Each word in the index is associated with a list of documents containing that word.
+When a document is added to the system, it is appended to the end of the index list for each word that it contains.
+
+\subsubsection{Implementation Limitations}
+The main limitation of our implementation is the use of a filesystem as a data backend.
 
 
 \subsection{Xanalogical Improvements}
@@ -165,10 +276,6 @@ Though scalability was not a design goal, \tw \ was built on top of technolgies 
 
 \subsection{Missing Features}
 
-
-
-
-\section{Implementation}
 
 
 \section{Micropayment Issues}
