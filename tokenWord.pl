@@ -35,6 +35,8 @@
 # Added checks for document existence.
 # Added a feedback form.
 # Added support for document highlights.
+# Added support for adding created documents to index.
+# Added limited support for searching.
 #
 
 
@@ -50,6 +52,7 @@ use tokenWord::documentManager;
 use tokenWord::userManager;
 use tokenWord::quoteClipboard;
 use tokenWord::userWorkspace;
+use tokenWord::indexSearch;
 
 use tokenWord::htmlGenerator;
 
@@ -389,8 +392,15 @@ else {
                     tokenWord::userWorkspace::submitAbstractDocument(
                                                                 $loggedInUser, 
                                                                 $abstractDoc );
+                my $text = 
+                        tokenWord::documentManager::renderDocumentText(
+                                                              $loggedInUser, 
+                                                              $docID );
+                # add to index
+                tokenWord::indexSearch::addToIndex( $loggedInUser,
+                                                    $docID,
+                                                    $text );
 
-            
                 # show the new document
             
                 # still need to purchase it, just incase quoted material
@@ -400,18 +410,13 @@ else {
                                                                 $loggedInUser,
                                                                 $docID );
                 if( $success ) {
-                    my $text = 
-                        tokenWord::documentManager::renderDocumentText(
-                                                              $loggedInUser, 
-                                                              $docID );
-            
-                  tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
-                                                             $loggedInUser,
-                                                             $docID, 
-                                                             $text, 0 );
+                    tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                               $loggedInUser,
+                                                               $docID, 
+                                                               $text, 0 );
                 }
                 else {
-                  tokenWord::htmlGenerator::generateFailedPurchasePage(
+                    tokenWord::htmlGenerator::generateFailedPurchasePage(
                                                                $loggedInUser,
                                                                $loggedInUser,
                                                                $docID,
@@ -704,6 +709,16 @@ else {
                                                  "document does not exist" );
             }
         }
+        elsif( $action eq "search" ) {
+            my $searchTermString = $cgiQuery->param( "terms" ) || '';
+            
+            my @terms = split( /\s+/, $searchTermString );
+            print "terms = @terms\n<BR>";
+            my @matchingDocs = tokenWord::indexSearch::searchIndex( 20,
+                                                                    @terms );
+            
+            print "matching docs = @matchingDocs\n";
+        }
         elsif( $action eq "deposit" ) {
         
             my $tokenCount = $cgiQuery->param( "tokenCount" ) || '';
@@ -814,7 +829,7 @@ sub showMainPage {
         
         tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
                                                    "jcr13",
-                                                   0, $text );
+                                                   0, $text, 0 );
     }
     else {
         tokenWord::htmlGenerator::generateMainPage( $loggedInUser );
@@ -830,6 +845,8 @@ sub setupDataDirectory {
         mkdir( "$dataDirectory/users", oct( "0777" ) );
 
         mkdir( "$dataDirectory/topDocuments", oct( "0777" ) );
+
+        mkdir( "$dataDirectory/index", oct( "0777" ) );
         
         writeFile( "$dataDirectory/topDocuments/mostQuoted", "" );
         writeFile( "$dataDirectory/topDocuments/mostRecent", "" );
