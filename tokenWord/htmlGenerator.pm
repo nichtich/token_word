@@ -15,6 +15,10 @@ package tokenWord::htmlGenerator;
 # Added support for withdraw page.
 # Added support for paypal instant payment notification.
 #
+# 2003-January-16   Jason Rohrer
+# Added support for trial balances.
+# Added a failed withdraw page.
+#
 
 
 use tokenWord::common;
@@ -81,12 +85,16 @@ sub generateFullFooter {
     generateFooter();
 
     my $balance = tokenWord::userManager::getBalance( $loggedInUser );
+    my $trialBalance = 
+      tokenWord::userManager::getTrialBalance( $loggedInUser );
 
+    
     
     my $footerText = readFileValue( "$htmlDirectory/fullFooter.html" );
     
     $footerText =~ s/<!--#USER-->/$loggedInUser/;
     $footerText =~ s/<!--#TOKEN_BALANCE-->/$balance/;
+    $footerText =~ s/<!--#TRIAL_TOKEN_BALANCE-->/$trialBalance/;
 
     # generate most quoted list
     my @mostQuoted = tokenWord::documentManager::getMostQuotedDocuments();
@@ -623,6 +631,27 @@ sub generateWithdrawConfirmPage {
 
     generateFullFooter( $loggedInUser );
 
+}
+
+
+
+
+##
+# Generates a failed withdraw page.
+#
+# @param0 the currently logged-in user.
+##
+sub generateFailedWithdrawPage {
+    ( my $loggedInUser ) = @_;
+    
+    generateFullHeader( "withdrawl failed" );
+
+    my $pageText = readFileValue( "$htmlDirectory/failedWithdraw.html" );
+
+    print $pageText;
+
+
+    generateFullFooter( $loggedInUser );
 }
 
 

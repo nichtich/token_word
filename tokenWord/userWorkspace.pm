@@ -16,6 +16,9 @@ package tokenWord::userWorkspace;
 # 2003-January-13   Jason Rohrer
 # Fixed behavior when a purchase fails.
 #
+# 2003-January-16   Jason Rohrer
+# Added support for trial tokens.
+#
 
 
 use tokenWord::common;
@@ -346,21 +349,31 @@ sub purchaseDocument {
     # now we know how much this document will cost for the purchaser
     
     # withdraw the tokens all in one go
-    my $withdrawSuccess = 
-        tokenWord::userManager::withdrawTokens( $purchasingUser, 
-                                                $netPaymentNeeded );
+    ( my $withdrawSuccess, my $trialTokensUsed, my $realTokensUsed ) = 
+        tokenWord::userManager::withdrawBothTokens( $purchasingUser, 
+                                                    $netPaymentNeeded );
     
     if( not $withdrawSuccess ) {
         return ( 0, $netPaymentNeeded );
     }
     else {
-        # withdraw happened, so deposit among chunk owners
+        # redeposit first, so we can use transfer
+        tokenWord::userManager::depositTokens( $purchasingUser,
+                                               $realTokensUsed );
+        tokenWord::userManager::depositTrialTokens( $purchasingUser,
+                                                    $trialTokensUsed );
+
+
+        # withdraw happened, so transfer among chunk owners
+        # (note that this is a bit unfair, since later chunk owners
+        #  are more likely to get "real" tokens...)
         foreach $transfer ( @neededTransfers ) {
             my @transferElements = split( /\|/, $transfer );
             my $owner = $transferElements[1];
             my $chunkID = $transferElements[2];
             my $amount = $transferElements[3];
-            tokenWord::userManager::depositTokens( $owner, $amount );
+            tokenWord::userManager::transferTokens( $purchasingUser,
+                                                    $owner, $amount );
 
             # now add to purchased directory
             my $purchasedChunkFile = "$purchasedDirName/$owner/$chunkID";

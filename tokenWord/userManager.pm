@@ -15,6 +15,9 @@ package tokenWord::userManager;
 # 2003-January-13   Jason Rohrer
 # Fixed withdraw function.
 #
+# 2003-January-16   Jason Rohrer
+# Added support for trial balances.
+#
 
 
 use tokenWord::common;
@@ -27,7 +30,8 @@ use tokenWord::common;
 # @param0 the username.
 # @param1 the user's password.
 # @param2 the user's paypal email.
-# @param3 the user's starting token balance.
+# @param3 the user's starting token balance, deposited into the
+#   user's trail balance.
 #
 # @return 1 if user created successfully, or 0 otherwise
 #    (for example, 0 is returned if the user already exists).
@@ -56,7 +60,11 @@ sub addUser {
         writeFile( "$userDirName/password", 
                    "$password" );
     
+        # user starts out with 0 "real" tokens
         writeFile( "$userDirName/balance", 
+                   "0" );
+
+        writeFile( "$userDirName/trialBalance", 
                    "$startBalance" );
 
         writeFile( "$userDirName/paypalEmail", 
@@ -113,6 +121,7 @@ sub checkLogin {
 
 ##
 # Transfers tokens between users.
+# Uses payer's trial tokens as much as possible.
 #
 # @param0 the source user.
 # @param1 the destination user.
@@ -125,22 +134,25 @@ sub checkLogin {
 ##
 sub transferTokens {
     ( my $srcUser, my $destUser, my $number ) = @_;
-    
-    my $withdrawSuccess = withdrawTokens( $srcUser, $number );
+        
+    ( my $sucess, my $usedTrial, my $usedReal ) =
+        withdrawBothTokens( $srcUser, $number );
 
-    if( not $withdrawSuccess ) {
-        return 0;
-    }
-    else {
-        depositTokens( $destUser, $number );
+    if( $sucess ) {
+        depositTokens( $destUser, $usedReal );
+        depositTrialTokens( $destUser, $usedTrial );
         return 1;
     }
+    else {
+        return 0;
+    }
+
 }
 
 
 
 ##
-# Adds tokens to a user's balance.
+# Adds tokens to a user's "real" balance.
 #
 # @param0 the user.
 # @param1 the number of tokens to add.
@@ -163,7 +175,7 @@ sub depositTokens {
 
 
 ##
-# Removes tokens from a user's balance.
+# Removes tokens from a user's "real" balance.
 #
 # @param0 the user.
 # @param1 the number of tokens to remove.
@@ -192,8 +204,110 @@ sub withdrawTokens {
 
 
 
+
 ##
-# Gets a user's token balance.
+# Adds tokens to a user's trial balance.
+#
+# @param0 the user.
+# @param1 the number of tokens to add.
+#
+# Example:
+# depositTrialTokens( "jb65", 1544 );
+##
+sub depositTrialTokens {
+    ( my $user, my $number ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $balance = readFileValue( "$userDirName/trialBalance" );
+
+    $balance += $number;
+
+    writeFile( "$userDirName/trialBalance", $balance );
+}
+
+
+
+##
+# Removes tokens from a user's trial balance.
+#
+# @param0 the user.
+# @param1 the number of tokens to remove.
+#
+# Example:
+# my $success = withdrawTrialTokens( "jb65", 1544 );
+##
+sub withdrawTrialTokens {
+    ( my $user, my $number ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $balance = readFileValue( "$userDirName/trialBalance" );
+
+    if( $balance >= $number ) {
+        $balance -= $number;
+        
+        writeFile( "$userDirName/trialBalance", $balance );
+
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+
+
+##
+# Removes tokens from a user's trial balance and real balance as
+# necessary to fill the withdrawl request, favoring the trial balance.
+#
+# @param0 the user.
+# @param1 the number of tokens to remove.
+#
+# Example:
+# ( my $success, my $trialWithdraw, my $realWithdraw ) 
+#     = withdrawTrialTokens( "jb65", 1544 );
+##
+sub withdrawBothTokens {
+    ( my $user, my $number ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $trialBalance = readFileValue( "$userDirName/trialBalance" );
+    my $realBalance = readFileValue( "$userDirName/balance" );
+
+    if( $trialBalance >= $number ) {
+        $trialBalance -= $number;
+        
+        writeFile( "$userDirName/trialBalance", $trialBalance );
+
+        return ( 1, $number, 0 );
+    }
+    elsif( $trialBalance + $realBalance >= $number ) {
+        my $usedTrialTokens = $trialBalance;
+        my $usedRealTokens = $number - $trialBalance;
+
+        $trialBalance -= $usedTrialTokens;
+        $realBalance -= $usedRealTokens;
+        
+        writeFile( "$userDirName/trialBalance", $trialBalance );
+        writeFile( "$userDirName/balance", $realBalance );
+
+        
+
+        return ( 1, $usedTrialTokens, $usedRealTokens );
+    }
+    else {
+        # not enough, combined
+        return ( 0, 0, 0 );
+    }
+}
+
+
+
+##
+# Gets a user's "real" token balance.
 #
 # @param0 the user.
 #
@@ -206,6 +320,26 @@ sub getBalance {
     my $userDirName = "$dataDirectory/users/$user";
     
     my $balance = readFileValue( "$userDirName/balance" );
+
+    return $balance;
+}
+
+
+
+##
+# Gets a user's trial token balance.
+#
+# @param0 the user.
+#
+# Example:
+# my $balance = getTrialBalance( "jb65" );
+##
+sub getTrialBalance {
+    ( my $user ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $balance = readFileValue( "$userDirName/trialBalance" );
 
     return $balance;
 }

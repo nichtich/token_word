@@ -27,6 +27,7 @@
 #
 # 2003-January-16   Jason Rohrer
 # Added check for correct remote host address.
+# Added a failed withdraw page.
 #
 
 
@@ -535,8 +536,9 @@ else {
                 showMainPage();
             }
             else {
-                print "you do not have enough tokens for this withdrawl";
-            }
+                tokenWord::htmlGenerator::generateFailedWithdrawPage(
+                                                              $loggedInUser );
+              }
         }
         else {
             # show main page
