@@ -34,9 +34,13 @@ sub generateFooter {
 
 
 sub generateLoginForm {
+    ( my $message ) = @_;
+ 
     generateHeader( "login" );
 
     my $formText = readFileValue( "$htmlDirectory/loginForm.html" );
+
+    $formText =~ s/<!--#MESSAGE-->/$message/;
     
     print $formText;
 
@@ -44,6 +48,53 @@ sub generateLoginForm {
     generateFooter();
 }
 
+
+
+sub generateCreateUserForm {
+    ( my $message ) = @_;
+ 
+    generateHeader( "create new user" );
+
+    my $formText = readFileValue( "$htmlDirectory/createUserForm.html" );
+
+    $formText =~ s/<!--#MESSAGE-->/$message/;
+    
+    print $formText;
+
+
+    generateFooter();
+}
+
+
+
+sub generateMainPage {
+    ( my $user ) = @_;
+ 
+    generateHeader( "main page" );
+
+    my $pageText = readFileValue( "$htmlDirectory/mainPage.html" );
+
+    $pageText =~ s/<!--#USER-->/$user/;
+    
+    print $pageText;
+
+
+    generateFooter();
+}
+
+
+
+sub generateCreateDocumentForm {
+    
+    generateHeader( "create document" );
+
+    my $formText = readFileValue( "$htmlDirectory/createDocumentForm.html" );
+    
+    print $formText;
+
+
+    generateFooter();
+}
 
 
 sub generateDocPage {

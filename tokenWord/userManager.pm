@@ -62,13 +62,42 @@ sub addUser {
 
         writeFile( "$userDirName/quoteClipboard/nextFreeID",
                    "0" );
-
-        print "userAdded\n";
         
         return 1;
     }
     else {
         return 0;
+    }
+}
+
+
+
+##
+# Checks a user login and password.
+#
+# @param0 the username.
+# @param1 the password.
+#
+# @return 1 if the login and password are correct, 0 otherwise.
+##
+sub checkLogin {
+    ( my $user, my $pass ) = @_;
+    
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    if( not -e $userDirName ) {
+        # user doesn't exist 
+        return 0;
+    }
+    else {
+        my $truePass = readFileValue( "$userDirName/password" );
+        
+        if( $truePass eq $pass ) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
 }
 

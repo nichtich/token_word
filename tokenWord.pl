@@ -38,49 +38,144 @@ setupDataDirectory();
 my $cgiQuery = CGI->new();
 my $action = $cgiQuery->param( "action" ) || '';
 
-my %userCookie = $cgiQuery->cookie( "loggedInUser" ) ;
 
-my $loggedInUser = $userCookie{ value } || ''; 
+# get the cookie, if it exists
+my $userCookie = $cgiQuery->cookie( "loggedInUser" ) ;
 
+my $loggedInUser;
 
-my $setCookie = 0;
-my $cookie;
-
-
-if( $action eq "login" ) {
-    my $user = $cgiQuery->param( "user" ) || '';
-    my $password = $cgiQuery->param( "password" ) || '';
-    
-
-    $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
-                              -value=>"$user",
-                              -expires=>'+1h' );
-    $setCookie = 1;
+if( $userCookie ) {
+    $loggedInUser = $userCookie;
+    ( $loggedInUser ) = ( $loggedInUser =~ /(\w+)/ );
+}
+else {
+    $loggedInUser = '';
 }
 
-if( $setCookie ) {
+
+
+if( $action eq "createUserForm" ) {
+    print $cgiQuery->header( -type=>'text/html' );
+    tokenWord::htmlGenerator::generateCreateUserForm( "" );
+}
+elsif( $action eq "createUser" ) {
+    my $user = $cgiQuery->param( "user" ) || '';
+    my $password = $cgiQuery->param( "password" ) || '';
+
+    #untaint
+    ( $user ) = ( $user =~ /(\w+)/ );
+    ( $password ) = ( $password =~ /(\w+)/ );
+
+
+    if( $user eq '' or length( $password ) < 4 ) {
+        print $cgiQuery->header( -type=>'text/html' );
+        tokenWord::htmlGenerator::generateCreateUserForm( 
+                        "password must be at least 4 characters long" );
+    }
+    else {
+        my $success = 
+          tokenWord::userManager::addUser( $user, $password, 10000 );
+    
+        if( not $success ) {
+            print $cgiQuery->header( -type=>'text/html' );
+            tokenWord::htmlGenerator::generateCreateUserForm( 
+                                                 "username already exists" );
+        }
+        else {
+            print $cgiQuery->header( -type=>'text/html' );
+            tokenWord::htmlGenerator::generateLoginForm( 
+                                        "user $user created, please log in" );
+        }
+    }
+}
+elsif( $action eq "loginForm" ) {
+    print $cgiQuery->header( -type=>'text/html' );
+    tokenWord::htmlGenerator::generateLoginForm( "" );
+}
+elsif( $action eq "login" ) {
+    my $user = $cgiQuery->param( "user" ) || '';
+    my $password = $cgiQuery->param( "password" ) || '';
+
+    #untaint
+    ( $user ) = ( $user =~ /(\w+)/ );
+    ( $password ) = ( $password =~ /(\w+)/ );
+    
+    
+    my $correct = tokenWord::userManager::checkLogin( $user, $password );
+
+    if( not $correct ) {
+        print $cgiQuery->header( -type=>'text/html' );
+        tokenWord::htmlGenerator::generateLoginForm( "login failed" );
+    }
+    else {
+        my $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
+                                        -value=>"$user",
+                                        -expires=>'+1h' );
+        
+        print $cgiQuery->header( -type=>'text/html',
+                                 -cookie=>$cookie );
+        
+        tokenWord::htmlGenerator::generateMainPage( "$user" );
+    }
+}
+elsif( $action eq "logout" ) {
+    my $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
+                                        -value=>"" );
+    
     print $cgiQuery->header( -type=>'text/html',
                              -cookie=>$cookie );
+    
+    tokenWord::htmlGenerator::generateLoginForm( 
+                                     "$loggedInUser has logged out\n" );
 }
 else {
     print $cgiQuery->header( -type=>'text/html' );
-}
+    
 
 
-if( $loggedInUser eq '' ) {
-    tokenWord::htmlGenerator::generateLoginForm();
-}
-else {
+    if( $loggedInUser eq '' ) {
+      tokenWord::htmlGenerator::generateLoginForm( "" );
+    }
+    else {
+        if( $action eq "test" ) {
+            print "test for user $loggedInUser\n";
+        }
+        elsif( $action eq "createDocumentForm" ) {
+            tokenWord::htmlGenerator::generateCreateDocumentForm();
+        }
+        elsif( $action eq "createDocument" ) {
+            my $abstractDoc = $cgiQuery->param( "abstractDoc" ) || '';
 
-    if( $action eq "showDocument" ) {
+            my $docID = 
+              tokenWord::userWorkspace::submitAbstractDocument(
+                       $loggedInUser, 
+                       $abstractDoc );
+
+            print "<BR>doc ID is $docID";
+            tokenWord::htmlGenerator::generateMainPage( $loggedInUser );
+        }
+        elsif( $action eq "showDocument" ) {
         
-        my $docOwner = $cgiQuery->param( "docOwner" ) || '';
-        my $docID = $cgiQuery->param( "docID" ) || '';
-    
-        my $text = 
-          tokenWord::documentManager::renderDocumentText( $docOwner, $docID );
-    
-      tokenWord::htmlGenerator::generateDocPage( $text );
+            my $docOwner = $cgiQuery->param( "docOwner" ) || '';
+            
+            # might equal 0
+            my $docID = $cgiQuery->param( "docID" );
+            
+
+            #untaint
+            ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
+            ( $docID ) = ( $docID =~ /(\d+)/ );
+
+            my $text = 
+                tokenWord::documentManager::renderDocumentText( $docOwner, 
+                                                                $docID );
+            # print "owner = $docOwner, ID= $docID";    
+            tokenWord::htmlGenerator::generateDocPage( $text );
+        
+        }
+        else {
+            tokenWord::htmlGenerator::generateMainPage( $loggedInUser );
+        }
     }
 }
 
