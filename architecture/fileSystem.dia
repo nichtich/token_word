@@ -61,13 +61,13 @@
         <dia:point val="23,5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="22.95,4.95;29.59,6.85"/>
+        <dia:rectangle val="22.95,4.95;31.102,6.85"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="23,5"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="6.54"/>
+        <dia:real val="8.052"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="1.8"/>
@@ -75,7 +75,7 @@
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#token_word#</dia:string>
+            <dia:string>#tokenWordData#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font name="Helvetica"/>
@@ -84,7 +84,7 @@
             <dia:real val="0.8"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="26.27,6.19469"/>
+            <dia:point val="27.026,6.19469"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
