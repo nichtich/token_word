@@ -63,7 +63,7 @@ $dbFile = "../../cgi-data/tokenWordData.db";
 
 # 1 to use db file
 # 0 to use filesytem
-$useDB = 0;
+$useDB = 1;
 
 
 ##
