@@ -1,6 +1,3 @@
-#!/usr/bin/perl -wT
-
-# for apnrecords.org server
 #!/usr/local/bin/perl -wT
 
 
@@ -537,8 +534,8 @@ else {
         elsif( $action eq "feedback" ) { 
             my $message = $cgiQuery->param( "message" ) || '';
 
-            addToFile( "$dataDirectory/feedback",
-                       "$loggedInUser :\n$message\n\n" );
+            bypass_addToFile( "$dataDirectory/feedback",
+                              "$loggedInUser :\n$message\n\n" );
             
             showMainPage();
         }
