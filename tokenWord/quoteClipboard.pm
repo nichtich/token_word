@@ -243,7 +243,7 @@ sub deleteQuote {
     
     my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";   
     
-    deleteFile( "$quoteDirName/$quoteID" ) ) {
+    deleteFile( "$quoteDirName/$quoteID" );
     
 }
 

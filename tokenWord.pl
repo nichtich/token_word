@@ -884,10 +884,10 @@ else {
         elsif( $action eq "deleteQuotes" ) {
             # quoteNumber parameter might occur multiple times, once for
             # each quote that is flagged for deletion.
-            @quoteNumbersToDelete = $cgiQuery->param( "quoteNumber" ) || '';
+            my @quoteNumbersToDelete = $cgiQuery->param( "quoteNumber" ) || '';
 
-            if( scalar( @quoteNumbersToDelete > 0 ) {
-                foreach $quoteNumber ( @quoteNumbersToDelete ) {
+            if( scalar( @quoteNumbersToDelete ) > 0 ) {
+                foreach my $quoteNumber ( @quoteNumbersToDelete ) {
                     deleteQuote( $loggedInUser, $quoteNumber );
                 }
             }
