@@ -4,6 +4,10 @@
 % 2003-February-6  Jason Rohrer
 % Created.
 %
+% 2003-February-13 Jason Rohrer
+% Finished initial draft.
+% Spell-checked.
+%
 
 
 \documentclass{acm_proc_article-sp}
@@ -33,12 +37,12 @@
 \begin{abstract}
 We describe \tw, a web-based xanalogical hypertext system.  Our system supports almost every core feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
 Features include deep quotation, unbreakable references, two-way reference chasing, and frictionless micropayments that are backed by real-world currency.
-To our knowledge, \tw \ is the first xanalogical system implementation to included all of these features.  Furthermore, \tw \ is the first xanalogical system of any kind to be accessible by a web browser with no additional software.
+To our knowledge, \tw \ is the first xanalogical system implementation to included all of these features.  Furthermore, \tw \  is the first xanalogical system of any kind to be accessible by a web browser with no additional software.
 
-Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \ was implented from scratch in ten days by one person.  
+Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \  was implemented from scratch in ten days by one person.  
 We attribute this success to the maturity of modern technology and development techniques.  
 %In particular, choosing Perl as the implementation language allowed the rather complex xanalogical text processing operations to be expressed in elegant ways.
-A live \tw \ system is running at:
+A live \tw \  system is running at:
 \begin{center}
 http://hypertext.sf.net/token\_word
 \end{center}
@@ -72,7 +76,7 @@ The following quote from a 1988 Autodesk press release is most telling:
 In 1964, Xanadu was a dream in a single mind.  In 1980, it was the
 shared goal of a small group of brilliant technologists.  By 1989, it
 will be a product.  And by 1995 it will begin to change the world.
-Much work remains to be done to realise the potential of Xanadu---it
+Much work remains to be done to realize the potential of Xanadu---it
 will take the Xanadu development team 18 months to field the first
 Xanadu system. \cite{AutodeskPress} 
 \end{quote}
@@ -85,7 +89,7 @@ Ironically, this decision was made just when the world was ripe for the first gl
 We are scared of Xanadu.  
 We hear its siren song and are tempted, but we know that many have tried and many have failed.  
 The most frustrating factor is that none of us really know how useful Xanadu would be, even if it {\it did} exist.  
-We can look at architecture diagrams and photgraphs of cardboard mock-ups \cite{Nelson1999}, but these do not give us a true sense of what it would be like to use a xanalogical system.  
+We can look at architecture diagrams and photographs of cardboard mock-ups \cite{Nelson1999}, but these do not give us a true sense of what it would be like to use a xanalogical system.  
 Few of us have ever played with a xanalogical user interface prototype, even fewer have paid or received a true micropayment (xanalogical or otherwise), and almost none have transcluded the work of another or had our work transcluded.
 
 What is using a xanalogical system really like?
@@ -97,8 +101,8 @@ Given this historical perspective, the contributions of this paper are threefold
 First, this paper analyzes the process that lead from a paper design to real world xanalogical software.
 Second, this paper shows that modern technology and techniques are of utmost importance for making this implementation process {\it possible}, let alone quick.
 Third, this paper describes a full xanalogical system implementation from the perspective of an end-user.
-The novelty of this paper hinges on the implmentation, which has a modern flavor, though the underlying ideas are quite old.
-We have acheived a novel success, where past attempts have failed, and we feel that the lessons learned from this process are valuable.
+The novelty of this paper hinges on the implementation, which has a modern flavor, though the underlying ideas are quite old.
+We have achieved a novel success, where past attempts have failed, and we feel that the lessons learned from this process are valuable.
 
 
 
@@ -121,7 +125,7 @@ When trying to implement unrestricted reuse in a way that works with copyright, 
 Xanadu's central mechanism is {\it transclusion}, a form of quotation.  
 Transclusion differs from standard quotation in that it does not involve copying of any kind.  
 When document $A$ transcludes a quote from document $B$, the quote is stored as a deep reference to the quoted material in $B$:  words from $B$ are not copied into $A$. 
-Whenver $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the necessary words from $B$ are fetched from $B$'s owner.
+Whenever $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the necessary words from $B$ are fetched from $B$'s owner.
 Thus, even though $A$'s owner has quoted document $B$, the quoted owner still retains control over the distribution and licensing of his or her words.
 %Avoiding copying led us to transclusion, and making transclusion work will lead us to the rest of the Xanadu model.
 
@@ -163,26 +167,26 @@ We can summarize the Xanadu model with the following feature list:  deep quotati
 
 \section{System Architecture}
 We designed and built \tw, a full-featured xanalogical system, from scratch in only ten days.
-To acheive this kind of rapid development, we relied heavily on modern technology and design techniques.
+To achieve this kind of rapid development, we relied heavily on modern technology and design techniques.
 We do not view past Xanadu failures with disdain.
 Those early attempts were simply ahead of their time:  the technology of the day was not ready for Xanadu.
-The central technologies that made \tw \  development possible were the web, CGI, Perl, and PayPal \cite{paypal}.
+The central technologies that made \tw \   development possible were the web, CGI, Perl, and PayPal \cite{paypal}.
 
 Our system, though full-featured, was not designed to be ``the'' scalable xanalogical system that will carry us all into the future.
-Instead, we focused on building a usable implemenation of xanalogical features for the purpose of experimentation.
-Though scalability was not a design goal, \tw \ was built on top of technolgies that have scaled well for other web-based projects \cite{Everything2, WikiWikiWeb, Wikipedia}.
-We claim that \tw \  could be scaled into a globally accessible system, albeit with minor code modifications and a sufficient hardware investment. 
+Instead, we focused on building a usable implementation of xanalogical features for the purpose of experimentation.
+Though scalability was not a design goal, \tw \  was built on top of technologies that have scaled well for other web-based projects \cite{Everything2, WikiWikiWeb, Wikipedia}.
+We claim that \tw \   could be scaled into a globally accessible system, albeit with minor code modifications and a sufficient hardware investment. 
 
 \subsection{User Perspective}
-In describing the \tw \ user experience, we are faced with the very issue that motivated \tw \ development in the first place:  descriptions in words and pictures do not give us a true sense of what it is like to {\it use} a system.
+In describing the \tw \  user experience, we are faced with the very issue that motivated \tw \  development in the first place:  descriptions in words and pictures do not give us a true sense of what it is like to {\it use} a system.
 Since this paper's focus is on a real-world implementation and not just a paper description, we encourage readers to visit {\tt http://hypertext.sf.net/token\_word} to try our system for themselves. 
 
-From the end-user's perspective, \tw \ has many sal\-ient features.
-Users access \tw \ with a web browser, and they must create accounts and log in to use the system.  
+From the end-user's perspective, \tw \  has many sal\-ient features.
+Users access \tw \  with a web browser, and they must create accounts and log in to use the system.  
 The central elements of the system are documents, which can contain quotes of other documents.
 Quote markers can be hidden or displayed, and quotes can be followed to see the context from which they were taken.
 Each document also features a list of documents that quote it, so references can be chased in both directions.
-The \tw \  document display interface can be seen in Figure \ref{fig:mainScreen}.
+The \tw \   document display interface can be seen in Figure \ref{fig:mainScreen}.
 
 % opera window size for figures:
 % 737 x 528
@@ -236,7 +240,7 @@ Users only pay for each piece of text once---repeat viewings of the same text, i
 Full text searches are supported across the entire document database, and search terms are highlighted when result documents are displayed.
 Search results (and other lists in \tw) are sorted with most-quoted documents first, since frequently quoted documents are likely to contain the best information. 
 
-\tw \ provides no explicit linking mechanism.
+\tw \  provides no explicit linking mechanism.
 However, since quote context can be obtained easily, brief quotes can be used as links between documents.
 For an example of quotes used to link, see Figure \ref{fig:quotesAsLinks}.
 
@@ -250,7 +254,7 @@ For an example of quotes used to link, see Figure \ref{fig:quotesAsLinks}.
 \subsection{Implementation Details}
 
 \subsubsection{Data Model}
-Keeping with the Xanadu model, \tw \ separates documents from the text they contain.
+Keeping with the Xanadu model, \tw \  separates documents from the text they contain.
 There are two types of data objects in \tw:  documents and chunks.
 A chunk contains a raw block of contiguous text, while a document is a list of reference to text chunks.
 Some of the referenced chunks in a document may have been created at the same time as the document (for new text in the document), while others may be part of quotes taken from other documents.
@@ -260,7 +264,7 @@ The document context pointer tracks which document the material was quoted from 
 If a document refers to a new text chunk that has not appeared in any previous documents, the document context pointer is omitted:  such chunks are not part of quotes and have no references that can be chased.
 With this two-pointer model, we can distinguish ``original'' material in a document from quoted material and support recursive reference chasing.
 By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
-%When following a quote reference, a chain of referneces may need to be chased before the original context of the text is found. 
+%When following a quote reference, a chain of references may need to be chased before the original context of the text is found. 
 
 For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote original material, residing in chunk $k$, from document $C$.  
 $A$'s reference will contain both a pointer to the text chunk $k$ and to the document context $B$.  
@@ -444,7 +448,7 @@ Note that {\tt length} is not specified for the document region context of a ref
 
 %With this representation, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
 %By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
-%When a new chunk is created as part of a document, the context portion of the reference is ommited, indicating that the document is the first context in which this chunk was used.
+%When a new chunk is created as part of a document, the context portion of the reference is omitted, indicating that the document is the first context in which this chunk was used.
 
 As described in our discussion of data models, each quote on a clipboard has only a single pointer to a document region and no chunk region pointers.
 We represent these references with the following format:
@@ -467,7 +471,7 @@ When a document is added to the system, its reference is appended to the end of 
 
 
 \subsubsection{Development}
-The entire \tw \  system is implemented as a single CGI script written in Perl, though the script is broken up into eight modules for organization purposes.
+The entire \tw \   system is implemented as a single CGI script written in Perl, though the script is broken up into eight modules for organization purposes.
 Perl's built-in support for regular expressions was useful for the rather complicated text processing done by \tw.
 Many of these text processing operations can be expressed in succinct and elegant ways using Perl.
 For example, highlighting possible misspellings in preview mode was a minor addition that required less than fifteen lines of code.
@@ -506,8 +510,8 @@ This approach would deal with the inode limitations, and it might actually impro
 A second approach would be to implement a simple application-level virtual filesystem for chunk and document storage.
 With this approach, we could taylor the storage system to our specific needs, though it would certainly be labor-intensive.
 
-All filesystem operations in \tw \ are wrapped by a single module with only a handful of interface functions.
-By modifying the implementation of these module functions, either of the scalable backends mentioned above could be added to \tw \ with no changes to the rest of the code. 
+All filesystem operations in \tw \  are wrapped by a single module with only a handful of interface functions.
+By modifying the implementation of these module functions, either of the scalable backends mentioned above could be added to \tw \  with no changes to the rest of the code. 
 
 We chose a filesystem backend, despite its scalability limitations, because of its simplicity.
 This choice fits into our implementation philosophy, since the focus was on producing a working system and adding features iteratively.
@@ -529,29 +533,29 @@ However, PayPal's currency model does not support the microdollar resolution tha
 Even if PayPal did support high-resolution payments, it does not allow a third party to initiate transfers between account holders in a transparent and frictionless way (and for good reason, given the security issues).
 
 To deal with these issues, we built an internal token balance system and used PayPal integration only for deposits and withdrawls of real-world currency.
-With this configuration, a deposit is by no means frictionless (logging in to PayPal is required), but after the deposit has been made, token payments are completely transparent as the user accesses \tw \ documents.
+With this configuration, a deposit is by no means frictionless (logging in to PayPal is required), but after the deposit has been made, token payments are completely transparent as the user accesses \tw \  documents.
 Similarly, withdrawing tokens in exchange for real-world currency is not frictionless: 
-PayPal does not support an automated payment mechanism, so withdrawl requests are queued for manual processing by the \tw \ system administrator.
+PayPal does not support an automated payment mechanism, so withdrawl requests are queued for manual processing by the \tw \  system administrator.
 Whereas deposits take effect immediately (using PayPal's ``Instant Payment Notification'' service), withdrawn token refunds are delayed by the response of the human administrator.
 From the administrator's point of view, the withdrawl queue can be used to increase security, since any suspicious activity can be investigated before real-world payments are made.  
 
 \subsection{Balancing Risk}
-Given that micropayments in \tw \ are mandatory and automatic, a major barrier to system adoption might exist:  trying \tw \ would require the deposit of real-world currency.
-Even the main page displayed after login is a first-class \tw \ document, so a new user with no tokens would not be able to read a description of \tw, let alone try any of its features.
+Given that micropayments in \tw \  are mandatory and automatic, a major barrier to system adoption might exist:  trying \tw \  would require the deposit of real-world currency.
+Even the main page displayed after login is a first-class \tw \  document, so a new user with no tokens would not be able to read a description of \tw, let alone try any of its features.
 
 One way of dealing with this adoption barrier would be to give each new user a small number of ``free'' tokens to start with (for example, at least enough tokens to read the main page).
-This solution would allow new users to try the system with no monetary investment, but it carries an enormous risk for the \tw \ system administrators.
+This solution would allow new users to try the system with no monetary investment, but it carries an enormous risk for the \tw \  system administrators.
 A small group of users could create many fake accounts and then use each account to read a large dummy document owned by one user.
 This kind of scam could be used to consolodate the free starting tokens from many accounts into one account, and then a withdrawl could be made in exchange for a large amount of real-world currency.
 Even if users are not trying to intentially scam the system, doling out free tokens poses considerable risk.
-One user might write documents that are popular with new users (for example, a collection of how-to documents) and ammass a large number of free tokens over time---the withdrawl of these tokens could financially devastate the \tw \ administrators.
+One user might write documents that are popular with new users (for example, a collection of how-to documents) and ammass a large number of free tokens over time---the withdrawl of these tokens could financially devastate the \tw \  administrators.
 
 We have devised a risk-free mechanism that deals with the adoption barrier.  
 Our approach uses two token types.
 The first type of tokens, called {\it trial} tokens, have no real-world value.
 Each new account starts out with a small number of trial tokens (in our live system, each account starts with 50,000 trial tokens).
 The second type of tokens, called {\it real} tokens, can be exchanged for real-world currency.
-Token transfers inside \tw \ keeps track of token types:  trial tokens can only be transfered between users' trial balances, and real tokens can only be transfered between real balances.
+Token transfers inside \tw \  keeps track of token types:  trial tokens can only be transfered between users' trial balances, and real tokens can only be transfered between real balances.
 Trial tokens are favored, and real tokens are only spent when a user has no trial tokens.
 
 For example, suppose the balances of three users are as shown in following table:
@@ -587,10 +591,10 @@ $C$&10 &20  \\
 
 %$A$'s new balance would be 0:150, $B$'s new balance would be 50:520, and $C$'s new balance would be 10:20. 
 
-This two-type scheme allows users to try \tw \ extensively without a monetary investment, and it also poses no financial risks to the administrators.
+This two-type scheme allows users to try \tw \  extensively without a monetary investment, and it also poses no financial risks to the administrators.
 Note that though trial tokens have no real-world value, they still have value inside \tw, since they can always be used to purchase new content.
 Inside \tw, a user that amasses many trial tokens is just as wealthy as a user with many real tokens.
-A user that actively published popular content in \tw \ could effectively use the system forever without depositing any real-world money.
+A user that actively published popular content in \tw \  could effectively use the system forever without depositing any real-world money.
 
 \section{Related Work}
 \label{sec:RelatedWork}
@@ -602,7 +606,7 @@ For example, Lukka and Fallenstein describe a system that uses ideas taken from 
 
 \subsection{Wikis}
 
-In terms of implementation, \tw \ is closely related to a recent class of hypertext systems known as Wikis, which are often implemented as Perl-based CGI programs.
+In terms of implementation, \tw \  is closely related to a recent class of hypertext systems known as Wikis, which are often implemented as Perl-based CGI programs.
 Wikis are reader-edited web sites, and web-based HTML forms are used as the interface for page authoring.
 In many cases, Wikis are open for editing by the public at large.
 
@@ -612,7 +616,7 @@ To create a new document, a user must follow one of these dangling links in an e
 Thus, in a Wiki, there is no way to create a page in isolation.
 In fact, the name of a new page is determined by the contents of the dangling link and cannot be specified in the page creation screen.
 
-\tw \ differs from a Wiki in its approach to hypertext, since a \tw \ quote can only be taken from an existing document.
+\tw \  differs from a Wiki in its approach to hypertext, since a \tw \  quote can only be taken from an existing document.
 No mechanism is provided for refering to a document that does not yet exist.
 
 
@@ -621,7 +625,7 @@ The most ambitious Wiki-based project is Wikipedia, a user-edited encyclopedia, 
 
 
 \subsection{Everything2}
-Like \tw \ and Wikis, Everything2 is a web-based hypertext system implemented using CGI and Perl \cite{Everything2}.
+Like \tw \  and Wikis, Everything2 is a web-based hypertext system implemented using CGI and Perl \cite{Everything2}.
 Everything2 supports dangling links to pages that do not exist yet, but it handles these links differently than a Wiki does.
 When a user follows a dangling link, a search is performed for the title of the non-existant page.
 Thus, dangling links are fuctional from a reader's point of view.
@@ -651,14 +655,14 @@ The first Wikis and weblogs were simple but functional.
 Over time, new implementations were released with more features.
 Today, the most popular systems in either category are extraordinarily feature-rich.
 
-Of course, out of all of the collaborative information spaces discussed here, \tw \ is the only system that supports deep content reuse and frictionless micropayments.
+Of course, out of all of the collaborative information spaces discussed here, \tw \  is the only system that supports deep content reuse and frictionless micropayments.
 Thus, these systems are closely related in terms of implementation, but their goals and end-user experiences are very different. 
 
 
 
 
 \section{Conclusion}
-Thoughout this paper, we have discussed the strategies that made \tw \ development possible, including an interative process and heavy use of existing technology.
+Thoughout this paper, we have discussed the strategies that made \tw \  development possible, including an interative process and heavy use of existing technology.
 
 One additional strategy was crucial, though it has not been mention explicitly:  a focus on a core xanalogical feature set.
 We set out to build a system that supported deep quotation, unbreakable references, and frictionless micropayments.
@@ -666,15 +670,15 @@ In Section \ref{sec:Xanadu}, we distilled these features from the Xanadu model.
 However, {\it Literary Machines} is over 250 pages long, and it is choked full of features that an ideal xanalogical system might have \cite{NelsonLiteraryMachines}.
 Perhaps previous Xanadu efforts aimed for this ideal feature set, and perhaps this is why they failed.
 
-\tw \ is by no means the ideal xanalogical system, and many features are missing.
+\tw \  is by no means the ideal xanalogical system, and many features are missing.
 However, it is still the first system to implement the core features of the Xanadu architecture.
-Though one would be hard-pressed to argue that the features included in \tw \ are not crucial, three important features are missing.
-First, \tw \ does not explicitly support document versioning.
+Though one would be hard-pressed to argue that the features included in \tw \  are not crucial, three important features are missing.
+First, \tw \  does not explicitly support document versioning.
 However, using the quotation primitive, a limited form of versioning can be emulated (a user can quote unchanged regions of the previous version when creating a new version).
-Second, \tw \ does not support multi-server integration:  each installation of \tw \ operates in isolation, and quotes between documents at different sites are not possible.
+Second, \tw \  does not support multi-server integration:  each installation of \tw \  operates in isolation, and quotes between documents at different sites are not possible.
 We see multi-server integration as one of the weakpoints in the Xanadu model:  how can we ensure that references never break in a system comprised of multiple, separately owned servers?
 Even if fault-tolerant, multi-server integration is possible, it is not essential for the end-user experience. 
-Third, \tw \  does not support the side-by-side document comparission with {\it transpointing} lines, a classic Xanadu feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
+Third, \tw \   does not support the side-by-side document comparission with {\it transpointing} lines, a classic Xanadu feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
 The transpointing interface would be difficult, if not impossible, to support in a web browser with no additional software.
 However, a side-by-side document comparisson interface, using colored highlighting to indicate itentical regions, has been contemplated for \tw.
 Implementing such an interface would be easy, though coming up with a highlighting scheme that works correctly in the general case (for example, without running out of readable colors) is quite difficult.
