@@ -84,6 +84,9 @@
 # Added path to make ispell wrapper work (so it can find aspell).
 # Added external web and email link support.
 #
+# 2004-December-3   Jason Rohrer
+# Added inline image support.
+#
 
 
 
@@ -662,10 +665,15 @@ else {
                                                                 $loggedInUser,
                                                                 $abstractDoc );
 
-                # add any external web links
+                # add any external web links (plain http:// URLS)
                 # search for http:// followed by a string of non-whitespace
                 $docTextPreview =~ 
-                    s/(http:\/\/\S+)/<A HREF=\"$1\" TARGET="_blank"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+                    s/[^\!](http:\/\/\S+)/<A HREF=\"$1\" TARGET="_blank"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+
+                # add any inline image links ( !http:// URLS)
+                # search for !http:// followed by a string of non-whitespace
+                $docTextPreview =~ 
+                    s/\!(http:\/\/\S+)/<IMG SRC=\"$1\">/gi;
 
                 # add any email address links
                 # search for two strings of non-whitespace separated by @
@@ -813,10 +821,16 @@ else {
                                                                   $docOwner, 
                                                                   $docID );
                     
-                    # add any external web links
+                    # add any external web links (plain http:// URLS)
                     # search for http:// followed by a string of non-whitespace
                     $text =~ 
-                        s/(http:\/\/\S+)/<A HREF=\"$1\" TARGET="_blank"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+                        s/[^\!](http:\/\/\S+)/<A HREF=\"$1\" TARGET="_blank"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+
+                    # add any inline image links ( !http:// URLS)
+                    # search for !http:// followed by a string of 
+                    # non-whitespace
+                    $text =~ 
+                        s/\!(http:\/\/\S+)/<IMG SRC=\"$1\">/gi;
 
                     # add any email address links
                     # search for two strings of non-whitespace separated by @
