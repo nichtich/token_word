@@ -1,0 +1,27 @@
+
+
+Monday, January 6, 2003
+
+Format for document files:
+
+A list of chunks, one per line:
+<chunkUsername, chunkID, chunkRegionOffset, chunkRegionLength; 
+ docUserName, docID, docRegionOffset >
+
+
+
+Document-specific values are optional.
+
+Note that a "docRegionLength" is not included, since it would be redundant
+(identical to chunkRegionLength).
+
+
+
+
+Examples:
+
+<jd45, 12, 104, 20>
+
+
+<jd45, 12, 104, 20; dpj, 14, 1304>
+
