@@ -217,7 +217,7 @@ sub renderMultiChunkText {
         my @regionElements = extractRegionComponents( $region );
 
         my $regionText = 
-          tokenWord::chunkManager::getRegion( @regionElements );
+          tokenWord::chunkManager::getRegionText( @regionElements );
 
         push( @chunkText, $regionText );
     }
