@@ -41,6 +41,9 @@ package tokenWord::htmlGenerator;
 # 2003-June-1   Jason Rohrer
 # Added support for deleting quotes from clipboards.
 #
+# 2003-July-18   Jason Rohrer
+# Un-reversed quote order, now that deletion is supported.
+#
 
 
 use tokenWord::common;
@@ -577,7 +580,7 @@ sub generateQuoteListPage {
     
     print "<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>\n";
 
-    @quotes = reverse( @quotes );
+    #@quotes = reverse( @quotes );
 
     if( scalar( @quotes ) > 0 ) {
         print "<H1>quotes:</H1>\n";
