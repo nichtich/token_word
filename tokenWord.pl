@@ -1,4 +1,12 @@
-#!/usr/bin/perl -wT
+#!/usr//bin/perl -wT
+
+# for apnrecords.org server
+#!/usr/local/bin/perl -wT
+
+
+
+
+
 
 #
 # Modification History
@@ -50,6 +58,21 @@
 # Added working no-cache directives of two types (Pragma and Cache-control).
 # Added highlight of search words.
 #
+# 2003-January-19   Jason Rohrer
+# Set up a local error log.  Changed to work with apnrecords.org server.
+#
+
+
+
+# setup a local error log
+use CGI::Carp qw(carpout);
+BEGIN {
+    use CGI::Carp qw(carpout);
+    open(LOG, ">>./tokenWord_errors.log") or
+        die("Unable to open tokenWord_errors.log: $!\n");
+    carpout(LOG);
+}
+
 
 
 use lib '.';
