@@ -22,6 +22,7 @@ package tokenWord::htmlGenerator;
 # Improved layout of most- lists.
 # Added support for error page.
 # Added a feedback form.
+# Added support for document highlights.
 #
 
 
@@ -375,7 +376,7 @@ sub generateCreateDocumentForm {
 # @param2 the ID of the document to display.
 # @param3 the text to display.
 # @param4 1 to display the document in quote mode, and 0 to display
-#   it in non-quote mode.
+#   it in non-quote mode, and 2 to display in highlighted mode
 ##
 sub generateDocPage {
     ( my $loggedInUser, my $docOwner, my $docID, 
@@ -389,9 +390,13 @@ sub generateDocPage {
     
     my $docDisplayText;
     
-    if( not $quoteFlag ) {
+    if( $quoteFlag == 0 ) {
         $docDisplayText = 
             readFileValue( "$htmlDirectory/documentDisplay.html" );
+    }
+    elsif( $quoteFlag == 2 ) {
+        $docDisplayText = 
+            readFileValue( "$htmlDirectory/highlightDocumentDisplay.html" );
     }
     else {
         $docDisplayText = 
@@ -425,7 +430,6 @@ sub generateDocPage {
 # @param0 the currently logged-in user.
 # @param1 the owner of the document to display.
 # @param2 the ID of the document to display.
-# @param3 the text to display.
 # @param4 an array of chunk regions in the document.
 ##
 sub generateDocQuotesPage {
@@ -438,7 +442,6 @@ sub generateDocQuotesPage {
 
     my $openBracketColor = "#00AF00";
     my $closeBracketColor = "#FF0000";
-    
 
     foreach $chunk ( @chunks ) {
         
@@ -446,18 +449,23 @@ sub generateDocQuotesPage {
             tokenWord::common::extractRegionComponents( $chunk );
         my $text = 
             tokenWord::chunkManager::getRegionText( @chunkElements );
-        
-        if( $chunk =~ /.*;.*/ ) {
+                
+        if( $chunk =~ /.*;.*/ ) {            
             # a chunk that quotes another doc
             # make a link around the chunk
+            
             my $quotedOwner = $chunkElements[4];
             my $quotedID = $chunkElements[5];
+            my $quotedOffset = $chunkElements[6];
+            my $quotedLength = $chunkElements[3];
 
             my $fullText =
                 "<FONT COLOR=$openBracketColor>[</FONT>".
                 "<A HREF=\"tokenWord.pl?action=showDocument".
                 "&docOwner=$quotedOwner".
-                "&docID=$quotedID\">".
+                "&docID=$quotedID".
+                "&highlightOffset=$quotedOffset".
+                "&highlightLength=$quotedLength\">".
                 "<FONT COLOR=#000000>$text</FONT></A>".
                 "<FONT COLOR=$closeBracketColor>]</FONT>";
             
@@ -475,6 +483,45 @@ sub generateDocQuotesPage {
 
     # pass to doc display function for formatting
     generateDocPage( $loggedInUser, $docOwner, $docID, $fullDocText, 1 );
+}
+
+
+
+##
+# Generates a page displaying a document in highlight  mode.
+#
+# @param0 the currently logged-in user.
+# @param1 the owner of the document to display.
+# @param2 the ID of the document to display.
+# @param3 the text to display.
+# @param4 the offset of the highlight.
+# @param5 the length of the highlight. 
+##
+sub generateDocHighlightPage {
+    ( my $loggedInUser, my $docOwner, my $docID, my $docText,
+      my $highlightOffset, my $highlightLength ) = @_;
+    
+
+    my $textBeforeHighlight = substr( $docText, 0, $highlightOffset );
+    my $textInHighlight = substr( $docText, $highlightOffset, 
+                                  $highlightLength );
+    my $textAfterHighlight = substr( $docText, 
+                                     $highlightOffset + $highlightLength );
+    
+    
+    my $highlightColor= "#FF0000";
+
+    my @textParts = ( $textBeforeHighlight,
+                      "<FONT COLOR=$highlightColor>",
+                      $textInHighlight,
+                      "</FONT>",
+                      $textAfterHighlight );
+    
+    my $fullDocText = join( "", @textParts );
+
+
+    # pass to doc display function for formatting
+    generateDocPage( $loggedInUser, $docOwner, $docID, $fullDocText, 2 );
 }
 
 

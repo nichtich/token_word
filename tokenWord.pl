@@ -34,6 +34,7 @@
 # Added document preview.
 # Added checks for document existence.
 # Added a feedback form.
+# Added support for document highlights.
 #
 
 
@@ -444,11 +445,38 @@ else {
                         tokenWord::documentManager::renderDocumentText( 
                                                                   $docOwner, 
                                                                   $docID );
-            
-                    tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                    # check for highlight
+                    
+                    # might be 0
+                    my $highlightOffset = 
+                        $cgiQuery->param( "highlightOffset" );
+                    my $highlightLength = 
+                        $cgiQuery->param( "highlightLength" );
+
+                    # untaint
+                    ( $highlightOffset ) = ( $highlightOffset =~ /(\d+)/ );
+                    ( $highlightLength ) = ( $highlightLength =~ /(\d+)/ );
+
+                    if( $highlightLength ne "" and  
+                        $highlightOffset ne "" and
+                        $highlightLength != 0 ) {
+
+                        tokenWord::htmlGenerator::generateDocHighlightPage( 
+                                                            $loggedInUser,
+                                                            $docOwner,
+                                                            $docID, 
+                                                            $text,
+                                                            $highlightOffset,
+                                                            $highlightLength );
+                    }
+                    else {
+                        # show plain document
+                        tokenWord::htmlGenerator::generateDocPage( 
+                                                               $loggedInUser,
                                                                $docOwner,
                                                                $docID, $text, 
                                                                0 );
+                    }
                 }
                 else {
                     tokenWord::htmlGenerator::generateFailedPurchasePage(
