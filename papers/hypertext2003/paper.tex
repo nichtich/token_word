@@ -595,20 +595,69 @@ A user that actively published popular content in \tw \ could effectively use th
 \section{Related Work}
 \label{sec:RelatedWork}
 
-Much of the existing work on xanalogical systems was discussed in Sections \ref{sec:Introduction} and \ref{sec:Xanadu}.
+Much of the existing work on xanalogical systems was discussed in Sections \ref{sec:Introduction} and \ref{sec:Xanadu}, so we will focus on related non-xanalogical systems here.
+However, we should mention that interest in xanalogical systems has not waned in recent years.
+For example, Lukka and Fallenstein describe a system that uses ideas taken from Freenet for xanalogical content storage and retrieval \cite{FreenetXanadu}. 
 
 
-Wikis
-\cite{WikiWikiWeb}
-\cite{Wikipedia}
+\subsection{Wikis}
 
-Everything2
-\cite{Everything2}
+In terms of implementation, \tw \ is closely related to a recent class of hypertext systems known as Wikis, which are often implemented as Perl-based CGI programs.
+Wikis are reader-edited web sites, and web-based HTML forms are used as the interface for page authoring.
+In many cases, Wikis are open for editing by the public at large.
 
-Weblogs
-\cite{kuro5hin}
+Aside from the sociological issues, Wikis approach hypertext in an interesting way.
+Links can be created in a document to documents that do not exist without knowing where those documents will eventually reside.
+To create a new document, a user must follow one of these dangling links in an existing page, which leads to a page creation screen.
+Thus, in a Wiki, there is no way to create a page in isolation.
+In fact, the name of a new page is determined by the contents of the dangling link and cannot be specified in the page creation screen.
 
-Xanadu
+\tw \ differs from a Wiki in its approach to hypertext, since a \tw \ quote can only be taken from an existing document.
+No mechanism is provided for refering to a document that does not yet exist.
+
+
+The first Wiki was created by Ward Cunningham in 1995 and is still active today\cite{WikiWikiWeb}.
+The most ambitious Wiki-based project is Wikipedia, a user-edited encyclopedia, which recently grew to over 100,000 entries \cite{Wikipedia}.
+
+
+\subsection{Everything2}
+Like \tw \ and Wikis, Everything2 is a web-based hypertext system implemented using CGI and Perl \cite{Everything2}.
+Everything2 supports dangling links to pages that do not exist yet, but it handles these links differently than a Wiki does.
+When a user follows a dangling link, a search is performed for the title of the non-existant page.
+Thus, dangling links are fuctional from a reader's point of view.
+We might conclude that Wikis favor authors, while Everything2 favors readers.
+As soon as a page is created that matches the title of a dangling link, that link points to the new page directly.
+
+In addition to in-line, user-created links (dangling or otherwise), each node in Everything2 features a list of automatically generated links.
+These links are culled from user traversal paths:  when a user leaves one page and enters another (either by clicking a link or performing a search), a two-way link is added between the pages.   
+
+
+\subsection{Weblogs}
+Another class of related web based hypertext systems are weblogs, or ``blogs.''
+These systems allow content to be added to a web site serially, one post at a time.
+Some blogs are used by individuals as a means of sharing daily thoughts with the world, while others aim to be collaborative information spaces filled with moderated comments posted by the public.
+One of the most interesting collaborative weblogs is Kuro5hin (pronounced ``corrosion''), which features high-quality news and culture stories submitted and moderated by the public \cite{kuro5hin}.
+Many blogs are implemented using CGI and Perl, though more recent efforts seem to favor PHP.
+
+
+\subsection{Commonalities and Differences}
+All three systems share several aspects in common with \tw.
+First, they are all web-based, collaborative information spaces.
+Second, they all relie heavily on existing technology for their implementations.
+Third, from what we can tell, they were developed relatively quickly.
+
+In addition, we can see iterative development philosophies in weblogs and Wikis, not necessarily in the individual projects, but in the phenomena themselves.
+The first Wikis and weblogs were simple but functional.
+Over time, new implementations were released with more features.
+Today, the most popular systems in either category are extraordinarily feature-rich.
+
+Of course, out of all of the collaborative information spaces discussed here, \tw \ is the only system that supports deep content reuse and frictionless micropayments.
+Thus, these systems are closely related in terms of implementation, but their goals are very different. 
+
+
+
+
+
 
 \section{Conclusion}
 
