@@ -288,10 +288,21 @@ sub extractAbstractQuote {
         return -1;
     }
     
-
-    my $quoteOffset = length( $splitDocument[0] );
-    my $quoteLength = length( $splitDocument[1] );
+    my $quoteOffset;
+    my $quoteLength;
     
+    if( scalar( @splitDocument ) == 1 ) {
+        # the whole document is quoted
+        $quoteOffset = 0;
+        $quoteLength = length( $splitDocument[0] );
+    }
+    else {
+        # take only the first quote
+        $quoteOffset = length( $splitDocument[0] );
+        $quoteLength = length( $splitDocument[1] );
+    }
+
+
     tokenWord::quoteClipboard::addQuote( $quotingUser,
                                          $quotedUser,
                                          $docID,
