@@ -86,12 +86,15 @@ some content costing more than other content?
 Took me a minute to understand how you got from the first to the second
 table.
 
-GOT HERE
 
 * You might want to explicitly reference the Udanax Gold project.
 
 * Might the Literate Programming ideas be viewed as related work? Not sure
 here.
+
+
+GOT HERE (whew!)
+
 
 Overall, very nicely written paper, very smooth narrative flow. I like the
 tone of the paper. It'll be really interesting to see what kinds of comments
