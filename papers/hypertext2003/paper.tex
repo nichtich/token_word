@@ -275,42 +275,73 @@ At the end of this reference chain, $C$'s reference will point only to $k$.
 \opaquetextfalse
 
 \rectnode{A}[1.5,2](-6,0)[\fillednodesfalse]     
-\autonodetext{A}[n]{Document $A$}
-\roundnode{kInAAnchor}(-5.45,.25)[\graphnodecolour{0}\graphnodesize{0.1}]
+\nodetext{A}(0,1.25){Document $A$}
 \rectnode{AQuote}[1.5,0.75](-6,.25)[\graphnodecolour{0.5}]  
 \rectnode{kInA}[1.5,0.5](-6,.25)[\graphnodecolour{0.85}]
+\roundnode{kInAStartAnchor}(-5.25,.5)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{kInAEndAnchor}(-5.25,0)[\graphnodecolour{0}\graphnodesize{0}]
+
+\roundnode{QuoteInAStartAnchor}(-5.25,.625)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{QuoteInAEndAnchor}(-5.25,-.125)[\graphnodecolour{0}\graphnodesize{0}]
 
 
 \rectnode{B}[1.5,2](-2,0)[\fillednodesfalse]
-\autonodetext{B}[s]{Document $B$}
+\nodetext{B}(0,-1.25){Document $B$}
 \roundnode{kInBAnchor}(-1.45,-.5)[\graphnodecolour{0}\graphnodesize{0.1}]
 \rectnode{AQuoteInB}[1.5,0.75](-2,-.5)[\graphnodecolour{0.5}]
 \rectnode{BQuote}[1.5,0.5](-2,-.5)[\graphnodecolour{0.85}]
 
+\roundnode{AQuoteInBStartAnchor}(-2.75,-.125)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{AQuoteInBEndAnchor}(-2.75,-.875)[\graphnodecolour{0}\graphnodesize{0}]
+
+\roundnode{QuoteInBStartAnchor}(-1.25,-.25)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{QuoteInBEndAnchor}(-1.25,-.75)[\graphnodecolour{0}\graphnodesize{0}]
 
 
 \rectnode{C}[1.5,2](2,0)[\fillednodesfalse]      
-\autonodetext{C}[n]{Document $C$}
+\nodetext{C}(-.75,1.25){Document $C$}
 \rectnode{kInC}[1.5,1](2,0)[\graphnodecolour{.85}]
 \rectnode{BQuoteInC}[1.5,0.5](2,.125)[\graphnodecolour{0.85}]
+
+\roundnode{BQuoteInCStartAnchor}(1.25,.375)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{BQuoteInCEndAnchor}(1.25,-.125)[\graphnodecolour{0}\graphnodesize{0}]
+
+\roundnode{kInCStartAnchor}(2.75,.5)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{kInCEndAnchor}(2.75,-.5)[\graphnodecolour{0}\graphnodesize{0}]
+
 
 
 \rectnode{k}[1.5,1](6,0)[\graphnodecolour{.85}]      
 \autonodetext{k}[n]{Chunk $k$}
+\rectnode{QuoteInK}[1.5,0.5](6,.125)[\graphnodecolour{0.85}]
+\roundnode{QuoteInKStartAnchor}(5.25,.375)[\graphnodesize{0}\graphnodecolour{0}]
+\roundnode{QuoteInKEndAnchor}(5.25,-.125)[\graphnodesize{0}\graphnodecolour{0}]
+
+\roundnode{kStartAnchor}(5.25,.5)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{kEndAnchor}(5.25,-.5)[\graphnodecolour{0}\graphnodesize{0}]
 
 
-\diredge{AQuote}{AQuoteInB}[\graphlinedash{4 4}\grapharrowtype{2}]
-\dirbow{kInAAnchor}{k}{0.17}[\grapharrowtype{1}]
 
-\diredge{BQuote}{BQuoteInC}[\graphlinedash{4 4}\grapharrowtype{2}]
-\dirbow{kInBAnchor}{k}{-0.17}[\grapharrowtype{1}]
 
-\diredge{kInC}{k}[\grapharrowtype{1}]
+\diredge{QuoteInAStartAnchor}{AQuoteInBStartAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+\diredge{QuoteInAEndAnchor}{AQuoteInBEndAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+\dirbow{kInAStartAnchor}{QuoteInKStartAnchor}{0.17}[\grapharrowtype{1}]
+\dirbow{kInAEndAnchor}{QuoteInKEndAnchor}{0.17}[\grapharrowtype{1}]
+
+\diredge{QuoteInBStartAnchor}{BQuoteInCStartAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+\diredge{QuoteInBEndAnchor}{BQuoteInCEndAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+
+\dirbow{QuoteInBStartAnchor}{QuoteInKStartAnchor}{-0.19}[\grapharrowtype{1}]
+\dirbow{QuoteInBEndAnchor}{QuoteInKEndAnchor}{-0.19}[\grapharrowtype{1}]
+
+
+\dirbow{kInCStartAnchor}{kStartAnchor}{.17}[\grapharrowtype{1}]
+\dirbow{kInCEndAnchor}{kEndAnchor}{.17}[\grapharrowtype{1}]
 
 
 \end{graph}
 
-\caption{An example reference chain.  Dotted arrows represent document pointers, and solid arrows represent chunk pointers.  Light gray regions represent text from chunk $k$.  Dark gray regions in $A$ and $B$ represent portions of $A$'s quote from $B$ that do not come from chunk $k$ (other chunks are omitted from this diagram for clarity).}
+\caption{An example reference chain.  Dotted lines represent document region pointers, and solid arcs represent chunk region pointers.  Light gray regions represent text from chunk $k$.  Dark gray regions in $A$ and $B$ represent portions of $A$'s quote from $B$ that do not come from chunk $k$ (other chunks are omitted from this diagram for clarity).}
 \label{fig:referenceChain}
 
 \end{center}
