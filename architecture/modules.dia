@@ -863,7 +863,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#getDocumentRegionChunks#</dia:string>
+            <dia:string>#getRegionChunks#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>#list#</dia:string>
@@ -896,7 +896,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#getDocumentRegionText#</dia:string>
+            <dia:string>#getRegionText#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>#string#</dia:string>
