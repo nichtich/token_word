@@ -40,6 +40,7 @@
 # Added display of search results.
 # Added a spell checker.
 # Changed to highlight-only spell checking display.
+# Changed to dynamically switch between local and global ispell.
 #
 
 
@@ -393,62 +394,45 @@ else {
                 
                     writeFile( $filePath, $docTextPreview );
 
-
+                    
+                    # find ispell program, either global or local
+                    my $ispellCommand;
                     
                     if( -e "/usr/bin/ispell" ) {
-                        # call ispell... this is a safe use of the shell
-                        # untaint and later restore PATH
-                        my $oldPath = $ENV{ "PATH" };
-                        $ENV{ "PATH" } = "";
-                    
-                        my $misspelled = 
-                            `/bin/cat ./$filePath | /usr/bin/ispell -l`;
-                
-                        $ENV{ "PATH" } = $oldPath;
-                        
-                        # delete temp file
-                        unlink( $filePath );
-
-
-                        @misspelledWords = split( /\s+/, $misspelled );
-                    
-                        # replace misspelled words with red versions
-                        foreach my $word ( @misspelledWords ) {
-                            my $redWord = "<FONT COLOR=#FF0000>$word</FONT>";
-                        
-                            # make sure we only replace those that have
-                            # not yet been replaced.
-                            $docTextPreview =~ 
-                                s/([^>])$word([^<])/$1$redWord$2/;
-                        }
+                        $ispellCommand ="/usr/bin/ispell -l";
                     }
                     else {
-                        addToFile( "errors.out", 
-                                   "Cannot find /usr/bin/ispell\n\n" );
-                        if( not -e "/bin/cat" ) {
-                            addToFile( "errors.out", 
-                                       "Cannot find /bin/cat\n\n" );
-                        }
-                        # search for ispell
-                        my $oldPath = $ENV{ "PATH" };
-                        $ENV{ "PATH" } = "";
-                    
-                        my $results = 
-                            `/usr/bin/find -name "*ispell*"`;
-                
-                        $ENV{ "PATH" } = $oldPath;
-                        
-                        if( not -e "/usr/bin/find" ) {
-                            addToFile( "errors.out", 
-                                       "Cannot find /usr/bin/find\n\n" );
-                        }
-                        else {
-                            addToFile( "errors.out", 
-                                       "search results: $results\n\n" );
-                        }
-                        addToFile( "errors.out",
-                                   "path = $oldPath\n\n" );
+                        # use local ispell install
+                        $ispellCommand = "./ispell -l -d ./english.hash";
                     }
+                    
+
+                    # call ispell... this is a safe use of the shell
+                    # untaint and later restore PATH
+                    my $oldPath = $ENV{ "PATH" };
+                    $ENV{ "PATH" } = "";
+                    
+                    my $misspelled = 
+                        `/bin/cat ./$filePath | $ispellCommand`;
+                    
+                    $ENV{ "PATH" } = $oldPath;
+                    
+                    # delete temp file
+                    unlink( $filePath );
+
+                    
+                    @misspelledWords = split( /\s+/, $misspelled );
+                    
+                    # replace misspelled words with red versions
+                    foreach my $word ( @misspelledWords ) {
+                        my $redWord = "<FONT COLOR=#FF0000>$word</FONT>";
+                        
+                        # make sure we only replace those that have
+                        # not yet been replaced.
+                        $docTextPreview =~ 
+                            s/([^>])$word([^<])/$1$redWord$2/;
+                    }
+                
                 }
                 
                 tokenWord::htmlGenerator::generateCreateDocumentForm( 
