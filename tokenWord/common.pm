@@ -24,6 +24,7 @@ sub BEGIN {
     use vars qw( $VERSIONS @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
     @ISA = qw( Exporter );
     @EXPORT = qw(
+                 $dataDirectoryName
                  $dataDirectory
                  $htmlDirectory
                  printFile
@@ -36,6 +37,7 @@ sub BEGIN {
 
 
 
+$dataDirectoryName = "tokenWordData";
 $dataDirectory = "../../cgi-data/tokenWordData";
 $htmlDirectory = "htmlTemplates";
 

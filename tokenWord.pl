@@ -62,6 +62,9 @@
 # Set up a local error log.  Changed to work with apnrecords.org server.
 # Changed to log user in immediately after account creation.
 #
+# 2003-February-11   Jason Rohrer
+# Added support for backup/restore of data directory as a tarball.
+#
 
 
 
@@ -117,6 +120,7 @@ $cgiQuery->cache( 1 );
 
 
 my $action = $cgiQuery->param( "action" ) || '';
+
 
 
 # get the cookie, if it exists
@@ -224,6 +228,83 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
                        "$paymentDate  $user  ".
                        "$payerEmail  $paymentGross  $numTokens\n" );
         }            
+    }
+}
+elsif( $action eq "getDataTarball" ) {
+    my $password = $cgiQuery->param( "password" ) || '';
+    
+    my $truePassword = readFileValue( "$dataDirectory/admin.pass" );
+
+    if( $password eq $truePassword ) {
+    
+        print $cgiQuery->header( -type=>'application-x/gzip', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+        my $oldPath = $ENV{ "PATH" };
+        $ENV{ "PATH" } = "";
+
+        open( TARBALL_READER, 
+  "cd $dataDirectory/..; /bin/tar cf - $dataDirectoryName | /bin/gzip -f |" );
+        while( <TARBALL_READER> ) {
+            print "$_";
+        }
+        close( TARBALL_READER );
+
+        $ENV{ "PATH" } = $oldPath;
+    }
+    else {
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+        print "access denied";
+    }
+}
+elsif( $action eq "makeDataTarball" ) {
+    my $password = $cgiQuery->param( "password" ) || '';
+    
+    my $truePassword = readFileValue( "$dataDirectory/admin.pass" );
+
+    if( $password eq $truePassword ) {
+    
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+        my $oldPath = $ENV{ "PATH" };
+        $ENV{ "PATH" } = "";
+
+        my $outcome =
+            `cd $dataDirectory/..; /bin/tar cf - $dataDirectoryName | /bin/gzip -f > $dataDirectoryName.tar.gz`;
+
+        print "Outcome = $outcome <BR>(blank indicates no error)";
+
+        $ENV{ "PATH" } = $oldPath;
+    }
+    else {
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+        print "access denied";
+    }
+}
+elsif( $action eq "refreshFromDataTarball" ) {
+    my $password = $cgiQuery->param( "password" ) || '';
+    
+    my $truePassword = readFileValue( "$dataDirectory/admin.pass" );
+
+    if( $password eq $truePassword ) {
+    
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+        my $oldPath = $ENV{ "PATH" };
+        $ENV{ "PATH" } = "";
+
+        my $outcome =
+            `cd $dataDirectory/..; /bin/rm -r $dataDirectoryName; /bin/cat ./$dataDirectoryName.tar.gz | /bin/gzip -d - | /bin/tar xf -`;
+
+        print "Outcome = $outcome <BR>(blank indicates no error)";
+
+        $ENV{ "PATH" } = $oldPath;
+    }
+    else {
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+        print "access denied";
     }
 }
 elsif( $action eq "createUserForm" ) {
@@ -1060,5 +1141,6 @@ sub setupDataDirectory {
         writeFile( "$dataDirectory/topDocuments/mostRecent", "" );
         
         writeFile( "$dataDirectory/index/docCount", "0" );
+        writeFile( "$dataDirectory/admin.pass", "changeme" );
     }
 }
