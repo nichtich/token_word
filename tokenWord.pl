@@ -76,6 +76,9 @@
 # 2003-June-2   Jason Rohrer
 # Added support for extracting multiple quotes with the same operation.
 #
+# 2003-July-18   Jason Rohrer
+# Added per-user toggle of quote display mode.
+#
 
 
 
@@ -137,9 +140,13 @@ my $action = $cgiQuery->param( "action" ) || '';
 # get the cookie, if it exists
 my $userCookie = $cgiQuery->cookie( "loggedInUser" ) ;
 my $userSessionIDCookie = $cgiQuery->cookie( "sessionID" ) ;
+my $userShowQuotesCookie = $cgiQuery->cookie( "showQuotes" ) ;
+
 
 my $loggedInUser;
 my $sessionID;
+my $showQuotes;
+
 
 if( $userCookie ) {
     $loggedInUser = $userCookie;
@@ -157,6 +164,14 @@ if( $userSessionIDCookie ) {
 }
 else {
     $sessionID = '';
+}
+
+
+if( $userShowQuotesCookie eq 'true' ) {
+    $showQuotes = 1;
+}
+else {
+    $showQuotes = 0;
 }
 
 
@@ -404,12 +419,17 @@ elsif( $action eq "createUser" ) {
             my $sessionIDCookie = $cgiQuery->cookie( -name=>"sessionID",
                                                      -value=>"$newSessionID",
                                                      -expires=>'+1h' );
-        
+
+            # default to hide quotes mode
+            my $showQuotesCookie = $cgiQuery->cookie( -name=>"showQuotes",
+                                                      -value=>"false",
+                                                      -expires=>'+1h' );
             print $cgiQuery->header( -type=>'text/html',
                                      -expires=>'now',
                                      -Cache_control=>'no-cache',
                                      -cookie=>[ $userCookie, 
-                                                $sessionIDCookie ] );
+                                                $sessionIDCookie,
+                                                $showQuotesCookie ] );
             $loggedInUser = $user;
 
             # save the new session ID
@@ -456,10 +476,16 @@ elsif( $action eq "login" ) {
                                                  -value=>"$newSessionID",
                                                  -expires=>'+1h' );
         
+        # default to hide quotes mode
+        my $showQuotesCookie = $cgiQuery->cookie( -name=>"showQuotes",
+                                                  -value=>"false",
+                                                  -expires=>'+1h' );
+
         print $cgiQuery->header( -type=>'text/html',
                                  -expires=>'now',
                                  -Cache_control=>'no-cache',
-                                 -cookie=>[ $userCookie, $sessionIDCookie ] );
+                                 -cookie=>[ $userCookie, $sessionIDCookie,
+                                            $showQuotesCookie ] );
         $loggedInUser = $user;
 
         # save the new session ID
@@ -474,11 +500,15 @@ elsif( $action eq "logout" ) {
                                         -value=>"" );
     my $sessionIDCookie = $cgiQuery->cookie( -name=>"sessionID",
                                              -value=>"" );
-    
+    my $showQuotesCookie = $cgiQuery->cookie( -name=>"showQuotes",
+                                              -value=>"",
+                                              -expires=>'+1h' );
+
     print $cgiQuery->header( -type=>'text/html',
                              -expires=>'now',
                              -Cache_control=>'no-cache',
-                             -cookie=>[ $userCookie, $sessionIDCookie ] );
+                             -cookie=>[ $userCookie, $sessionIDCookie,
+                                        $showQuotesCookie ] );
     
     # leave the old sessionID file in place    
 
@@ -527,10 +557,55 @@ else {
         my $sessionIDCookie = $cgiQuery->cookie( -name=>"sessionID",
                                                  -value=>"$sessionID",
                                                  -expires=>'+1h' );
+
+        my $showQuotesCookieValue;
+
+        
+        if( $action eq "showDocumentQuotes" ) {
+            $showQuotesCookieValue = "true";
+            $showQuotes = 1;
+        }
+        elsif( $action eq "hideDocumentQuotes" ) {
+            $showQuotesCookieValue = "false";
+            $showQuotes = 0;
+        }
+        else {
+            # retain old value
+            $showQuotesCookieValue = "$userShowQuotesCookie";
+        }
+
+        my $showQuotesCookie = $cgiQuery->cookie( 
+                                              -name=>"showQuotes",
+                                              -value=>"$showQuotesCookieValue",
+                                              -expires=>'+1h' );
+
         print $cgiQuery->header( -type=>'text/html',
                                  -expires=>'now',
                                  -Cache_control=>'no-cache',
-                                 -cookie=>[ $userCookie, $sessionIDCookie ] );
+                                 -cookie=>[ $userCookie, $sessionIDCookie,
+                                            $showQuotesCookie ] );
+
+        # switch action to show document quotes if show quote mode is on
+        # and highlights are off 
+        my $highlightOn = 0;
+        my $highlightWordsString = 
+            $cgiQuery->param( "highlightWords" ) || '';
+        my $highlightLength = 
+            $cgiQuery->param( "highlightLength" ) || '';
+
+        if( $highlightWordsString ne "" or $highlightLength ne "" ) {
+            $highlightOn = 1;
+            print "highlight is on<BR>";
+        }
+
+        if( $showQuotes and not $highlightOn ) {
+            if( $action eq "showDocument" ) {
+                # switch action
+                $action = "showDocumentQuotes";
+            }
+        }
+
+
 
         if( $action eq "test" ) {
             print "test for user $loggedInUser\n";
@@ -692,7 +767,7 @@ else {
                 }
             }
         }
-        elsif( $action eq "showDocument" ) {
+        elsif( $action eq "showDocument" or $action eq "hideDocumentQuotes" ) {
         
             my $docOwner = $cgiQuery->param( "docOwner" ) || '';
             
