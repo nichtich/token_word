@@ -28,6 +28,7 @@
 # 2003-January-16   Jason Rohrer
 # Added check for correct remote host address.
 # Added a failed withdraw page.
+# Added MD5 user session ID cookie with corresponding local file.
 #
 
 
@@ -35,7 +36,7 @@ use lib '.';
 
 use strict;
 use CGI;                # Object-Oriented
-
+use MD5;
 
 use tokenWord::common;
 use tokenWord::chunkManager;
@@ -63,8 +64,10 @@ my $action = $cgiQuery->param( "action" ) || '';
 
 # get the cookie, if it exists
 my $userCookie = $cgiQuery->cookie( "loggedInUser" ) ;
+my $userSessionIDCookie = $cgiQuery->cookie( "sessionID" ) ;
 
 my $loggedInUser;
+my $sessionID;
 
 if( $userCookie ) {
     $loggedInUser = $userCookie;
@@ -73,6 +76,15 @@ if( $userCookie ) {
 }
 else {
     $loggedInUser = '';
+}
+
+if( $userSessionIDCookie ) {
+    $sessionID = $userSessionIDCookie;
+    # untaint
+    ( $sessionID ) = ( $sessionID =~ /(\w+)/ );
+}
+else {
+    $sessionID = '';
 }
 
 
@@ -220,25 +232,44 @@ elsif( $action eq "login" ) {
         tokenWord::htmlGenerator::generateLoginForm( "login failed" );
     }
     else {
-        my $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
-                                        -value=>"$user",
-                                        -expires=>'+1h' );
+        my $userCookie = $cgiQuery->cookie( -name=>"loggedInUser",
+                                            -value=>"$user",
+                                            -expires=>'+1h' );
+        
+        # take the MD5 hash of the username, password, 
+        # and current system time 
+        my $md5 = new MD5;
+        $md5->add( $user, $password, time() ); 
+        my $newSessionID = $md5->hexdigest();
+
+        my $sessionIDCookie = $cgiQuery->cookie( -name=>"sessionID",
+                                                 -value=>"$newSessionID",
+                                                 -expires=>'+1h' );
         
         print $cgiQuery->header( -type=>'text/html',
                                  -expires=>'now',
-                                 -cookie=>$cookie );
+                                 -cookie=>[ $userCookie, $sessionIDCookie ] );
         $loggedInUser = $user;
+
+        # save the new session ID
+        writeFile( "$dataDirectory/users/$user/sessionID",
+                   $newSessionID );
+
         showMainPage();
     }
 }
 elsif( $action eq "logout" ) {
-    my $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
-                                    -value=>"" );
+    my $userCookie = $cgiQuery->cookie( -name=>"loggedInUser",
+                                        -value=>"" );
+    my $sessionIDCookie = $cgiQuery->cookie( -name=>"sessionID",
+                                             -value=>"" );
     
     print $cgiQuery->header( -type=>'text/html',
                              -expires=>'now',
-                             -cookie=>$cookie );
+                             -cookie=>[ $userCookie, $sessionIDCookie ] );
     
+    # leave the old sessionID file in place    
+
     if( $loggedInUser ne '' ) {
         tokenWord::htmlGenerator::generateLoginForm( 
                                       "$loggedInUser has logged out\n" );
@@ -248,25 +279,40 @@ elsif( $action eq "logout" ) {
     }
 }
 else {
-    
-
-    
-
 
     if( $loggedInUser eq '' ) {
         print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
-    else {
+    elsif( -e "$dataDirectory/users/$loggedInUser/sessionID" and
+           $sessionID ne 
+           readFileValue( "$dataDirectory/users/$loggedInUser/sessionID" ) ) {
+        
+        # bad session ID returned in cookie
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
 
-        # send back a new cookie to keep the user logged in
-        my $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
+        tokenWord::htmlGenerator::generateLoginForm( "" );
+    }
+    elsif( not -e "$dataDirectory/users/$loggedInUser/sessionID" ) {
+        # session ID file does not exist
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+
+        tokenWord::htmlGenerator::generateLoginForm( "" );
+    }
+    else {
+        # session ID returned in cookie is correct
+
+        # send back a new cookie to keep the user logged in longer
+        my $userCookie = $cgiQuery->cookie( -name=>"loggedInUser",
                                         -value=>"$loggedInUser",
                                         -expires=>'+1h' );
+        my $sessionIDCookie = $cgiQuery->cookie( -name=>"sessionID",
+                                                 -value=>"$sessionID",
+                                                 -expires=>'+1h' );
         print $cgiQuery->header( -type=>'text/html',
                                  -expires=>'now',
-                                 -cookie=>$cookie );
+                                 -cookie=>[ $userCookie, $sessionIDCookie ] );
 
         if( $action eq "test" ) {
             print "test for user $loggedInUser\n";
@@ -580,8 +626,8 @@ sub setupDataDirectory {
 
         mkdir( "$dataDirectory/topDocuments", oct( "0777" ) );
         
-        writeToFile( "$dataDirectory/topDocuments/mostQuoted", "" );
-        writeToFile( "$dataDirectory/topDocuments/mostRecent", "" );
+        writeFile( "$dataDirectory/topDocuments/mostQuoted", "" );
+        writeFile( "$dataDirectory/topDocuments/mostRecent", "" );
         
     }
 }
