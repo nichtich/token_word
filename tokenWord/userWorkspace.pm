@@ -33,6 +33,9 @@ package tokenWord::userWorkspace;
 # 2003-June-2   Jason Rohrer
 # Added support for extracting multiple quotes with the same operation.
 #
+# 2004-October-20   Jason Rohrer
+# Switched internally from @ to @@@ as marker to allow email addresses.
+#
 
 
 use tokenWord::common;
@@ -56,12 +59,12 @@ use tokenWord::quoteClipboard;
 sub submitAbstractDocument {
     ( my $username, my $docText ) = @_;
     
-    # replace < and > with @< and >@
-    $docText =~ s/</@</g;
-    $docText =~ s/>/>@/g;
+    # replace < and > with @@@< and >@@@
+    $docText =~ s/</@@@</g;
+    $docText =~ s/>/>@@@/g;
     
         
-    my @docSections = split( /@/, $docText );
+    my @docSections = split( /@@@/, $docText );
 
 
     if( $docSections[0] eq "" ) {
@@ -205,12 +208,12 @@ sub submitAbstractDocument {
 sub previewAbstractDocument {
     ( my $username, my $docText ) = @_;
     
-    # replace < and > with @< and >@
-    $docText =~ s/</@</g;
-    $docText =~ s/>/>@/g;
+    # replace < and > with @@@< and >@@@
+    $docText =~ s/</@@@</g;
+    $docText =~ s/>/>@@@/g;
     
         
-    my @docSections = split( /@/, $docText );
+    my @docSections = split( /@@@/, $docText );
 
 
     if( $docSections[0] eq "" ) {
