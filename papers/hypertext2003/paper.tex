@@ -28,6 +28,7 @@
 % Fixed a typo.
 % Fixed mistakes pointed out by Nelson.  
 % Added comments for Nelson's suggestions.
+% Added note about transpointing windows reference.
 %
 
 
@@ -746,6 +747,7 @@ Second, \tokenWord \  does not support multi-server integration:  each installat
 We see multi-server integration as one of the weakpoints in the Xanadu architecture:  how can we ensure that references never break in a system comprised of multiple, separately owned servers?
 Even if fault-tolerant, multi-server integration is possible, it is not essential for the end-user experience. 
 Third, \tokenWord \   does not support side-by-side document comparison with transpointing lines, a classic Xanadu interface feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
+% Nelson describes transpointing windows in more detail in CACM 1995.  Cite here.
 The transpointing interface would be difficult, if not impossible, to support in a web browser with no additional software.
 However, a side-by-side document comparison interface, using colored highlighting to indicate identical regions, has been contemplated for \tokenWord.
 Implementing such an interface would be easy, though coming up with a highlighting scheme that works correctly in the general case (for example, without running out of readable colors) is quite difficult.
