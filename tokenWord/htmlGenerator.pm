@@ -23,6 +23,7 @@ package tokenWord::htmlGenerator;
 # Added support for error page.
 # Added a feedback form.
 # Added support for document highlights.
+# Added display of search results.
 #
 
 
@@ -674,6 +675,68 @@ sub generateExtractQuoteForm {
     $formText =~ s/<!--#MESSAGE-->/$message/;
     
     print $formText;
+
+
+    generateFullFooter( $loggedInUser );
+}
+
+
+
+##
+# Generates a page of search results.
+#
+# @param0 the currently logged-in user.
+# @param1 the search term string.
+# @param2 the number of documents searched.
+# @param3 the search time as a formatted string.
+# @param4 the list of < user, docID > result strings.
+##
+sub generateSearchResultsPage {
+    ( my $loggedInUser, my $searchTerms, my $docCount, my $searchTime, 
+      my @results ) = @_;
+ 
+    generateFullHeader( "search results: $searchTerms" );
+
+    my $pageText = readFileValue( "$htmlDirectory/searchResults.html" );
+
+    $pageText =~ s/<!--#SEARCH_TERMS-->/$searchTerms/;
+    $pageText =~ s/<!--#DOC_COUNT-->/$docCount/;
+    $pageText =~ s/<!--#SEARCH_TIME-->/$searchTime/;
+    
+
+    my @resultListParts = ();
+    
+    # add the head of the list
+    push( @resultListParts, "<TABLE BORDER=0>" );
+
+    foreach $result ( @results ) {
+        my @components = 
+            tokenWord::common::extractRegionComponents( $result );
+        
+        my $owner = $components[0];
+        my $id = $components[1];
+
+        my $title = tokenWord::documentManager::getDocTitle( $owner, $id );
+        
+        push( @resultListParts, 
+              "<TR><TD>$owner\'s</TD><TD><A HREF=\"tokenWord.pl?".
+              "action=showDocument&docOwner=$owner&docID=$id\">".
+              "$title</A></TD>\n" );
+    }
+    
+    if( scalar( @results ) == 0 ) {
+        push( @resultListParts, "<TR><TD>none</TD></TR>\n" );
+    }
+
+    # add the foot of the list
+    push( @resultListParts, "</TABLE>" );
+
+
+    my $resultList = join( "", @resultListParts );
+
+    $pageText =~ s/<!--#RESULTS_LIST-->/$resultList/;
+
+    print $pageText;
 
 
     generateFullFooter( $loggedInUser );

@@ -64,6 +64,35 @@ sub addToIndex {
         
         addToFile( "$letterDirectory/$word", "$docRegion\n" );
     }
+
+
+    
+    # increment indexed doc count
+
+    my $docCountFileName = 
+        "$dataDirectory/index/docCount";
+
+    my $docCount = readFileValue( $docCountFileName );
+
+    # untaint doc count
+    ( $docCount ) = ( $docCount =~ /(\d+)/ );
+
+
+    my $newCount = $docCount + 1;
+
+    writeFile( $docCountFileName, $newCount );
+
+}
+
+
+
+##
+# Gets the number of documents in the index.
+#
+# @return the indexed document count.
+##
+sub getIndexedDocCount {
+    return readFileValue( "$dataDirectory/index/docCount" );
 }
 
 

@@ -37,6 +37,7 @@
 # Added support for document highlights.
 # Added support for adding created documents to index.
 # Added limited support for searching.
+# Added display of search results.
 #
 
 
@@ -55,6 +56,8 @@ use tokenWord::userWorkspace;
 use tokenWord::indexSearch;
 
 use tokenWord::htmlGenerator;
+
+use Time::HiRes;
 
 
 my $paypalPercent = 0.029;
@@ -712,12 +715,32 @@ else {
         elsif( $action eq "search" ) {
             my $searchTermString = $cgiQuery->param( "terms" ) || '';
             
+            my $startTime = Time::HiRes::time();
+
             my @terms = split( /\s+/, $searchTermString );
-            print "terms = @terms\n<BR>";
-            my @matchingDocs = tokenWord::indexSearch::searchIndex( 20,
+            my @matchingDocs = tokenWord::indexSearch::searchIndex( 100,
                                                                     @terms );
             
-            print "matching docs = @matchingDocs\n";
+            my $endTime = Time::HiRes::time();
+            my $netTime = $endTime - $startTime;
+
+            my $timeString;
+            if( $netTime < 1 ) {
+                $netTime = $netTime * 1000;
+                $timeString = sprintf( "%.2f milliseconds", $netTime );
+            }
+            else {
+                $timeString = sprintf( "%.2f seconds", $netTime );
+            }
+
+            my $docCount = tokenWord::indexSearch::getIndexedDocCount();
+
+            tokenWord::htmlGenerator::generateSearchResultsPage (
+                                                            $loggedInUser,
+                                                            $searchTermString,
+                                                            $docCount,
+                                                            $timeString,
+                                                            @matchingDocs );
         }
         elsif( $action eq "deposit" ) {
         
@@ -847,9 +870,10 @@ sub setupDataDirectory {
         mkdir( "$dataDirectory/topDocuments", oct( "0777" ) );
 
         mkdir( "$dataDirectory/index", oct( "0777" ) );
-        
+
         writeFile( "$dataDirectory/topDocuments/mostQuoted", "" );
         writeFile( "$dataDirectory/topDocuments/mostRecent", "" );
         
+        writeFile( "$dataDirectory/index/docCount", "0" );
     }
 }
