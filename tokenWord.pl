@@ -394,29 +394,37 @@ else {
                     writeFile( $filePath, $docTextPreview );
 
 
-                    # call ispell... this is a safe use of the shell
-                    # untaint and later restore PATH
-                    my $oldPath = $ENV{ "PATH" };
-                    $ENV{ "PATH" } = "";
-                
-                    my $misspelled = 
-                        `/bin/cat ./$filePath | /usr/bin/ispell -l`;
-                
-                    $ENV{ "PATH" } = $oldPath;
-
-                    # delete temp file
-                    unlink( $filePath );
-
-
-                    @misspelledWords = split( /\s+/, $misspelled );
                     
-                    # replace misspelled words with red versions
-                    foreach my $word ( @misspelledWords ) {
-                        my $redWord = "<FONT COLOR=#FF0000>$word</FONT>";
+                    if( -e "/usr/bin/ispell" ) {
+                        # call ispell... this is a safe use of the shell
+                        # untaint and later restore PATH
+                        my $oldPath = $ENV{ "PATH" };
+                        $ENV{ "PATH" } = "";
+                    
+                        my $misspelled = 
+                            `/bin/cat ./$filePath | /usr/bin/ispell -l`;
+                
+                        $ENV{ "PATH" } = $oldPath;
                         
-                        # make sure we only replace those that have
-                        # not yet been replaced.
-                        $docTextPreview =~ s/([^>])$word([^<])/$1$redWord$2/;
+                        # delete temp file
+                        unlink( $filePath );
+
+
+                        @misspelledWords = split( /\s+/, $misspelled );
+                    
+                        # replace misspelled words with red versions
+                        foreach my $word ( @misspelledWords ) {
+                            my $redWord = "<FONT COLOR=#FF0000>$word</FONT>";
+                        
+                            # make sure we only replace those that have
+                            # not yet been replaced.
+                            $docTextPreview =~ 
+                                s/([^>])$word([^<])/$1$redWord$2/;
+                        }
+                    }
+                    else {
+                        addToFile( "errors.out", 
+                                   "Cannot find /usr/bin/ispell\n\n" );
                     }
                 }
                 
