@@ -12,7 +12,7 @@
 
 \begin{document}
 
-\title{\tw:  Building a Xanalogical System in Nine Days}
+\title{\tw:  Building a Xanalogical System in Ten Days}
 
 \numberofauthors{1}
 
@@ -34,7 +34,7 @@ We describe \tw, a web-based xanalogical hypertext system.  Our system supports 
 Features include deep quotation, unbreakable references, two-way reference chasing, and frictionless micropayments that are backed by real-world currency.
 To our knowledge, \tw \ is the first xanalogical system implementation to included all of these features.  Furthermore, \tw \ is the first xanalogical system of any kind to be accessible by a web browser with no additional software.
 
-Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \ was implented from scratch in nine days by one person.  
+Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \ was implented from scratch in ten days by one person.  
 We attribute this success to the maturity of modern technology and design techniques.  
 In particular, choosing Perl as the implementation language allowed the rather complex xanalogical text processing operations to be expressed in elegant ways.
 A live \tw \ system is running at:
@@ -159,7 +159,7 @@ We can summarize the Xanadu model with the following feature list:  deep quotati
 
 
 \section{System Architecture}
-We designed and built \tw, a full-featured xanalogical system, from scratch in only nine days.
+We designed and built \tw, a full-featured xanalogical system, from scratch in only ten days.
 To acheive this kind of rapid development, we relied heavily on modern technology and design techniques.
 We do not view past Xanadu failures with disdain.
 Those early attempts were simply ahead of their time:  the technology of the day was not ready for Xanadu.
@@ -258,11 +258,20 @@ The chunks associated with a quote are only resolved when the quote is used as p
 The entire \tw \  system is implemented as a single CGI script written in Perl, though the script is broken up into eight modules for organization purposes.
 Perl's built-in support for regular expressions was very useful for the rather complicated text processing done by \tw.
 Many of these text processing operations could be expressed in succinct and elegant ways using Perl.
-For example, highlighting possible misspellings in preview mode was a minor addition that required less than ten lines of code.
+For example, highlighting possible misspellings in preview mode was a minor addition that required less than fifteen lines of code.
 
 CGI programming is well-supported in Perl, and HTML made user interface layout and user action processing easy to implement.
 Perl-based CGI programming seems to be the modern method of choice for rapidly developing complex, multi-user applications.
 Other systems that have used this development method successfully are discussed in Section \ref{sec:RelatedWork}.
+
+Even though the full development cycle was short, we used an iterative process.
+Features were added one at a time to the system, and the system was maintained in a usable form at all times.
+For example, we started with a system that managed text chunks, then added document management, then added quotes, then added tokens transfers, {\it etc.}
+Final iterations added features such as spell checking and index-based searching.
+From our understanding of previous xanalogical implementation efforts, this iterative process may have been key to our success.
+The Xanadu model is complex and subtle, and it is easy to get bogged down by details without ever producing a working system.
+Our system started out simple and grew in complexity, feature by feature.
+
 
 \subsubsection{Data Representation}
 The system data is stored in a directory tree on the filesystem.
