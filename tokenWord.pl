@@ -9,11 +9,15 @@
 # 2003-January-7   Jason Rohrer
 # Updated to test new features.
 #
+# 2003-January-8   Jason Rohrer
+# Started working on CGI interface.
+#
 
 
 use lib '.';
 
 use strict;
+use CGI;                # Object-Oriented
 
 
 use tokenWord::common;
@@ -23,79 +27,64 @@ use tokenWord::userManager;
 use tokenWord::quoteClipboard;
 use tokenWord::userWorkspace;
 
+use tokenWord::htmlGenerator;
 
-print "test\n";
 
+# make sure data directories exist
 setupDataDirectory();
 
+
+
+my $cgiQuery = CGI->new();
+my $action = $cgiQuery->param( "action" ) || '';
+
+my %userCookie = $cgiQuery->cookie( "loggedInUser" ) ;
+
+my $loggedInUser = $userCookie{ value } || ''; 
+
+
+my $setCookie = 0;
+my $cookie;
+
+
+if( $action eq "login" ) {
+    my $user = $cgiQuery->param( "user" ) || '';
+    my $password = $cgiQuery->param( "password" ) || '';
     
-    # use regexp to untaint username
-    #my ( $safeUsername ) = 
-    #    ( $username =~ /(\w+)$/ );
+
+    $cookie = $query->cookie( -name=>"loggedInUser",
+                              -value=>"$user",
+                              -expires=>'+1h' );
+    $setCookie = 1;
+}
+
+if( $setCookie ) {
+    print $cgiQuery->header( -type=>'text/html',
+                             -cookie=>$cookie );
+}
+else {
+    print $cgiQuery->header( -type=>'text/html' );
+}
+
+
+if( $loggedInUser eq '' ) {
+    tokenWord::htmlGenerator::generateLoginForm();
+}
+else {
+
+    if( $action eq "showDocument" ) {
+        
+        my $docOwner = $cgiQuery->param( "docOwner" ) || '';
+        my $docID = $cgiQuery->param( "docID" ) || '';
     
-
-tokenWord::userManager::addUser( "jj55", "testPass", "1500" );
-my $chunkID = tokenWord::chunkManager::addChunk( "jj55", 
-                                                 "This is a test chunk." );
-
-my $region = 
-  tokenWord::chunkManager::getRegionText( "jj55", $chunkID, 10, 4 );
-print "chunk region = $region\n";
-
-my $docString = "<jj55, $chunkID, 0, 5>\n<jj55, $chunkID, 10, 4>";
-my $docID = 
-  tokenWord::documentManager::addDocument( "jj55", $docString );
+        my $text = 
+          tokenWord::documentManager::renderDocumentText( $docOwner, $docID );
+    
+      tokenWord::htmlGenerator::generateDocPage( $text );
+    }
+}
 
 
-my $fullDocText =
-  tokenWord::documentManager::renderDocumentText( "jj55", $docID );
-
-print "Full document text = \n$fullDocText\n";
-
-$region = 
-  tokenWord::documentManager::renderRegionText( "jj55", $docID, 2, 2 );
-print "document region = $region\n";
-
-
-#my $quoteID = tokenWord::quoteClipboard::addQuote( "jj55", "jj55",
-#                                                   $docID, 2, 2 );
-
-my $quoteID = tokenWord::userWorkspace::extractAbstractQuote( 
-                                                         "jj55", "jj55",
-                                                         $docID,
-                                                         "T<q>his te</q>st" );
-
-$region = 
-  tokenWord::quoteClipboard::renderQuoteText( "jj55", $quoteID );
-print "quote = $region\n";
-
-$docID = 
-  tokenWord::userWorkspace::submitAbstractDocument(
-      "jj55", "I am quoting myself here:  <q $quoteID>" );
-
-print "done submitting document\n";
-
-$fullDocText =
-  tokenWord::documentManager::renderDocumentText( "jj55", $docID );
-
-print "Full quote document text = \n$fullDocText\n";
-
-
-print "Adding user ab10\n";
-tokenWord::userManager::addUser( "ab10", "testPass", "1500" );
-
-my $balance = tokenWord::userManager::getBalance( "ab10" );
-print "ab10 balance = $balance\n";
-print "ab10 purchasing document\n";
-tokenWord::userWorkspace::purchaseDocument( "ab10", "jj55", $docID );
-
-my $balance = tokenWord::userManager::getBalance( "ab10" );
-print "ab10 balance = $balance\n";
-print "ab10 purchasing document again\n";
-tokenWord::userWorkspace::purchaseDocument( "ab10", "jj55", $docID );
-
-my $balance = tokenWord::userManager::getBalance( "ab10" );
-print "ab10 balance = $balance\n";
 
 
 

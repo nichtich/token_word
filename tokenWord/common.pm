@@ -32,6 +32,7 @@ sub BEGIN {
 
 
 $dataDirectory = "tokenWordData";
+$htmlDirectory = "htmlTemplates";
 
 
 
