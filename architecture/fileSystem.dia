@@ -3598,5 +3598,100 @@
         <dia:connection handle="1" to="O98" connection="1"/>
       </dia:connections>
     </dia:object>
+    <dia:object type="UML - Object" version="0" id="O100">
+      <dia:attribute name="obj_pos">
+        <dia:point val="11,10"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="10.95,9.95;14.1892,11.85"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="11,10"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="3.1392"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="1.8"/>
+      </dia:attribute>
+      <dia:attribute name="text">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>#temp#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.8"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="12.5696,11.0947"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string/>
+      </dia:attribute>
+      <dia:attribute name="exstate">
+        <dia:string/>
+      </dia:attribute>
+      <dia:attribute name="attrib">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.8"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="0,0"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="0"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="is_active">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="show_attribs">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="multiple">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Line" version="0" id="O101">
+      <dia:attribute name="obj_pos">
+        <dia:point val="26.7512,6.8"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="12.5208,6.75123;26.8,10.0488"/>
+      </dia:attribute>
+      <dia:attribute name="conn_endpoints">
+        <dia:point val="26.7512,6.8"/>
+        <dia:point val="12.5696,10"/>
+      </dia:attribute>
+      <dia:attribute name="numcp">
+        <dia:int val="1"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O0" connection="6"/>
+        <dia:connection handle="1" to="O100" connection="1"/>
+      </dia:connections>
+    </dia:object>
   </dia:layer>
 </dia:diagram>
