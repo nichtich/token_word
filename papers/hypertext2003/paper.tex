@@ -31,13 +31,13 @@
 \maketitle
 
 \begin{abstract}
-We describe \tw, a web-based xanalogical hypertext system.  Our system supports almost every feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
+We describe \tw, a web-based xanalogical hypertext system.  Our system supports almost every core feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
 Features include deep quotation, unbreakable references, two-way reference chasing, and frictionless micropayments that are backed by real-world currency.
 To our knowledge, \tw \ is the first xanalogical system implementation to included all of these features.  Furthermore, \tw \ is the first xanalogical system of any kind to be accessible by a web browser with no additional software.
 
 Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \ was implented from scratch in ten days by one person.  
-We attribute this success to the maturity of modern technology and design techniques.  
-In particular, choosing Perl as the implementation language allowed the rather complex xanalogical text processing operations to be expressed in elegant ways.
+We attribute this success to the maturity of modern technology and development techniques.  
+%In particular, choosing Perl as the implementation language allowed the rather complex xanalogical text processing operations to be expressed in elegant ways.
 A live \tw \ system is running at:
 \begin{center}
 http://hypertext.sf.net/token\_word
@@ -498,7 +498,7 @@ In our example, 33 bytes of data would occupy at least a kilobyte of disk space.
 
 The second limitation is in terms of filesystem architecture:  Unix-like filesystems use an inode table, and each file must be associated with an inode.
 When a filesystem is created, the number of available inodes is fixed, and this number can be relatively small (the common ratio for modern Linux systems seems to be about 200,000 inodes per gigabyte of disk space). \cite{OperatingSystems}
-Ignoring storage efficiency concerns, our implementation is limited in terms of the number of chunks and documents it can contain.
+Thus, even if we ignore storage efficiency concerns, our implementation is limited in terms of the number of chunks and documents it can contain.
 
 If our system did need to scale to support millions of users and billions of chunks and documents, several approaches would be possible.
 First, we could use an existing database system as a backend to store chunks and documents.
@@ -512,7 +512,7 @@ By modifying the implementation of these module functions, either of the scalabl
 We chose a filesystem backend, despite its scalability limitations, because of its simplicity.
 This choice fits into our implementation philosophy, since the focus was on producing a working system and adding features iteratively.
 A scalable backend might be seen as a feature to be added in a future iteration.
-Our system, in its current form, is still functional in terms of its goals:  it could support hundreds of users and hundreds of thousands of documents, which is enough to give us an understanding of a xanalogical user experience.
+Our system, in its current form, is still functional in terms of its goals:  it can potentially support hundreds of users and hundreds of thousands of documents, which is enough to give us an understanding of a xanalogical user experience.
 
 
 %\subsection{Xanalogical Improvements}
@@ -529,7 +529,7 @@ However, PayPal's currency model does not support the microdollar resolution tha
 Even if PayPal did support high-resolution payments, it does not allow a third party to initiate transfers between account holders in a transparent and frictionless way (and for good reason, given the security issues).
 
 To deal with these issues, we built an internal token balance system and used PayPal integration only for deposits and withdrawls of real-world currency.
-For example, a deposit is by no means frictionless (logging in to PayPal is required), but after the deposit has been made, token payments are completely transparent as the user accesses \tw \ documents.
+With this configuration, a deposit is by no means frictionless (logging in to PayPal is required), but after the deposit has been made, token payments are completely transparent as the user accesses \tw \ documents.
 Similarly, withdrawing tokens in exchange for real-world currency is not frictionless: 
 PayPal does not support an automated payment mechanism, so withdrawl requests are queued for manual processing by the \tw \ system administrator.
 Whereas deposits take effect immediately (using PayPal's ``Instant Payment Notification'' service), withdrawn token refunds are delayed by the response of the human administrator.
@@ -641,9 +641,9 @@ Many blogs are implemented using CGI and Perl, though more recent efforts seem t
 
 
 \subsection{Commonalities and Differences}
-All three systems share several aspects in common with \tw.
+All three systems discussed above share several features in common with \tw.
 First, they are all web-based, collaborative information spaces.
-Second, they all relie heavily on existing technology for their implementations.
+Second, they all rely heavily on existing technology for their implementations.
 Third, from what we can tell, they were developed relatively quickly.
 
 In addition, we can see iterative development philosophies in weblogs and Wikis, not necessarily in the individual projects, but in the phenomena themselves.
@@ -652,15 +652,40 @@ Over time, new implementations were released with more features.
 Today, the most popular systems in either category are extraordinarily feature-rich.
 
 Of course, out of all of the collaborative information spaces discussed here, \tw \ is the only system that supports deep content reuse and frictionless micropayments.
-Thus, these systems are closely related in terms of implementation, but their goals are very different. 
-
-
+Thus, these systems are closely related in terms of implementation, but their goals and end-user experiences are very different. 
 
 
 
 
 \section{Conclusion}
+Thoughout this paper, we have discussed the strategies that made \tw \ development possible, including an interative process and heavy use of existing technology.
 
+One additional strategy was crucial, though it has not been mention explicitly:  a focus on a core xanalogical feature set.
+We set out to build a system that supported deep quotation, unbreakable references, and frictionless micropayments.
+In Section \ref{sec:Xanadu}, we distilled these features from the Xanadu model.
+However, {\it Literary Machines} is over 250 pages long, and it is choked full of features that an ideal xanalogical system might have \cite{NelsonLiteraryMachines}.
+Perhaps previous Xanadu efforts aimed for this ideal feature set, and perhaps this is why they failed.
+
+\tw \ is by no means the ideal xanalogical system, and many features are missing.
+However, it is still the first system to implement the core features of the Xanadu architecture.
+Though one would be hard-pressed to argue that the features included in \tw \ are not crucial, three important features are missing.
+First, \tw \ does not explicitly support document versioning.
+However, using the quotation primitive, a limited form of versioning can be emulated (a user can quote unchanged regions of the previous version when creating a new version).
+Second, \tw \ does not support multi-server integration:  each installation of \tw \ operates in isolation, and quotes between documents at different sites are not possible.
+We see multi-server integration as one of the weakpoints in the Xanadu model:  how can we ensure that references never break in a system comprised of multiple, separately owned servers?
+Even if fault-tolerant, multi-server integration is possible, it is not essential for the end-user experience. 
+Third, \tw \  does not support the side-by-side document comparission with {\it transpointing} lines, a classic Xanadu feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
+The transpointing interface would be difficult, if not impossible, to support in a web browser with no additional software.
+However, a side-by-side document comparisson interface, using colored highlighting to indicate itentical regions, has been contemplated for \tw.
+Implementing such an interface would be easy, though coming up with a highlighting scheme that works correctly in the general case (for example, without running out of readable colors) is quite difficult.
+
+In recent personal conversations, Nelson has described a layered presentation model that could work in conjunction with a xanalogical storage system.
+For example, a presentation layer could specify font sizes, links, or annotations, and multiple layers could be stacked when rendering a particular piece of content.
+Given \tw's data model and presentation code, adding layers would not be difficult.
+In fact, particular types of layers are already implemented:  highlights for misspellings, quote context, and hit search terms are applied to document text after it is assembled.
+Highlights are achieved by inserting presentation tags (in this case, HTML font color tags) around particular character spans.
+Many other presentation styles could be supported with a similar mechanism by inserting other tag types.
+Layers are an ideal feature to add in a future development iteration.
 
 \section{Acknowledgements}
 Thanks are due to Ted Nelson and Jim Whitehead for their contributions to interesting xanalogical discussions over the past year. ``Xanadu'' is a trademark of Ted Nelson.  To prevent confusion, the generic terms ({\it e.g.}, xanalogical system) have been used wherever possible.
