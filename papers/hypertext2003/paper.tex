@@ -17,6 +17,9 @@
 % 2003-February-14 Jason Rohrer
 % Made changes to match ACM SIG formatting guidelines.
 %
+% 2003-February-15 Jason Rohrer
+% Added changes in response to Jim's comments.
+%
 
 
 \documentclass{acm_proc_article-sp}
@@ -26,7 +29,7 @@
 
 \begin{document}
 
-\title{\tw:  Building a Xanalogical System in Ten Days}
+\title{\tw:  a Xanalogical Storage and Authoring System}
 
 \numberofauthors{1}
 
@@ -43,17 +46,16 @@
 
 
 \begin{abstract}
-We describe \tw, a web-based xanalogical hypertext system.  Our system supports almost every core feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
+We describe \tw, a web-based xanalogical hypertext system.  
+Our system supports almost every core feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
 Features include deep quotation, unbreakable references, two-way reference chasing, and frictionless micropayments that are backed by real-world currency.
 To our knowledge, \tw \ is the first xanalogical system implementation to included all of these features.  Furthermore, \tw \  is the first xanalogical system of any kind to be accessible by a web browser with no additional software.
-
-Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \  was implemented from scratch in ten days by one person.  
-We attribute this success to the maturity of modern technology and development techniques.  
-%In particular, choosing Perl as the implementation language allowed the rather complex xanalogical text processing operations to be expressed in elegant ways.
+Previous attempts at full xanalogical implementations took many years and were ultimately never completed.
+Given this historical backdrop, an additional contribution of this paper is in analyzing the development strategies that led to a relatively novel success.
 A live \tw \  system is running at:
-\begin{center}
-http://hypertext.sf.net/token\_word
-\end{center}
+
+\centering\texttt{http://hypertext.sf.net/token\_word}
+
 \end{abstract}
 
 \category{H.5.4}{Information Interfaces and Applications}{Hypertext/Hypermedia}[Architectures]
@@ -97,8 +99,10 @@ Ironically, this decision was made just when the world was ripe for the first gl
 We are scared of Xanadu.  
 We hear its siren song and are tempted, but we know that many have tried and many have failed.  
 The most frustrating factor is that none of us really know how useful Xanadu would be, even if it \textit{did} exist.  
-We can look at architecture diagrams and photographs of cardboard mock-ups \cite{Nelson1999}, but these do not give us a true sense of what it would be like to use a xanalogical system.  
+We can look at architecture diagrams and photographs of cardboard mock-ups \cite{Nelson1999}, but these do not give us a true sense of what it would be like to use a xanalogical system.
 Few of us have ever played with a xanalogical user interface prototype, even fewer have paid or received a true micropayment (xanalogical or otherwise), and almost none have transcluded the work of another or had our work transcluded.
+Many hypertext systems have been inspired by xanalogical ideas.
+To our knowledge, however, none of these system support a true form of transclusion, let alone transclusion \textit{and} micropayments, both of which are central to the Xanadu architecture and user experience.
 
 What is using a xanalogical system really like?
 Is it as useful as it sounds?
@@ -174,7 +178,7 @@ We can summarize the Xanadu model with the following feature list:  deep quotati
 
 
 \section{System Architecture}
-We designed and built \tw, a full-featured xanalogical system, from scratch in only ten days.
+We designed and built \tw, a full-featured xanalogical system, from scratch in only ten days, and our development team consisted of a single programmer.
 To achieve this kind of rapid development, we relied heavily on modern technology and development techniques.
 We do not view past Xanadu failures with disdain.
 Those early attempts were simply ahead of their time:  the technology of the day was not ready for Xanadu.
@@ -610,7 +614,13 @@ A user that actively published popular content in \tw \  could effectively use t
 
 Much of the existing work on xanalogical systems was discussed in Sections \ref{sec:Introduction} and \ref{sec:Xanadu}, so we will focus on related non-xanalogical systems here.
 However, we should mention that interest in Xanadu has not waned in recent years.
-For example, Lukka and Fallenstein describe a system that uses ideas taken from Freenet for xanalogical content storage and retrieval \cite{FreenetXanadu}. 
+For example, Lukka and Fallenstein describe a system that uses ideas taken from Freenet for xanalogical content storage and retrieval \cite{FreenetXanadu}.
+Recent work with XLink has focused on adding transclusion capabilities to the web \cite{Lowe2001}, but support is limited to embedding entire documents.
+XPointer can be used in conjunction with XLink to refer to document spans \cite{Vitali2002}, though nothing prevents these references from breaking when documents change.
+
+
+
+
 
 
 \subsection{Wikis}

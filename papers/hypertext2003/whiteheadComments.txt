@@ -31,6 +31,8 @@ already developed a system that incorporates the majority of the Xanadu
 ideas. I certainly don't know of any that support transclusion and
 micropayments at the same time, though.
 
+GOT HERE
+
 * Section 3: "Given these
 precedents, we believe that token word could be scaled into
 a globally accessible system, albeit with minor code modi?-
