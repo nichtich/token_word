@@ -1,3 +1,8 @@
+% 
+% token_word paper
+% Author:  Jason Rohrer
+%
+
 %
 % Modification History
 %
@@ -8,6 +13,9 @@
 % Finished initial draft.
 % Spell-checked.
 % Finished first round of proof reading.
+%
+% 2003-February-14 Jason Rohrer
+% Made changes to match ACM SIG formatting guidelines.
 %
 
 
@@ -30,10 +38,9 @@
     \email{rohrer@cse.ucsc.edu}
 }
 
-\date{February 6, 2003}
-
-
 \maketitle
+
+
 
 \begin{abstract}
 We describe \tw, a web-based xanalogical hypertext system.  Our system supports almost every core feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
@@ -64,13 +71,13 @@ Xanadu is a dream and an ideal.
 We know it would be great (or at least interesting) if a xanalogical system existed, but we are also resigned to the notion that such a system will probably never exist.
 Is Xanadu impossible?
 
-That question by itself, the impossibility question, is extraordinarily intriguing.  We {\it know} that Xanadu is not impossible.  
+That question by itself, the impossibility question, is extraordinarily intriguing.  We \textit{know} that Xanadu is not impossible.  
 The design, on paper \cite{NelsonLiteraryMachines}, is clear enough:  we just need to build it.  
 The problem might be that no one tried to build it.  
 But many people did try to build Xanadu over the years.  
 The problem might be that the people trying to build it did not have sufficient resources.  But people with extraordinary resources did try to build it.  
 Will anyone argue that Autodesk did not have extraordinary software development resources in the late 1980s?  
-Furthermore, Autodesk {\it believed} in Xanadu.  
+Furthermore, Autodesk \textit{believed} in Xanadu.  
 The following quote from a 1988 Autodesk press release is most telling:
 
 \begin{quote}
@@ -89,7 +96,7 @@ Ironically, this decision was made just when the world was ripe for the first gl
 
 We are scared of Xanadu.  
 We hear its siren song and are tempted, but we know that many have tried and many have failed.  
-The most frustrating factor is that none of us really know how useful Xanadu would be, even if it {\it did} exist.  
+The most frustrating factor is that none of us really know how useful Xanadu would be, even if it \textit{did} exist.  
 We can look at architecture diagrams and photographs of cardboard mock-ups \cite{Nelson1999}, but these do not give us a true sense of what it would be like to use a xanalogical system.  
 Few of us have ever played with a xanalogical user interface prototype, even fewer have paid or received a true micropayment (xanalogical or otherwise), and almost none have transcluded the work of another or had our work transcluded.
 
@@ -100,7 +107,7 @@ This paper attempts to answer these question by describing the first fully-reali
 
 Given this historical perspective, the contributions of this paper are threefold.
 First, this paper analyzes the process that lead from a paper design to real-world xanalogical software.
-Second, this paper shows that modern technology and techniques are of utmost importance for making this implementation process {\it possible}, let alone quick.
+Second, this paper shows that modern technology and techniques are of utmost importance for making this implementation process \textit{possible}, let alone quick.
 Third, this paper describes a full xanalogical system implementation from the perspective of an end-user.
 The novelty of this paper hinges on the implementation, which has a modern flavor, though the underlying ideas are quite old.
 We have achieved a novel success, where past attempts have failed, and we feel that the lessons learned from this process are valuable.
@@ -112,18 +119,18 @@ We have achieved a novel success, where past attempts have failed, and we feel t
 
 \label{sec:Xanadu}
 As mentioned in the above quote, Xanadu's underlying ideas were first incubated by Nelson in the 1960s \cite{Nelson1965}.  
-These ideas evolved somewhat over the next forty years, receiving one of their most verbose presentations in Nelson's book {\it Literary Machines}, which was first published in 1981 \cite{NelsonLiteraryMachines}.  
+These ideas evolved somewhat over the next forty years, receiving one of their most verbose presentations in Nelson's book \textit{Literary Machines}, which was first published in 1981 \cite{NelsonLiteraryMachines}.  
 Nelson's more recent paper on the xanalogical model is up to date in terms of modern technological trends, but the core ideas have not changed \cite{Nelson1999}.  
-The high-level description and interpretation of Xanadu given here is based on information culled from {\it Literary Machines}, Nelson's recent lectures, and personal conversations with Nelson.
+The high-level description and interpretation of Xanadu given here is based on information culled from \textit{Literary Machines}, Nelson's recent lectures, and personal conversations with Nelson.
 
-The chief goal of Xanadu, distilled into a single phrase, is {\it frictionless content reuse}.  
+The chief goal of Xanadu, distilled into a single phrase, is \textit{frictionless content reuse}.  
 This goal would be easily realized in a frictionless, copyright-free world:  authors could simply copy whatever they want and reuse it however they please.  
 In our world, however, we have copyright.
 Unlike other systems \cite{Clark2000}, Xanadu does not attempt to undermine copyright, but instead tries to work with it. 
 All of the design choices and complications in the Xanadu model can be seen as mechanisms for making reuse frictionless in the face of copyright.
-When trying to implement unrestricted reuse in a way that works with copyright, we are faced with the following issue:  {\it copyright forbids unrestricted copying}.
+When trying to implement unrestricted reuse in a way that works with copyright, we are faced with the following issue:  \textit{copyright forbids unrestricted copying}.
 
-Xanadu's central mechanism is {\it transclusion}, a form of quotation.  
+Xanadu's central mechanism is \textit{transclusion}, a form of quotation.  
 Transclusion differs from standard quotation in that it does not involve copying of any kind.  
 When document $A$ transcludes a quote from document $B$, the quote is stored as a deep reference to the quoted material in $B$:  words from $B$ are not copied into $A$. 
 Whenever $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the necessary words from $B$ are fetched from $B$'s owner.
@@ -149,7 +156,7 @@ For example, we may assign monetary value to a printed copy of a book, but we ha
 In the Xanadu model, when users read a quote from document $B$ embedded in document $A$, they may only be accessing a small portion of $B$ (for example, a single sentence from a 10,000-word document).
 Thus, $B$'s owner must be prepared to license only a portion of $B$ to readers.
 The Xanadu model handles this licensing issue with micropayments and per-character values for content.
-Nelson is fond of using the term {\it nanobuck} ($10^{-9}$ dollars) to describe the smallest unit of payment:  documents, or portions of documents, are licensed for $N$ nanobucks per character.
+Nelson is fond of using the term \textit{nanobuck} ($10^{-9}$ dollars) to describe the smallest unit of payment:  documents, or portions of documents, are licensed for $N$ nanobucks per character.
 For example, if $N=100$, a document containing one million characters, if licensed in its entirety, would cost \$0.10, while the first half would cost only \$0.05.
 
 When licensing a portion of a document in the Xanadu model, users are actually licensing a region of the content space.
@@ -179,8 +186,8 @@ Though scalability was not a design goal, \tw \  was built on top of technologie
 Given these precedents, we believe that \tw \   could be scaled into a globally accessible system, albeit with minor code modifications and a sufficient hardware investment. 
 
 \subsection{User Perspective}
-In describing the \tw \  user experience, we are faced with the very issue that motivated \tw \  development in the first place:  descriptions in words and pictures do not give us a true sense of what it is like to {\it use} a system.
-Since this paper's focus is on a real-world implementation and not just an abstract description, we encourage readers to visit {\tt http://hypertext.sf.net/token\_word} to try our system for themselves. 
+In describing the \tw \  user experience, we are faced with the very issue that motivated \tw \  development in the first place:  descriptions in words and pictures do not give us a true sense of what it is like to \textit{use} a system.
+Since this paper's focus is on a real-world implementation and not just an abstract description, we encourage readers to visit \texttt{http://hypertext.sf.net/token\_word} to try our system for themselves. 
 
 From the end-user's perspective, \tw \  has many sal\-ient features.
 Users access \tw \  with a web browser, and they must create accounts and log in to use the system.  
@@ -432,21 +439,21 @@ To support two-way reference chasing, each document has a file that tracks the d
 
 References in documents are represented using the following format:
 \begin{center}
-{\tt <chunkUserID, chunkID, chunkStartOffset, length;\\ 
+\texttt{<chunkUserID, chunkID, chunkStartOffset, length;\\ 
 docUserID, docID, docStartOffset>} 
 \end{center}
 The portion of the reference before the ``;'' describes the chunk region of the reference.  
 The second portion, which is optional, describes the document region context of the reference.  
-Note that {\tt chunkUserID} may differ from {\tt docUserID}, since the quoted region may itself be part of a quote in the context document (in the case of a nested quote).
-Consider our previous example, which is shown in Figure \ref{fig:referenceChain}, and suppose that documents $B$ and  $C$ are owned by {\tt userY} and {\tt userZ}, respectively.
+Note that \texttt{chunkUserID} may differ from \texttt{docUserID}, since the quoted region may itself be part of a quote in the context document (in the case of a nested quote).
+Consider our previous example, which is shown in Figure \ref{fig:referenceChain}, and suppose that documents $B$ and  $C$ are owned by \texttt{userY} and \texttt{userZ}, respectively.
 %For example, document $A$ may quote from document $B$, but the portion that $A$ quotes may be part of $B$'s quote from document $C$.
 The reference included in document $A$ might look like this:
 \begin{center}
-{\tt <userZ, k, 12, 50; userY, B, 125>} 
+\texttt{<userZ, k, 12, 50; userY, B, 125>} 
 \end{center}
 In other words, we have 50 characters from chunk $k$, starting with character 13, which were quoted from document $B$, starting at character 126.
-{\tt userZ} owns both document $C$ and chunk $k$, since $k$ was created as original material for use in $C$.
-Note that {\tt length} is not specified for the document region context of a reference, since it would be redundant (in our example, it would be 50).
+\texttt{userZ} owns both document $C$ and chunk $k$, since $k$ was created as original material for use in $C$.
+Note that \texttt{length} is not specified for the document region context of a reference, since it would be redundant (in our example, it would be 50).
 
 %With this representation, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
 %By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
@@ -455,13 +462,13 @@ Note that {\tt length} is not specified for the document region context of a ref
 As described in our discussion of data models, each quote on a clipboard has only a single pointer to a document region and no chunk region pointers.
 We represent these references with the following format:
 \begin{center}
-{\tt <docUserID, docID, startOffset, length>} 
+\texttt{<docUserID, docID, startOffset, length>} 
 \end{center}
-Consider our previous example clipboard, which is shown in Figure \ref{fig:quoteClipboardModel}, and suppose that documents $A$ and  $B$ are owned by {\tt userX} and {\tt userY}, respectively.
+Consider our previous example clipboard, which is shown in Figure \ref{fig:quoteClipboardModel}, and suppose that documents $A$ and  $B$ are owned by \texttt{userX} and \texttt{userY}, respectively.
 The clipboard representation might look like this:
 \begin{center}
-{\tt <userX, A, 37, 75>}\\
-{\tt <userY, B, 100, 50>}\\ 
+\texttt{<userX, A, 37, 75>}\\
+\texttt{<userY, B, 100, 50>}\\ 
 \end{center}
 
 
@@ -554,9 +561,9 @@ One user might write documents that are popular with new users (for example, a c
 
 We have devised a risk-free mechanism that deals with the adoption barrier.  
 Our approach uses two token types.
-The first type of tokens, called {\it trial} tokens, have no real-world value.
+The first type of tokens, called \textit{trial} tokens, have no real-world value.
 Each new account starts out with a small number of trial tokens (in our live system, each account starts with 50,000 trial tokens).
-The second type of tokens, called {\it real} tokens, can be exchanged for real-world currency.
+The second type of tokens, called \textit{real} tokens, can be exchanged for real-world currency.
 The token transfer logic in \tw \  keeps track of token types:  trial tokens can only be transfered between users' trial balances, and real tokens can only be transfered between real balances.
 Trial tokens are favored, and real tokens are only spent when a user has no trial tokens.
 
@@ -668,7 +675,7 @@ Thoughout this paper, we have discussed the strategies that made \tw \  developm
 
 One additional strategy was crucial, though it has not been mention explicitly:  a focus on a core xanalogical feature set.
 We aimed to build a system that supported deep quotation, unbreakable references, and frictionless micropayments---we distilled these features from the Xanadu model in Section \ref{sec:Xanadu}.
-However, {\it Literary Machines} is over 250 pages long, and it is chocked full of features that an ideal xanalogical system might have \cite{NelsonLiteraryMachines}.
+However, \textit{Literary Machines} is over 250 pages long, and it is chocked full of features that an ideal xanalogical system might have \cite{NelsonLiteraryMachines}.
 Perhaps previous Xanadu efforts aimed to support this entire feature set, and perhaps that is why they failed.
 
 \tw \  is by no means an ideal xanalogical system, and many features are missing.
@@ -679,7 +686,7 @@ However, using the quotation primitive, a limited form of versioning can be emul
 Second, \tw \  does not support multi-server integration:  each installation of \tw \  operates in isolation, and quotes between documents at different sites are not possible.
 We see multi-server integration as one of the weakpoints in the Xanadu architecture:  how can we ensure that references never break in a system comprised of multiple, separately owned servers?
 Even if fault-tolerant, multi-server integration is possible, it is not essential for the end-user experience. 
-Third, \tw \   does not support side-by-side document comparission with {\it transpointing} lines, a classic Xanadu interface feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
+Third, \tw \   does not support side-by-side document comparission with \textit{transpointing} lines, a classic Xanadu interface feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
 The transpointing interface would be difficult, if not impossible, to support in a web browser with no additional software.
 However, a side-by-side document comparisson interface, using colored highlighting to indicate itentical regions, has been contemplated for \tw.
 Implementing such an interface would be easy, though coming up with a highlighting scheme that works correctly in the general case (for example, without running out of readable colors) is quite difficult.
@@ -693,7 +700,7 @@ Many other presentation styles could be supported in this way by inserting other
 Layers are an ideal feature to add in a future development iteration.
 
 \section{Acknowledgements}
-Thanks are due to Ted Nelson and Jim Whitehead for their contributions to interesting xanalogical discussions over the past year. ``Xanadu'' is a trademark of Ted Nelson.  To prevent confusion, the generic terms ({\it e.g.}, xanalogical system) have been used wherever possible.
+Thanks are due to Ted Nelson and Jim Whitehead for their contributions to interesting xanalogical discussions over the past year. ``Xanadu'' is a trademark of Ted Nelson.  To prevent confusion, the generic terms (\textit{e.g.}, xanalogical system) have been used wherever possible.
 
 \bibliographystyle{abbrv}
 \bibliography{paper}
