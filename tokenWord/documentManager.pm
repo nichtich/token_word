@@ -6,9 +6,13 @@ package tokenWord::documentManager;
 # 2003-January-6   Jason Rohrer
 # Created.
 #
+# 2003-January-7   Jason Rohrer
+# Fixed regexp matching bugs.
+#
 
 
 use tokenWord::common;
+use tokenWord::chunkManager;
 
 
 ##
@@ -68,15 +72,20 @@ sub getRegionChunks {
     
     my $lengthSum = 0;
     
-    my @regions = split( /\n/, $docString );
+    my @regions = split( />\s*</, $docString );
 
     foreach my $region ( @regions ) {
-        
+        print "Loop region = $region\n";
+        # first remove all < or >
+        $region =~ s/[<>]//g;
+
         my @regionParts = split( /;/, $region );        
 
-        # we only care about the first part here (discard document info)
-        my @regionElements = split( /<*\s*,\s*>*/, $regionParts[0] );
         print "region parts = $regionParts[0]\n";
+
+
+        # we only care about the first part here (discard document info)
+        my @regionElements = split( /\s*,\s*/, $regionParts[0] );
 
         #FIXME
 
@@ -143,14 +152,21 @@ sub getRegionText {
     
     my @chunks = getRegionChunks( @_ );
     
-
+    
+    # accumulate text for each chunk in this array
     my @chunkText = ();
 
     foreach my $region ( @chunks ) {
-        my @regionElements = split( /<\s+,\s+>/, $region );
+
+        # first remove all < or >
+        $region =~ s/[<>]//g;
+
+        my @regionElements = split( /\s*,\s*/, $region );
         
-        push( @chunkText, 
-              chunkManager::getRegion( @regionElements ) );
+        my $regionText = 
+          tokenWord::chunkManager::getRegion( @regionElements );
+
+        push( @chunkText, $regionText );
     }
     
     return join( "", @chunkText );
