@@ -122,7 +122,7 @@ elsif( $action eq "login" ) {
 }
 elsif( $action eq "logout" ) {
     my $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
-                                        -value=>"" );
+                                    -value=>"" );
     
     print $cgiQuery->header( -type=>'text/html',
                              -expires=>'now',
@@ -132,19 +132,32 @@ elsif( $action eq "logout" ) {
                                      "$loggedInUser has logged out\n" );
 }
 else {
-    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+    
+
     
 
 
     if( $loggedInUser eq '' ) {
-      tokenWord::htmlGenerator::generateLoginForm( "" );
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+
+        tokenWord::htmlGenerator::generateLoginForm( "" );
     }
     else {
+
+        # send back a new cookie to keep the user logged in
+        my $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
+                                        -value=>"$loggedInUser",
+                                        -expires=>'+1h' );
+        print $cgiQuery->header( -type=>'text/html',
+                                 -expires=>'now',
+                                 -cookie=>$cookie );
+
         if( $action eq "test" ) {
             print "test for user $loggedInUser\n";
         }
         elsif( $action eq "createDocumentForm" ) {
-            tokenWord::htmlGenerator::generateCreateDocumentForm();
+            tokenWord::htmlGenerator::generateCreateDocumentForm( 
+                                                        $loggedInUser );
         }
         elsif( $action eq "createDocument" ) {
             my $abstractDoc = $cgiQuery->param( "abstractDoc" ) || '';
@@ -177,12 +190,18 @@ else {
             #untaint
             ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
             ( $docID ) = ( $docID =~ /(\d+)/ );
-
+            
+            #first, purchase the document
+            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                        $docOwner,
+                                                        $docID );
+            
             my $text = 
                 tokenWord::documentManager::renderDocumentText( $docOwner, 
                                                                 $docID );
             
-            tokenWord::htmlGenerator::generateDocPage( $docOwner,
+            tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                       $docOwner,
                                                        $docID, $text );
         
         }
@@ -192,7 +211,8 @@ else {
                 tokenWord::quoteClipboard::renderAllQuotes( $loggedInUser );
             
             
-            tokenWord::htmlGenerator::generateQuoteListPage( @quoteList );
+            tokenWord::htmlGenerator::generateQuoteListPage( $loggedInUser,
+                                                             @quoteList );
         
         }
         elsif( $action eq "extractQuoteForm" ) {
@@ -210,7 +230,8 @@ else {
                 tokenWord::documentManager::renderDocumentText( $docOwner, 
                                                                 $docID );
             
-            tokenWord::htmlGenerator::generateExtractQuoteForm( $docOwner,
+            tokenWord::htmlGenerator::generateExtractQuoteForm( $loggedInUser,
+                                                                $docOwner,
                                                                 $docID,
                                                                 $text );
         }

@@ -8,6 +8,15 @@
 
 <H2>create document:</H2>
 
+<TABLE BORDER=0>
+<TR><TD>
+You can embed quotes from your <A HREF="tokenWord.pl?action=showQuoteList">quote clipboard</A> in your document with &#60;q N&#62-style quote tags, where N is the quote number.<BR>
+For example, inserting the tag &#60;q 3&#62 would embed quote 3 in your document.<BR>
+</TD></TR>
+</TABLE>
+
+
+
 <FORM METHOD=POST ACTION="tokenWord.pl">
 
 <INPUT TYPE="hidden" NAME="action" VALUE="createDocument">
@@ -17,7 +26,7 @@
 
 <TR>
 <TD ALIGN=LEFT>
-<INPUT TYPE="textarea" COLS=40 ROWS=20 NAME="abstractDoc" VALUE="">
+<INPUT TYPE="textarea" COLS=60 ROWS=20 NAME="abstractDoc" VALUE="">
 </TD>
 <TD ALIGN=LEFT>
 </TD>

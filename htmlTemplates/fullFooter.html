@@ -1,0 +1,69 @@
+
+
+</TD>
+
+
+<!-- Sidebar goes here -->
+
+
+<TD VALIGN=TOP>
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=2>
+
+<TR>
+<TD BGCOLOR=#000000><FONT COLOR=#FFFFFF>logged in as <B><!--#USER--></B></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR=#EEEEEE>
+
+
+-<A HREF="tokenWord.pl?action=showQuoteList">quote clipboard</A><BR>
+
+-<A HREF="tokenWord.pl?action=createDocumentForm">create document</A><BR>
+
+-<A HREF="tokenWord.pl?action=logout">logout</A>
+
+
+<HR>
+show document:
+<FORM ACTION="tokenWord.pl">
+
+<INPUT TYPE="hidden" NAME="action" VALUE="showDocument">
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+
+<TR>
+<TD>user:</TD>
+<TD><INPUT TYPE="text" MAXLENGTH=256 SIZE=8 NAME="docOwner" VALUE=""></TD>
+</TR>
+
+<TR>
+<TD>docID:</TD>
+<TD><INPUT TYPE="text" MAXLENGTH=256 SIZE=8 NAME="docID" VALUE=""></TD>
+</TR>
+
+<TR>
+<TD></TD><TD ALIGN=RIGHT><INPUT TYPE=submit VALUE="show"></TD>
+</TR>
+
+</TABLE>
+
+</FORM>
+
+
+
+<HR>
+Token balance:<BR>
+<!--#TOKEN_BALANCE-->
+
+
+</TD>
+</TR>
+
+</TABLE>
+
+
+
+</TD></TR></TABLE>
+

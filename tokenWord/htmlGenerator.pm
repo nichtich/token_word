@@ -9,7 +9,7 @@ package tokenWord::htmlGenerator;
 
 
 use tokenWord::common;
-
+use tokenWord::userManager;
 
 
 sub generateHeader {
@@ -27,7 +27,38 @@ sub generateHeader {
 sub generateFooter {
 
     my $footerText = readFileValue( "$htmlDirectory/footer.html" );
+
+    print $footerText;
+}
+
+
+
+
+sub generateFullHeader {
+    ( my $title ) = @_;
+
+    generateHeader( $title );
+
+    my $headerText = readFileValue( "$htmlDirectory/fullHeader.html" );
     
+    print $headerText;
+}
+
+
+
+sub generateFullFooter {
+    ( my $loggedInUser ) = @_;
+    
+    generateFooter();
+
+    my $balance = tokenWord::userManager::getBalance( $loggedInUser );
+
+    
+    my $footerText = readFileValue( "$htmlDirectory/fullFooter.html" );
+    
+    $footerText =~ s/<!--#USER-->/$loggedInUser/;
+    $footerText =~ s/<!--#TOKEN_BALANCE-->/$balance/;
+
     print $footerText;
 }
 
@@ -70,7 +101,7 @@ sub generateCreateUserForm {
 sub generateMainPage {
     ( my $user ) = @_;
  
-    generateHeader( "main page" );
+    generateFullHeader( "main page" );
 
     my $pageText = readFileValue( "$htmlDirectory/mainPage.html" );
 
@@ -79,67 +110,70 @@ sub generateMainPage {
     print $pageText;
 
 
-    generateFooter();
+    generateFullFooter( $user );
 }
 
 
 
 sub generateCreateDocumentForm {
-    
-    generateHeader( "create document" );
+    ( my $user ) = @_;
+
+    generateFullHeader( "create document" );
 
     my $formText = readFileValue( "$htmlDirectory/createDocumentForm.html" );
     
     print $formText;
 
 
-    generateFooter();
+    generateFullFooter( $user );
 }
 
 
 sub generateDocPage {
-    ( my $docOwner, my $docID, my $docText ) = @_;
+    ( my $user, my $docOwner, my $docID, my $docText ) = @_;
     
     my @docElements = split( /\n\n/, $docText );
 
     my $docTitle = shift( @docElements );
 
-    generateHeader( "document: $docTitle" );
+    generateFullHeader( "document: $docTitle" );
     
-    print "<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>\n";
+    my $docDisplayText = 
+        readFileValue( "$htmlDirectory/documentDisplay.html" ); 
 
-    print "<H1>$docTitle</H1>\n";
+
+    $docDisplayText =~ s/<!--#DOC_TITLE-->/$docTitle/g;
+    $docDisplayText =~ s/<!--#DOC_OWNER-->/$docOwner/g;
+    $docDisplayText =~ s/<!--#DOC_ID-->/$docID/g;
+
+    my @bodyTextElements = ();
 
     foreach $paragraph ( @docElements ) {
-        print "$paragraph<BR><BR>\n";
+        push( @bodyTextElements, "$paragraph<BR><BR>\n" );
     }
     
-    print "<BR><BR>\n";
+    my $bodyText = join( "", @bodyTextElements );
 
-    print "<A HREF=\"tokenWord.pl?action=extractQuoteForm";
-    print "&docOwner=$docOwner&docID=$docID\">";
-    print "extract a quote</A>\n";
+    $docDisplayText =~ s/<!--#DOC_BODY-->/$bodyText/;
 
-    print "</TD></TR></TABLE>\n";
+    print $docDisplayText;
 
-    print "</CENTER>\n";
-
-    generateFooter();
+    generateFullFooter( $user );
 }
 
 
 
 sub generateQuoteListPage {
-    my @quotes = @_;
+    ( my $user, my @quotes ) = @_;
 
-    generateHeader( "quote list" );
+    generateFullHeader( "quote list" );
     
     print "<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>\n";
 
     if( scalar( @quotes ) > 0 ) {
         print "<H1>Quotes:</H1>\n";
     
-        print "<TABLE CELLSPACING=5 BORDER=1>\n";
+        print "<TABLE CELLPADDING=5 BORDER=1>\n";
         
         print "<TR><TD>quote number</TD><TD>quote</TD></TR>\n";
 
@@ -169,15 +203,15 @@ sub generateQuoteListPage {
     }
     print "</TD></TR></TABLE></CENTER>\n";
     
-    generateFooter();
+    generateFullFooter( $user );
 }
 
 
 
 sub generateExtractQuoteForm {
-    ( my $docOwner, my $docID, my $docText ) = @_;
+    ( my $user, my $docOwner, my $docID, my $docText ) = @_;
 
-    generateHeader( "extract quote" );
+    generateFullHeader( "extract quote" );
 
     my $formText = readFileValue( "$htmlDirectory/extractQuoteForm.html" );
 
@@ -188,7 +222,7 @@ sub generateExtractQuoteForm {
     print $formText;
 
 
-    generateFooter();
+    generateFullFooter( $user );
 }
 
 
