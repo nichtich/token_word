@@ -391,7 +391,7 @@ sub updateDatabaseFromDataTarball {
     my $fileList =
         `/bin/cat ./$dataDirectoryName.tar | /bin/tar tf -`;
 
-    my @files = split( /\n/, $fileList );
+    my @files = split( /\w+/, $fileList );
 
     foreach $file ( @files ) {
         print "Inserting $file<BR>";
