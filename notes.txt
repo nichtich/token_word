@@ -25,3 +25,21 @@ Examples:
 
 <jd45, 12, 104, 20; dpj, 14, 1304>
 
+
+
+
+Tuesday, January 7, 2003
+
+Format for user abstract document submission:
+
+plain text, including <q N> quote tags, where N is a quote number.
+
+Example:
+
+This is a test document.  I am quoting David, who said:
+<q 15>
+I am also quoting David's father, who said:
+<q 23>
+ 
+
+
