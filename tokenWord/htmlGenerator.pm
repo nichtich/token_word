@@ -20,6 +20,7 @@ package tokenWord::htmlGenerator;
 # Added a failed withdraw page.
 # Added document preview.
 # Improved layout of most- lists.
+# Added support for error page.
 #
 
 
@@ -696,6 +697,24 @@ sub generateFailedWithdrawPage {
 
     print $pageText;
 
+
+    generateFullFooter( $loggedInUser );
+}
+
+
+
+##
+# Generates an error page.
+#
+# @param0 the currently logged-in user.
+# @param1 the error message to display 
+##
+sub generateErrorPage {
+    ( my $loggedInUser, my $message ) = @_;
+    
+    generateFullHeader( "error" );
+
+    print "<CENTER>$message</CENTER>";
 
     generateFullFooter( $loggedInUser );
 }

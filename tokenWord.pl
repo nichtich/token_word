@@ -32,6 +32,7 @@
 # Added check for badly-formatted quote extraction.
 # Improved behavior on document creation.
 # Added document preview.
+# Added checks for document existence.
 #
 
 
@@ -417,26 +418,38 @@ else {
             ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
             ( $docID ) = ( $docID =~ /(\d+)/ );
             
-            #first, purchase the document
-            ( my $success, my $amount ) =
-                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                            $docOwner,
-                                                            $docID );
-            if( $success ) {
-                my $text = 
-                    tokenWord::documentManager::renderDocumentText( $docOwner, 
-                                                                    $docID );
+            # make sure it exists
+            if( tokenWord::documentManager::doesDocumentExist( $docOwner,
+                                                               $docID ) ) {
+
+                #first, purchase the document
+                ( my $success, my $amount ) =
+                  tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                              $docOwner,
+                                                              $docID );
+                if( $success ) {
+                    my $text = 
+                        tokenWord::documentManager::renderDocumentText( 
+                                                                  $docOwner, 
+                                                                  $docID );
             
-                tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
-                                                           $docOwner,
-                                                           $docID, $text, 0 );
-            }
-            else {
-                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                    tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                               $docOwner,
+                                                               $docID, $text, 
+                                                               0 );
+                }
+                else {
+                    tokenWord::htmlGenerator::generateFailedPurchasePage(
                                                                $loggedInUser,
                                                                $docOwner,
                                                                $docID,
                                                                $amount );
+                  }
+            }
+            else {
+                tokenWord::htmlGenerator::generateErrorPage( 
+                                                 $loggedInUser,
+                                                 "document does not exist" );
             }
         }
         elsif( $action eq "showDocumentQuotes" ) {
@@ -451,28 +464,38 @@ else {
             ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
             ( $docID ) = ( $docID =~ /(\d+)/ );
             
-            #first, purchase the document
-            ( my $success, my $amount ) =
-                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                            $docOwner,
-                                                            $docID );
+            # make sure it exists
+            if( tokenWord::documentManager::doesDocumentExist( $docOwner,
+                                                               $docID ) ) {
+                #first, purchase the document
+                ( my $success, my $amount ) =
+                    tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                                $docOwner,
+                                                                $docID );
 
-            if( $success ) {
-                my @chunks = 
-                  tokenWord::documentManager::getAllChunks( $docOwner,
-                                                            $docID );
+                if( $success ) {
+                    my @chunks = 
+                        tokenWord::documentManager::getAllChunks( $docOwner,
+                                                                  $docID );
             
-              tokenWord::htmlGenerator::generateDocQuotesPage( $loggedInUser,
+                    tokenWord::htmlGenerator::generateDocQuotesPage( 
+                                                               $loggedInUser,
                                                                $docOwner,
                                                                $docID, 
                                                                @chunks );
-            }
-            else {
-                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                }
+                else {
+                    tokenWord::htmlGenerator::generateFailedPurchasePage(
                                                                $loggedInUser,
                                                                $docOwner,
                                                                $docID,
                                                                $amount );
+                  }
+            }
+            else {
+                tokenWord::htmlGenerator::generateErrorPage( 
+                                                 $loggedInUser,
+                                                 "document does not exist" );
             }
         }
         elsif( $action eq "listQuotingDocuments" ) {
@@ -487,15 +510,24 @@ else {
             ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
             ( $docID ) = ( $docID =~ /(\d+)/ );
             
-            my @quotingDocs = 
-                tokenWord::documentManager::getQuotingDocuments( $docOwner,
-                                                                 $docID );
+            # make sure it exists
+            if( tokenWord::documentManager::doesDocumentExist( $docOwner,
+                                                               $docID ) ) {
+                my @quotingDocs = 
+                    tokenWord::documentManager::getQuotingDocuments( $docOwner,
+                                                                     $docID );
             
-            tokenWord::htmlGenerator::generateQuotingDocumentListPage( 
+                tokenWord::htmlGenerator::generateQuotingDocumentListPage( 
                                                              $loggedInUser,
                                                              $docOwner,
                                                              $docID, 
                                                              @quotingDocs );
+            }
+            else {
+                tokenWord::htmlGenerator::generateErrorPage( 
+                                                 $loggedInUser,
+                                                 "document does not exist" );
+            }
             
         }
         elsif( $action eq "showQuoteList" ) {
@@ -516,29 +548,39 @@ else {
             ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
             ( $docID ) = ( $docID =~ /(\d+)/ );
 
-            #first, purchase the document
-            ( my $success, my $amount ) =
-                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                            $docOwner,
-                                                            $docID );
-            if( $success ) {
-                my $text = 
-                  tokenWord::documentManager::renderDocumentText( $docOwner, 
+            # make sure it exists
+            if( tokenWord::documentManager::doesDocumentExist( $docOwner,
+                                                               $docID ) ) {
+                #first, purchase the document
+                ( my $success, my $amount ) =
+                    tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                                $docOwner,
+                                                                $docID );
+                if( $success ) {
+                    my $text = 
+                        tokenWord::documentManager::renderDocumentText( 
+                                                                  $docOwner, 
                                                                   $docID );
             
-                tokenWord::htmlGenerator::generateExtractQuoteForm( 
+                    tokenWord::htmlGenerator::generateExtractQuoteForm( 
                                                                $loggedInUser,
                                                                $docOwner,
                                                                $docID,
                                                                $text,
                                                                "");
-            }
-            else {
-                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                }
+                else {
+                    tokenWord::htmlGenerator::generateFailedPurchasePage(
                                                                $loggedInUser,
                                                                $docOwner,
                                                                $docID,
                                                                $amount );
+                  }
+            }
+            else {
+                tokenWord::htmlGenerator::generateErrorPage( 
+                                                 $loggedInUser,
+                                                 "document does not exist" );
             }
         }
         elsif( $action eq "extractQuote" ) {
@@ -554,64 +596,72 @@ else {
             ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
             ( $docID ) = ( $docID =~ /(\d+)/ );
 
+            if( tokenWord::documentManager::doesDocumentExist( $docOwner,
+                                                               $docID ) ) {
 
-            # fix "other" newline style.
-            $abstractQuote =~ s/\r/\n/g;
+                # fix "other" newline style.
+                $abstractQuote =~ s/\r/\n/g;
             
             
-            # convert non-standard paragraph breaks (with extra whitespace)
-            # to newline-newline breaks
-            $abstractQuote =~ s/\s*\n\s*\n/\n\n/g;
-            
-            # since abstract quote string contains entire document
-            # text, forcing user to purchase document when extracting
-            # quote makes sense
+                # convert non-standard paragraph breaks (with extra whitespace)
+                # to newline-newline breaks
+                $abstractQuote =~ s/\s*\n\s*\n/\n\n/g;
+                
+                # since abstract quote string contains entire document
+                # text, forcing user to purchase document when extracting
+                # quote makes sense
 
-            #first, purchase the document
-            ( my $success, my $amount ) =
-              tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                          $docOwner,
-                                                          $docID );
+                #first, purchase the document
+                ( my $success, my $amount ) =
+                    tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                                $docOwner,
+                                                                $docID );
 
-            if( $success ) {
-                my $newQuoteID =
-                  tokenWord::userWorkspace::extractAbstractQuote( 
+                if( $success ) {
+                    my $newQuoteID =
+                        tokenWord::userWorkspace::extractAbstractQuote( 
                                                               $loggedInUser,
                                                               $docOwner, 
                                                               $docID,
                                                               $abstractQuote );
-                if( $newQuoteID == -1 ) {
-                    # failed to extract quote
-                    # show form with a message
-                    my $text = 
-                      tokenWord::documentManager::renderDocumentText(
+                    if( $newQuoteID == -1 ) {
+                        # failed to extract quote
+                        # show form with a message
+                        my $text = 
+                            tokenWord::documentManager::renderDocumentText(
                                                                   $docOwner, 
                                                                   $docID );
             
-                    tokenWord::htmlGenerator::generateExtractQuoteForm( 
+                        tokenWord::htmlGenerator::generateExtractQuoteForm( 
                                                                $loggedInUser,
                                                                $docOwner,
                                                                $docID,
                                                                $text,
                                          "quote tags not properly formatted" );
-                }
-                else {
-                    # show the new quote list
-                    my @quoteList = 
-                      tokenWord::quoteClipboard::getAllQuoteRegions( 
+                    }
+                    else {
+                        # show the new quote list
+                        my @quoteList = 
+                            tokenWord::quoteClipboard::getAllQuoteRegions( 
                                                               $loggedInUser );
             
-                  tokenWord::htmlGenerator::generateQuoteListPage(
+                        tokenWord::htmlGenerator::generateQuoteListPage(
                                                               $loggedInUser,
                                                               @quoteList );
+                    }
                 }
-            }
-            else {
-                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                else {
+                    tokenWord::htmlGenerator::generateFailedPurchasePage(
                                                                $loggedInUser,
                                                                $docOwner,
                                                                $docID,
                                                                $amount );
+                  }
+            }
+            else {
+                tokenWord::htmlGenerator::generateErrorPage( 
+                                                 $loggedInUser,
+                                                 "document does not exist" );
             }
         }
         elsif( $action eq "deposit" ) {

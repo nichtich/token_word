@@ -28,8 +28,9 @@ package tokenWord::documentManager;
 # 2003-January-14   Jason Rohrer
 # Added support for most recent and most quoted lists.
 #
-# 2003-January-14   Jason Rohrer
+# 2003-January-16   Jason Rohrer
 # Fixed bug in most-quoted list.
+# Added function for checking document existence.
 #
 
 
@@ -273,6 +274,33 @@ sub getMostRecentDocuments {
     my $mostRecentString = readFileValue( $mostRecentFile );
 
     my @mostRecent = split( /\n/, $mostRecentString );
+}
+
+
+
+##
+# Gets whether a document exists.
+#
+# @param0 the username.
+# @param1 the docID.
+#
+# @return 1 if the document exist, and 0 otherwise.
+#
+# Example:
+# my $exists = doesDocumentExist( "jb55", 5 );
+##
+sub doesDocumentExist {
+    ( my $username, my $docID  ) = @_;
+
+    my $docDirName = "$dataDirectory/users/$username/text/documents";
+
+    
+    if( -e "$docDirName/$docID" ) { 
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 
