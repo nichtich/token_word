@@ -70,6 +70,7 @@
 # Changed to use subroutine to check for file existence.
 # Changed to use subroutine to make directories.
 # Added bypassed file access where appropriate.
+# Added function for populating database from a tarball.
 #
 
 
@@ -310,6 +311,24 @@ elsif( $action eq "refreshFromDataTarball" ) {
         print "Outcome = $outcome <BR>(blank indicates no error)";
 
         $ENV{ "PATH" } = $oldPath;
+    }
+    else {
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+        print "access denied";
+    }
+}
+elsif( $action eq "updateDatabaseFromDataTarball" ) {
+    my $password = $cgiQuery->param( "password" ) || '';
+    
+    my $truePassword = bypass_readFileValue( "$dataDirectory/admin.pass" );
+
+    if( $password eq $truePassword ) {
+    
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now',
+                                 -Cache_control=>'no-cache' );
+
+        updateDatabaseFromDataTarball();
     }
     else {
         print $cgiQuery->header( -type=>'text/html', -expires=>'now',

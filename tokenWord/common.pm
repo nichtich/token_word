@@ -19,6 +19,7 @@ package tokenWord::common;
 # 2003-April-30   Jason Rohrer
 # Added skeleton for using db database instead of filesystem.
 # Added db implementation.
+# Added function for populating database from a tarball.
 #
 
 
@@ -50,6 +51,7 @@ sub BEGIN {
                  bypass_addToFile
                  makeDirectory
                  bypass_makeDirectory
+                 updateDatabaseFromDataTarball
                  trimWhitespace
                  extractRegionComponents );
 }
@@ -370,6 +372,37 @@ sub bypass_makeDirectory {
     my $permissionMask = $_[1];
     
     mkdir( $fileName, $permissionMask );
+}
+
+
+
+##
+# Updates the database using a data tarball.
+##
+sub updateDatabaseFromDataTarball {
+    my $oldPath = $ENV{ "PATH" };
+    $ENV{ "PATH" } = "";
+
+    # extract the tar file
+    my $outcome = 
+        `/bin/cat ./$dataDirectoryName.tar.gz | /bin/gzip -d - > ./$dataDirectoryName.tar`;
+
+    # first, get a file list
+    my $fileList =
+        `/bin/cat ./$dataDirectoryName.tar | /bin/tar tf -`;
+
+    my @files = split( /\n/, $fileList );
+
+    foreach $file ( @files ) {
+        my $fileContents = 
+            `/bin/cat ./$dataDirectoryName.tar | /bin/tar xOf - $file`;
+        writeFile( $file, $fileContents );
+    }
+    my $outcome2 =
+        `rm ./$dataDirectoryName.tar`;
+    print "Outcome = $outcome $outcome2 <BR>(blank indicates no error)";
+    
+    $ENV{ "PATH" } = $oldPath;
 }
 
 
