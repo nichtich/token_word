@@ -20,6 +20,7 @@ package tokenWord::common;
 # Added skeleton for using db database instead of filesystem.
 # Added db implementation.
 # Added function for populating database from a tarball.
+# Switched to gtar to support the O flag.
 #
 
 
@@ -419,7 +420,8 @@ sub updateDatabaseFromDataTarball {
 	    print "$fileCount/$totalFiles: Inserting file $fullFileName<BR>\n";
 
 	    my $fileContents = 
-		`cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/tar xOf - $safeFileName`;
+		`cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/gtar xOf - $safeFileName`;
+        print "   $fileContents\n";
 	    writeFile( $fullFileName, $fileContents );
 	}
 	$fileCount = $fileCount + 1;
