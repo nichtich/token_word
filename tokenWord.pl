@@ -990,7 +990,7 @@ else {
                                                               $docOwner, 
                                                               $docID,
                                                               $abstractQuote );
-                    if( $newQuoteID[0] == -1 ) {
+                    if( $newQuoteIDs[0] == -1 ) {
                         # failed to extract quote
                         # show form with a message
                         my $text = 
