@@ -1,3 +1,31 @@
+frequently asked questions
+
+Q:  how can links be created between documents?
+
+A:  in token_word, the only available mechanism is the quote, which can effectively be used as a link.  Simply quote relevant words from the document that you want to link to---the quoted words will serve as the "link anchor" in your document.  The "link" can be seen by readers when they click the "show embedded quotes" link at the bottom of your document.  Since quotes can be tracked in both directions (by using the "documents that quote this document" link), quotes are actually more powerful than the link mechanisms supported in certain other hypertext systems.
+
+Q:  what is the difference between "trial" tokens and "real" tokens?
+
+A:  trial tokens are given to you for free when you create a token word account, and they have no real-world monetary value (they cannot be withdrawn in exchange for real money).  Their only value is their purchasing power inside token_word.  Real tokens are deposited into token_word in exchange for real money.  The system tracks both kinds of tokens---trial tokens can only be transfered into the trial balance of another user, and real tokens can only be transfered between real balances.  When you purchase a document, the token_word system favors payment with trial tokens as long as they are available.
+
+Q:  what is the point of having two token types?
+
+A:  we want to give new users free tokens, but we also do not want to get ourselves into a sticky financial situation.  Imagine if a particular user (perhaps with the help of other conspiring users) accumulated billions of free tokens and then tried to cash out for real-world money.  Trial tokens allow new users to try out the system for free without financial risk on our part.
+
+
+
+token_word history
+
+token_word was coded from scratch using perl in approximately nine days (January 8, 2002 -- January 17, 2002) by jason rohrer (me, jcr13).
+
+token_word is based on the ideas of Ted Nelson, which have been evolving over the last 40 years.  I had been thinking about Ted's ideas for about one year, and my thoughts on these matters culminated with the frantic production of the token_word system.
+
+in terms of code, token_word relies on CGI.pm (by Lincoln D. Stein), MD5.pm (by Neil Winton), and ispell (by a large group of people over a large number of years).
+
+
+
+
+
 token_word main page
 
 token_word is an online literature system built around the notion of content quotation and reuse---the aim of this system is to make reuse completely frictionless.
@@ -12,7 +40,9 @@ what happens when quotation and reference-chasing becomes automatic?  Quotation 
 
 and what about links?  token_word provides no explicit linking mechanism, though quotes can be used effectively as links (which can be viewed by clicking on the "show embedded quotes" link below).  For example, you can get more information about token_word by chasing the references in the following quotes:
 
+<q0>
 
+<q1>
 
 along with frictionless, deep quotation, token_word delivers a frictionless micropayment system.  Each character in the token_word universe is worth one token.  Thus, a 3000-character article is worth 3000 tokens.  When a user accesses the article for the first time, he or she pays 3000 tokens.  This payment does not go entirely to the author of the article, but is instead split up among the original authors of the words in the article (some of which may have been written by the author of the article).  If the 3000-character article contains 2300 original characters and a 700-character quote, 2300 tokens are transfered to the article author and 700 are transfered to the quote author.
 
