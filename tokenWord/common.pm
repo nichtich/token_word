@@ -398,7 +398,7 @@ sub updateDatabaseFromDataTarball {
     my $totalFiles = scalar( @files );
 
     foreach $file ( @files ) {
-	my ( $safeFileName ) = ( $file =~ /([\w\/]+)/ );
+	my ( $safeFileName ) = ( $file =~ /([\w.\/]+)/ );
         
 	$fullFileName = "$dataDirectoryPath$safeFileName";
 
