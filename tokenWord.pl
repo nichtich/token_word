@@ -145,7 +145,17 @@ else {
         }
         elsif( $action eq "createDocument" ) {
             my $abstractDoc = $cgiQuery->param( "abstractDoc" ) || '';
+            
+            writeFile( "docBefore.txt", $abstractDoc );
+            # fix "other" newline style.
+            $abstractDoc =~ s/\r/\n/g;
+            
+            writeFile( "docAfter.txt", $abstractDoc );
 
+            # convert non-standard paragraph breaks (with extra whitespace)
+            # to newline-newline breaks
+            $abstractDoc =~ s/\s*\n\s*\n/\n\n/g;
+            
             my $docID = 
               tokenWord::userWorkspace::submitAbstractDocument(
                        $loggedInUser, 

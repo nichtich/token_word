@@ -106,12 +106,16 @@ sub generateDocPage {
 
     generateHeader( "document: $docTitle" );
     
+    print "<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>\n";
+
     print "<H1>$docTitle</H1>\n";
 
     foreach $paragraph ( @docElements ) {
-        print "$paragraph\n<p>\n";
+        print "<p>$paragraph</p>\n";
     }
     
+    print "</TD></TR></TABLE></CENTER>\n";
+
     generateFooter();
 }
 
