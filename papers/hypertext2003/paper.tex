@@ -257,7 +257,8 @@ Each reference in a document contains a pointer to text chunk region and an opti
 The document context pointer tracks which document the material was quoted from and is used for quote reference chasing.
 If a document refers to a new text chunk that has not appeared in any previous documents, the document context pointer is omitted:  such chunks are not part of quotes and have no references that can be chased.
 With this two-pointer model, we can distinguish ``original'' material in a document from quoted material and support recursive reference chasing.
-When following a quote reference, a chain of referneces may need to be chased before the original context of the text is found. 
+By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
+%When following a quote reference, a chain of referneces may need to be chased before the original context of the text is found. 
 
 For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote original material, residing in chunk $k$, from document $C$.  
 $A$'s reference will contain both a pointer to the text chunk $k$ and to the document context $B$.  
@@ -342,7 +343,7 @@ Figure \ref{fig:referenceChain} shows a diagram of this reference chain.
 
 \end{graph}
 
-\caption{An example reference chain.  Dotted lines represent document region pointers, and solid arcs represent chunk region pointers.  Light gray regions represent text from chunk $k$.  Dark gray regions in $A$ and $B$ represent portions of $A$'s quote from $B$ that do not come from chunk $k$ (other chunks are omitted from this diagram for clarity).}
+\caption{An example reference chain model.  Dotted lines represent document region pointers, and solid arcs represent chunk region pointers.  Light gray regions represent text from chunk $k$.  Dark gray regions in $A$ and $B$ represent portions of $A$'s quote from $B$ that do not come from chunk $k$ (other chunks are omitted from this diagram for clarity).}
 \label{fig:referenceChain}
 
 \end{center}
@@ -366,7 +367,7 @@ The alternative list model mentioned above could not be easily used to track quo
 \begin{figure}[b]
 \begin{center}
 
-\begin{graph}(6.5,2.5)(-3.25,-1.25)
+\begin{graph}(6.5,2.8)(-3.25,-1.0)
 \graphnodesize{0.6}
 \graphnodecolour{1}
 \opaquetextfalse
@@ -404,7 +405,7 @@ The alternative list model mentioned above could not be easily used to track quo
 
 \end{graph}
 
-\caption{An example quote clipboard.  Dotted lines represent document region pointers.}
+\caption{An example quote clipboard model.  Dotted lines represent document region pointers.}
 \label{fig:quoteClipboardModel}
 
 \end{center}
@@ -417,28 +418,45 @@ The alternative list model mentioned above could not be easily used to track quo
 
 
 \subsubsection{Data Representation}
-The system data is stored in a directory tree on the filesystem.
-Each user has directory that stores that user's chunk files, document files, and quote clipboard files, along with a list of previously purchased chunk regions.
+The system data is stored in a filesystem directory tree.
+Each user has directory that holds that user's chunk files, document files, and quote clipboard files, along with a list of previously purchased chunk regions.
 To support two-way reference chasing, each document has a file that tracks the documents that quote it.
 
-References throughout the system are stored in the following form:
+References in documents are represented using the following format:
 \begin{center}
 {\tt <chunkUserID, chunkID, startOffset, length;\\ 
 docUserID, docID, startOffset>} 
 \end{center}
-The portion of the reference befor the ``;'' describes the text chunk of the reference.  
-The second portion, which is optional, describes the quote context of the reference.  
+The portion of the reference before the ``;'' describes the chunk region of the reference.  
+The second portion, which is optional, describes the document region context of the reference.  
 Note that {\tt chunkUserID} may differ from {\tt docUserID}, since the quote context may be part of a quote in another document.
-For example, document $A$ may quote from document $B$, but the portion that $A$ quotes may be part of $B$'s quote from document $C$.
-In this example, the reference included in $A$ might look like this:
+Consider our previous example, which is shown in Figure \ref{fig:referenceChain}, and suppose that documents $B$ and  $C$ are owned by {\tt userY} and {\tt userZ}, respectively.
+%For example, document $A$ may quote from document $B$, but the portion that $A$ quotes may be part of $B$'s quote from document $C$.
+The reference included in document $A$ might look like this:
 \begin{center}
-{\tt <userC, C, 105, 38; userB, B, 421>} 
+{\tt <userX, k, 12, 50; userY, B, 125>} 
 \end{center}
-Note that {\tt length} is not specified for the document context of a reference, since it would be redundant.
+In other words, we have 50 characters from chunk $k$, starting with character 13, which were quoted from document $B$, starting at character 126.
+Note that {\tt length} is not specified for the document region context of a reference, since it would be redundant (in our example, it would be 50).
 
-With this representation, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
-By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
-When a new chunk is created as part of a document, the context portion of the reference is ommited, indicating that the document is the first context in which this chunk was used.
+%With this representation, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
+%By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
+%When a new chunk is created as part of a document, the context portion of the reference is ommited, indicating that the document is the first context in which this chunk was used.
+
+As described in our discussion of data models, each quote on a clipboard has only a single pointer to a document region and no chunk region pointers.
+We represent these references with the following format:
+\begin{center}
+{\tt <docUserID, docID, startOffset, length>} 
+\end{center}
+Consider our previous example clipboard, which is shown in Figure \ref{fig:quoteClipboardModel}, and suppose that documents $A$ and  $B$ are owned by {\tt userX} and {\tt userY}, respectively.
+The clipboard representation might look like this:
+\begin{center}
+{\tt <userX, A, 37, 75>}\\
+{\tt <userY, B, 100, 50>}\\ 
+\end{center}
+
+
+
 
 Since documents and text chunks are static, full text searches can be implemented using an index that is updated in real time as documents are created.
 Each word in the index is associated with a list of documents containing that word.
