@@ -116,8 +116,8 @@ elsif( $action eq "login" ) {
         print $cgiQuery->header( -type=>'text/html',
                                  -expires=>'now',
                                  -cookie=>$cookie );
-        
-        tokenWord::htmlGenerator::generateMainPage( "$user" );
+        $loggedInUser = $user;
+        showMainPage();
     }
 }
 elsif( $action eq "logout" ) {
@@ -177,7 +177,8 @@ else {
                        $abstractDoc );
 
             print "<BR>doc ID is $docID";
-            tokenWord::htmlGenerator::generateMainPage( $loggedInUser );
+            
+            showMainPage();
         }
         elsif( $action eq "showDocument" ) {
         
@@ -192,18 +193,26 @@ else {
             ( $docID ) = ( $docID =~ /(\d+)/ );
             
             #first, purchase the document
-            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                        $docOwner,
-                                                        $docID );
+            ( my $success, my $amount ) =
+                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                            $docOwner,
+                                                            $docID );
+            if( $success ) {
+                my $text = 
+                    tokenWord::documentManager::renderDocumentText( $docOwner, 
+                                                                    $docID );
             
-            my $text = 
-                tokenWord::documentManager::renderDocumentText( $docOwner, 
-                                                                $docID );
-            
-            tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
-                                                       $docOwner,
-                                                       $docID, $text, 0 );
-        
+                tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                           $docOwner,
+                                                           $docID, $text, 0 );
+            }
+            else {
+                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                                                               $loggedInUser,
+                                                               $docOwner,
+                                                               $docID,
+                                                               $amount );
+            }
         }
         elsif( $action eq "showDocumentQuotes" ) {
         
@@ -254,14 +263,11 @@ else {
             
         }
         elsif( $action eq "showQuoteList" ) {
-            
             my @quoteList = 
-                tokenWord::quoteClipboard::renderAllQuotes( $loggedInUser );
-            
+                tokenWord::quoteClipboard::getAllQuoteRegions( $loggedInUser );
             
             tokenWord::htmlGenerator::generateQuoteListPage( $loggedInUser,
                                                              @quoteList );
-        
         }
         elsif( $action eq "extractQuoteForm" ) {
             my $docOwner = $cgiQuery->param( "docOwner" ) || '';
@@ -312,28 +318,29 @@ else {
                                                             $abstractQuote );
             
             # show the new quote list
-
             my @quoteList = 
-                tokenWord::quoteClipboard::renderAllQuotes( $loggedInUser );
-            
+                tokenWord::quoteClipboard::getAllQuoteRegions( $loggedInUser );
             
             tokenWord::htmlGenerator::generateQuoteListPage( $loggedInUser,
                                                              @quoteList );
         }
         else {
             # show main page
-            my $text = 
-                tokenWord::documentManager::renderDocumentText( "jcr13", 
-                                                                0 );
-            
-            tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
-                                                       "jcr13",
-                                                       0, $text );
+            showMainPage();
         }
     }
 }
 
 
+sub showMainPage {
+    my $text = 
+      tokenWord::documentManager::renderDocumentText( "jcr13", 
+                                                      0 );
+    
+    tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                               "jcr13",
+                                               0, $text );
+}
 
 
 

@@ -117,6 +117,29 @@ sub generateMainPage {
 
 
 
+sub generateFailedPurchasePage {
+    ( my $loggedInUser, my $docOwner, my $docID, my $amount ) = @_;
+    
+    my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
+                                                            $docID );
+
+    generateFullHeader( "document purchase failed" );
+
+    my $pageText = readFileValue( "$htmlDirectory/failedPurchase.html" );
+
+    $pageText =~ s/<!--#DOC_OWNER-->/$docOwner/g;
+    $pageText =~ s/<!--#DOC_ID-->/$docID/g;
+    $pageText =~ s/<!--#DOC_TITLE-->/$docTitle/g;
+    $pageText =~ s/<!--#AMOUNT_NEEDED-->/$amount/g;
+    
+    print $pageText;
+
+
+    generateFullFooter( $loggedInUser );
+}
+
+
+
 sub generateCreateDocumentForm {
     ( my $user ) = @_;
 
@@ -241,10 +264,24 @@ sub generateQuoteListPage {
         foreach $quote ( @quotes ) {
             print "<TR><TD VALIGN=TOP>&#60;q $quoteCounter&#62;</TD>";
             print "<TD>\n";
-
-            my @quoteElements = split( /\n\n/, $quote );
             
-            foreach $paragraph ( @quoteElements ) {
+            my @components = extractRegionComponents( $quote );
+            my $docOwner = $components[0];
+            my $docID =  $components[1];
+            my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
+                                                                    $docID );
+
+            print "from $docOwner\'s ";
+            print "<A HREF=\"tokenWord.pl?action=showDocument";
+            print "&docOwner=$docOwner&docID=$docID\">$docTitle</A>:<BR><BR>";
+
+            my $quoteText = tokenWord::quoteClipboard::renderQuoteText( 
+                                                              $user,
+                                                              $quoteCounter );
+            
+            my @quoteParagraphs = split( /\n\n/, $quoteText );
+            
+            foreach $paragraph ( @quoteParagraphs ) {
                 print "$paragraph<BR><BR>\n";
             }
             

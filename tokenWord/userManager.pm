@@ -12,6 +12,9 @@ package tokenWord::userManager;
 # 2003-January-8   Jason Rohrer
 # Added function for transfering tokens.
 #
+# 2003-January-13   Jason Rohrer
+# Fixed withdraw function.
+#
 
 
 use tokenWord::common;
@@ -170,11 +173,16 @@ sub withdrawTokens {
     
     my $balance = readFileValue( "$userDirName/balance" );
 
-    $balance -= $number;
+    if( $balance >= $number ) {
+        $balance -= $number;
+        
+        writeFile( "$userDirName/balance", $balance );
 
-    writeFile( "$userDirName/balance", $balance );
-
-    return 1;
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 

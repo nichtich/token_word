@@ -13,6 +13,9 @@ package tokenWord::userWorkspace;
 # Fixed a taint checking bug.
 # Fixed a bug that missed multiple quotes.
 #
+# 2003-January-13   Jason Rohrer
+# Fixed behavior when a purchase fails.
+#
 
 
 use tokenWord::common;
@@ -203,8 +206,11 @@ sub extractAbstractQuote {
 # @param1 the user owning the document.
 # @param3 the document id.
 #
+# @return 1 if the purchase succeeded and 0 otherwise, along with 
+#   amount needed
+#
 # Example:
-# purchaseDocument( "jj55", "jdg1", 10 );
+# ( my $success, my $amount ) = purchaseDocument( "jj55", "jdg1", 10 );
 ##
 sub purchaseDocument {
     ( my $purchasingUser, my $docOwner, my $docID ) = @_;
@@ -215,6 +221,11 @@ sub purchaseDocument {
     my @docChunks = 
         tokenWord::documentManager::getAllChunks( $docOwner, $docID );
     
+    # accumulate needed transfers here
+    my @neededTransfers = ();
+    my $netPaymentNeeded = 0;
+
+
     foreach my $chunk ( @docChunks ) {
         my @chunkElements = extractRegionComponents( $chunk );
 
@@ -229,26 +240,49 @@ sub purchaseDocument {
             my $purchasedChunkFile = "$purchasedDirName/$chunkOwner/$chunkID";
 
             if( not -e "$purchasedDirName/$chunkOwner" ) {
-                # make purchased dir
-                mkdir( "$purchasedDirName/$chunkOwner", oct( "0777" ) );
-            
-                writeFile( $purchasedChunkFile,
-                       "< $chunkOwner, $chunkID, $startOffset, $length >\n" );
                 
-                tokenWord::userManager::transferTokens( $purchasingUser,
-                                                        $chunkOwner,
-                                                        $length );
+                my $purchaseString = 
+                        "< $chunkOwner, $chunkID, $startOffset, $length >";
+                my $transferString = 
+                    join( "|", ( $purchasingUser, $chunkOwner,
+                                 $chunkID,
+                                 $length,
+                                 $purchaseString ) );
+                push( @neededTransfers, $transferString );
+                $netPaymentNeeded += $length;
+                
+                # make purchased dir
+                #mkdir( "$purchasedDirName/$chunkOwner", oct( "0777" ) );
+            
+                #writeFile( $purchasedChunkFile,
+                #       "< $chunkOwner, $chunkID, $startOffset, $length >\n" );
+                
+                #tokenWord::userManager::transferTokens( $purchasingUser,
+                #                                        $chunkOwner,
+                #                                        $length );
             }
             else {
                 # dir exists for that owner
                 if( not -e $purchasedChunkFile ) {
+
+                    my $purchaseString = 
+                        "< $chunkOwner, $chunkID, $startOffset, $length >";
+                    my $transferString = 
+                        join( "|", ( $purchasingUser, $chunkOwner,
+                                     $chunkID,
+                                     $length,
+                                     $purchaseString ) );
+                    push( @neededTransfers, $transferString );
+                    $netPaymentNeeded += $length;
+
+
                     # make a file
-                    writeFile( $purchasedChunkFile,
-                       "< $chunkOwner, $chunkID, $startOffset, $length >\n" );
+                    #writeFile( $purchasedChunkFile,
+                    #   "< $chunkOwner, $chunkID, $startOffset, $length >\n" );
                     
-                    tokenWord::userManager::transferTokens( $purchasingUser,
-                                                            $chunkOwner,
-                                                            $length );
+                    #tokenWord::userManager::transferTokens( $purchasingUser,
+                    #                                        $chunkOwner,
+                    #                                        $length );
                 }
                 else {
                     # file already exists for this chunk
@@ -258,21 +292,22 @@ sub purchaseDocument {
                     my @chunkList = split( /\n/, $chunkListString );
                     
                     my $chunkEmptied = 0;
-
+                    
                     foreach my $purchasedChunk ( @chunkList ) {
+                        
                         my @trimedChunks = 
                             trimRegion( $chunk, $purchasedChunk );
                     
-                        if( $#trimedChunks == 0 ) {
+                        if( scalar( @trimmedChunks ) == 0 ) {
                             # nothing left
                             # FIXME
                             $chunkEmptied = 1;
                             @chunkList = ();
                         }
-                        elsif( $#trimmedChunks == 1 ) {
+                        elsif( scalar( @trimmedChunks ) == 1 ) {
                             $chunk = $trimmedChunks[0];
                         }
-                        elsif( $#trimmedChunks == 2 ) {
+                        elsif( scalar( @trimmedChunks ) == 2 ) {
                             # continue processing first portion
                             $chunk = $trimmedChunks[0];
                             # add the excess to the end of our chunk list
@@ -285,16 +320,75 @@ sub purchaseDocument {
                         # we still need to purchase
                         my @chunkElements = extractRegionComponents( $chunk );
                         my $chunkLength = $chunkElements[3];
-                    
-                      tokenWord::userManager::transferTokens( $purchasingUser,
-                                                              $chunkOwner,
-                                                              $chunkLength );
+                        
+                        my $purchaseString = $chunk;
+                        my $transferString = 
+                            join( "|", ( $purchasingUser, $chunkOwner,
+                                         $chunkID,
+                                         $chunkLength,
+                                         $purchaseString ) );
+                        push( @neededTransfers, $transferString );
+                        $netPaymentNeeded += $chunkLength;
+
+                        #tokenWord::userManager::transferTokens( 
+                        #                                      $purchasingUser,
+                        #                                      $chunkOwner,
+                        #                                      $chunkLength );
                         # add the chunk to the end of our purchased file
-                        addToFile( $purchasedChunkFile, "$chunk\n" );
+                        #addToFile( $purchasedChunkFile, "$chunk\n" );
                     }
                 }
             }
         }
+    }
+
+
+    # now we know how much this document will cost for the purchaser
+    
+    # withdraw the tokens all in one go
+    my $withdrawSuccess = 
+        tokenWord::userManager::withdrawTokens( $purchasingUser, 
+                                                $netPaymentNeeded );
+    
+    if( not $withdrawSuccess ) {
+        return ( 0, $netPaymentNeeded );
+    }
+    else {
+        # withdraw happened, so deposit among chunk owners
+        foreach $transfer ( @neededTransfers ) {
+            my @transferElements = split( /\|/, $transfer );
+            my $owner = $transferElements[1];
+            my $chunkID = $transferElements[2];
+            my $amount = $transferElements[3];
+            tokenWord::userManager::depositTokens( $owner, $amount );
+
+            # now add to purchased directory
+            my $purchasedChunkFile = "$purchasedDirName/$owner/$chunkID";
+
+            my $purchaseString = $transferElements[4];
+
+            if( not -e "$purchasedDirName/$owner" ) {
+                # make purchased dir
+                mkdir( "$purchasedDirName/$owner", oct( "0777" ) );
+            
+                writeFile( $purchasedChunkFile,
+                           "$purchaseString\n" );
+            }
+            else {
+                # dir exists for that owner
+                if( not -e $purchasedChunkFile ) {
+                    # start file
+                    # add to end of file
+                    writeFile( $purchasedChunkFile, "$purchaseString\n" );
+                }
+                else {
+                    # add to end of file
+                    addToFile( $purchasedChunkFile, "$purchaseString\n" );
+                }
+            }
+        }
+        
+        return ( 1, $netPaymentNeeded );
     }
 }
 

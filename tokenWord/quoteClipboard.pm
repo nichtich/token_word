@@ -141,7 +141,7 @@ sub renderQuoteText {
 ##
 sub renderAllQuotes {
     ( my $user ) = @_;
-    
+
     my $numQuotes = getQuoteCount( $user );
 
     my @quoteList = ();
@@ -150,6 +150,36 @@ sub renderAllQuotes {
         my $text = renderQuoteText( $user, $quoteNumber );
         
         push( @quoteList, $text );          
+    }
+    
+    return @quoteList;
+}
+
+
+
+##
+# Gets the document regions for all of user's quotes.
+#
+# @param0 the username.
+#
+# @return the regions of all quotes in an array.
+#
+# Example:
+# my @quoteRegionList = renderAllQuoteRegions( "jj55" );
+##
+sub getAllQuoteRegions {
+    ( my $user ) = @_;
+    
+    my $numQuotes = getQuoteCount( $user );
+
+    my @quoteList = ();
+
+    for( my $quoteNumber=0; $quoteNumber < $numQuotes; $quoteNumber++ ) { 
+        my @region = getQuoteRegion( $user, $quoteNumber );
+        
+        my $joinedRegion = join( ", ", @region );
+
+        push( @quoteList, "< $joinedRegion >" );          
     }
     
     return @quoteList;
