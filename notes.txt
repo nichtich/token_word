@@ -57,3 +57,12 @@ This is a test document.
 Abstract quote extraction:
 This is <q>a test</q> document.
 
+
+
+Format for quote list:
+
+Quoted doc region followed by quoting doc region, separated by |
+
+Example:
+
+<jd45, 12, 104, 20> | <jcd14, 24, 10, 20>
