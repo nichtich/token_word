@@ -57,8 +57,13 @@ $region =
 print "document region = $region\n";
 
 
-my $quoteID = tokenWord::quoteClipboard::addQuote( "jj55", "jj55",
-                                                   $docID, 2, 2 );
+#my $quoteID = tokenWord::quoteClipboard::addQuote( "jj55", "jj55",
+#                                                   $docID, 2, 2 );
+
+my $quoteID = tokenWord::userWorkspace::extractAbstractQuote( 
+                                                         "jj55", "jj55",
+                                                         $docID,
+                                                         "T<q>his te</q>st" );
 
 $region = 
   tokenWord::quoteClipboard::renderQuoteText( "jj55", $quoteID );
@@ -67,6 +72,8 @@ print "quote = $region\n";
 $docID = 
   tokenWord::userWorkspace::submitAbstractDocument(
       "jj55", "I am quoting myself here:  <q $quoteID>" );
+
+print "done submitting document\n";
 
 $fullDocText =
   tokenWord::documentManager::renderDocumentText( "jj55", $docID );

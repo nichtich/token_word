@@ -9,6 +9,9 @@ package tokenWord::common;
 # 2003-January-7   Jason Rohrer
 # Added a function for extracting region components.
 #
+# 2003-January-8   Jason Rohrer
+# Fixed an extra newline bug in readFileValue.
+#
 
 
 # define our exported variables and subroutines
@@ -70,7 +73,7 @@ sub readFileValue {
 
     my @lineList = <FILE>;
 
-    my $value = join( "\n", @lineList );
+    my $value = join( "", @lineList );
 
     close FILE;
  

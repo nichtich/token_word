@@ -180,18 +180,11 @@ sub renderDocumentText {
 
     my $docDirName = "$dataDirectory/users/$username/text/documents";
 
-    
-    
     $docString = readFileValue( "$docDirName/$docID" );
 
     # replace region separators with newlines
     $docString =~ s/>\s*</>\n</;
-    
-    # accumulate "hit" regions (trimmed when necessary) here 
-    my @selectedRegions = ();
-    
-    my $lengthSum = 0;
-    
+
     my @regions = split( /\n/, $docString );
     
     return renderMultiChunkText( @regions );

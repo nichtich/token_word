@@ -6,6 +6,9 @@ package tokenWord::userWorkspace;
 # 2003-January-7   Jason Rohrer
 # Created.
 #
+# 2003-January-8   Jason Rohrer
+# Added function for extracting abstract quotes.
+#
 
 
 use tokenWord::common;
@@ -46,15 +49,17 @@ sub submitAbstractDocument {
             $section =~ s/\s//;
 
             my $quoteNumber = $section;
-
+            
             # build a < chunkLocator; docLocator > style locator for each 
             # chunk in this quote, where the docLocator points to the
             # document being quoted now
 
-            my @docRegion = getQuoteRegion( "jj55",  $quoteNumber );
+            my @docRegion = 
+                tokenWord::quoteClipboard::getQuoteRegion( $username,  
+                                                           $quoteNumber );
             
             my @quoteChunks =
-              tokenWord::documentManager::getRegionChunks( @docRegion );
+                tokenWord::documentManager::getRegionChunks( @docRegion );
             
             my $docOwner = $docRegion[0];
             my $docNumber = $docRegion[1];
@@ -94,7 +99,7 @@ sub submitAbstractDocument {
         }
         
     }
-    
+
     my $concreteDocumentString = join( "\n", @docRegions );
 
     return tokenWord::documentManager::addDocument( $username, 
@@ -104,68 +109,34 @@ sub submitAbstractDocument {
 
 
 ##
-# Gets the number of quotes in a user's clipboard.
+# Extracts a quoted region from abstract document (text and quote tag pair).
 #
-# @param0 the username.
+# @param0 the quoting user.
+# @param1 the quoted user.
+# @param3 the quoted documentID.
+# @param4 the abstract document string.
 #
-# @return the number of quotes.
+# @return the id of the new quote.
 #
 # Example:
-# my $numberOfQuotes = getQuoteCount( "jj55" );
+# my $quoteID = extractAbstractQuote( "jj55", "jdg1", 10, 
+#                                     "This is a <q>test document</q>." );
 ##
-sub getQuoteCount {
-    my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";
-
-    my $nextID = readFileValue( "$quoteDirName/nextFreeID" );
-
-    # untaint next id
-    my ( $safeNextID ) = ( $nextID =~ /(\d+)/ );
+sub extractAbstractQuote {
+    ( my $quotingUser, my $quotedUser, my $docID, my $docText ) = @_;
     
-    return $safeNextID;
-}
-
-
-
-##
-# Gets the region associated with a quote.
-#
-# @param0 the username.
-# @param1 the quoteID.
-#
-# @return a list containing the region descriptors
-#   (username, docID, startOffset, length).
-#
-# Example:
-# my @docRegion = getQuoteRegion( "jj55", 3 );
-##
-sub getQuoteRegion {
-    ( my $username, my $quoteID ) = @_;
-
-    my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";   
     
-    $quoteRegionString = readFileValue( "$quoteDirName/$quoteID" );
+    # split around quote tags
+    my @splitDocument = split( /<\s*\/?\s*q\s*>/, $docText );
 
-    return extractRegionComponents( $quoteRegionString );
-}
-
-
-
-##
-# Gets the text content for a quote.
-#
-# @param0 the username.
-# @param1 the quoteID.
-#
-# @return the text rendering of a quote.
-#
-# Example:
-# my @quoteText = renderQuoteText( "jj55", 3 );
-##
-sub renderQuoteText {
-    ( my $username, my $quoteID ) = @_;
-                                        
-    return tokenWord::documentManager::renderRegionText( 
-        getQuoteRegion( $username, $quoteID ) );
+    my $quoteOffset = length( $splitDocument[0] );
+    my $quoteLength = length( $splitDocument[1] );
+    
+    tokenWord::quoteClipboard::addQuote( $quotingUser,
+                                         $quotedUser,
+                                         $docID,
+                                         $quoteOffset,
+                                         $quoteLength );
 }
 
 

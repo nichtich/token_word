@@ -62,7 +62,7 @@ sub getRegionText {
 
     ( my $username, my $chunkID, my $startOffset, my $length ) = @_;
 
-
+    
     my $chunkDirName = "$dataDirectory/users/$username/text/chunks";
 
     $chunkString = readFileValue( "$chunkDirName/$chunkID" );
