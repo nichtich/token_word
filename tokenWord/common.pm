@@ -25,6 +25,7 @@ package tokenWord::common;
 
 # the db file interface
 use DB_File;
+use Fcntl;
 
 
 
