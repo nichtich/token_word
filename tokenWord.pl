@@ -82,6 +82,7 @@
 # 2004-October-20   Jason Rohrer
 # Added new PayPal IP.
 # Added path to make ispell wrapper work (so it can find aspell).
+# Added external web and email link support.
 #
 
 
@@ -660,7 +661,17 @@ else {
                     tokenWord::userWorkspace::previewAbstractDocument( 
                                                                 $loggedInUser,
                                                                 $abstractDoc );
-                
+
+                # add any external web links
+                # search for http:// followed by a string of non-whitespace
+                $docTextPreview =~ 
+                    s/(http:\/\/\S+)/<A HREF=\"$1\" TARGET="_blank"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+
+                # add any email address links
+                # search for two strings of non-whitespace separated by @
+                $docTextPreview =~
+                    s/(\S+@\S+)/<A HREF=\"mailto:$1\"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+
                 my @misspelledWords = ();
 
                 my $spellCheck = $cgiQuery->param( "spellCheck" ) || '';
@@ -802,6 +813,16 @@ else {
                                                                   $docOwner, 
                                                                   $docID );
                     
+                    # add any external web links
+                    # search for http:// followed by a string of non-whitespace
+                    $text =~ 
+                        s/(http:\/\/\S+)/<A HREF=\"$1\" TARGET="_blank"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+
+                    # add any email address links
+                    # search for two strings of non-whitespace separated by @
+                    $text =~
+                        s/(\S+@\S+)/<A HREF=\"mailto:$1\"><FONT COLOR=#00BF00>$1<\/FONT><\/A>/gi;
+
                     my $highlightWordsString = 
                         $cgiQuery->param( "highlightWords" ) || '';
 
