@@ -14,6 +14,7 @@ package tokenWord::documentManager;
 #
 # 2003-January-8   Jason Rohrer
 # Added support for quote lists.
+# Added more untainting.
 #
 
 
@@ -105,15 +106,17 @@ sub getRegionChunks {
     
     $docString = readFileValue( "$docDirName/$docID" );
 
+    $safeDocString = untaintDocString( $docString );
+
     # replace region separators with newlines
-    $docString =~ s/>\s*</>\n</;
+    $safeDocString =~ s/>\s*</>\n</;
     
     # accumulate "hit" regions (trimmed when necessary) here 
     my @selectedRegions = ();
     
     my $lengthSum = 0;
     
-    my @regions = split( /\n/, $docString );
+    my @regions = split( /\n/, $safeDocString );
 
     foreach my $region ( @regions ) {
         my @regionElements = extractRegionComponents( $region );
@@ -196,6 +199,36 @@ sub renderRegionText {
 
 
 ##
+# Gets all regions that make up a document.
+#
+# @param0 the username.
+# @param1 the documentID.
+#
+# @return a list of all regions in the document.
+#
+# Example:
+# my @regions = getAllChunks( "jb55", 5 );
+##
+sub getAllChunks {
+    ( my $username, my $docID ) = @_;
+
+    my $docDirName = "$dataDirectory/users/$username/text/documents";
+
+    my $docString = readFileValue( "$docDirName/$docID" );
+
+    my $safeDocString = untaintDocString( $docString );
+
+    # replace region separators with newlines
+    $safeDocString =~ s/>\s*</>\n</;
+
+    my @regions = split( /\n/, $safeDocString );
+    
+    return @regions;
+}
+
+
+
+##
 # Gets the full content text of a document.
 #
 # @param0 the username.
@@ -207,18 +240,7 @@ sub renderRegionText {
 # my $text = renderDocumentText( "jb55", 5 );
 ##
 sub renderDocumentText {
-    ( my $username, my $docID ) = @_;
-
-    my $docDirName = "$dataDirectory/users/$username/text/documents";
-
-    $docString = readFileValue( "$docDirName/$docID" );
-
-    # replace region separators with newlines
-    $docString =~ s/>\s*</>\n</;
-
-    my @regions = split( /\n/, $docString );
-    
-    return renderMultiChunkText( @regions );
+    return renderMultiChunkText( getAllChunks( @_ ) );
 }
 
 
@@ -247,6 +269,35 @@ sub renderMultiChunkText {
     }
     
     return join( "", @chunkText );
+}
+
+
+
+##
+# Untaints a document string.
+#
+# @param0 the string to untaint.
+#
+# @return the untainted string.
+##
+sub untaintDocString {
+    my $docString = $_[0];
+    
+    my @docParts = split( /\n/, $docString );
+
+    my @safeParts = ();
+
+    for my $part ( @docParts ) {
+        my ( $safePart ) = ( $part =~ 
+/(<\s*\w+\s*,\s*\d+\s*,\s*\d+\s*,\s*\d+\s*;?\s*\w*\s*,?\s*\d*\s*,?\s*\d*\s*>)/
+                             );
+        
+        push( @safeParts, $safePart );
+    }
+
+    my $safeDocString = join( "\n", @safeParts );
+
+    return $safeDocString;
 }
 
 

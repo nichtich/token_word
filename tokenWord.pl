@@ -34,7 +34,7 @@ setupDataDirectory();
     #    ( $username =~ /(\w+)$/ );
     
 
-tokenWord::userManager::addUser( "jj55", "testPass", "15" );
+tokenWord::userManager::addUser( "jj55", "testPass", "1500" );
 my $chunkID = tokenWord::chunkManager::addChunk( "jj55", 
                                                  "This is a test chunk." );
 
@@ -79,6 +79,23 @@ $fullDocText =
   tokenWord::documentManager::renderDocumentText( "jj55", $docID );
 
 print "Full quote document text = \n$fullDocText\n";
+
+
+print "Adding user ab10\n";
+tokenWord::userManager::addUser( "ab10", "testPass", "1500" );
+
+my $balance = tokenWord::userManager::getBalance( "ab10" );
+print "ab10 balance = $balance\n";
+print "ab10 purchasing document\n";
+tokenWord::userWorkspace::purchaseDocument( "ab10", "jj55", $docID );
+
+my $balance = tokenWord::userManager::getBalance( "ab10" );
+print "ab10 balance = $balance\n";
+print "ab10 purchasing document again\n";
+tokenWord::userWorkspace::purchaseDocument( "ab10", "jj55", $docID );
+
+my $balance = tokenWord::userManager::getBalance( "ab10" );
+print "ab10 balance = $balance\n";
 
 
 

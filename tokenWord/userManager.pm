@@ -9,6 +9,9 @@ package tokenWord::userManager;
 # 2003-January-7   Jason Rohrer
 # Changed to return a success flag on user add.
 #
+# 2003-January-8   Jason Rohrer
+# Added function for transfering tokens.
+#
 
 
 use tokenWord::common;
@@ -67,6 +70,102 @@ sub addUser {
     else {
         return 0;
     }
+}
+
+
+
+##
+# Transfers tokens between users.
+#
+# @param0 the source user.
+# @param1 the destination user.
+# @param2 the number of tokens to transfer.
+#
+# @return 1 if transfer succeeded, or 0 otherwise.
+#
+# Example:
+# my $transferSuccess = transferTokens( "jb65", "jjd4", 1544 );
+##
+sub transferTokens {
+    ( my $srcUser, my $destUser, my $number ) = @_;
+    
+    my $withdrawSuccess = withdrawTokens( $srcUser, $number );
+
+    if( not $withdrawSuccess ) {
+        return 0;
+    }
+    else {
+        depositTokens( $destUser, $number );
+        return 1;
+    }
+}
+
+
+
+##
+# Adds tokens to a user's balance.
+#
+# @param0 the user.
+# @param1 the number of tokens to add.
+#
+# Example:
+# depositTokens( "jb65", 1544 );
+##
+sub depositTokens {
+    ( my $user, my $number ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $balance = readFileValue( "$userDirName/balance" );
+
+    $balance += $number;
+
+    writeFile( "$userDirName/balance", $balance );
+}
+
+
+
+##
+# Removes tokens from a user's balance.
+#
+# @param0 the user.
+# @param1 the number of tokens to remove.
+#
+# Example:
+# my $success = withdrawTokens( "jb65", 1544 );
+##
+sub withdrawTokens {
+    ( my $user, my $number ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $balance = readFileValue( "$userDirName/balance" );
+
+    $balance -= $number;
+
+    writeFile( "$userDirName/balance", $balance );
+
+    return 1;
+}
+
+
+
+##
+# Gets a user's token balance.
+#
+# @param0 the user.
+#
+# Example:
+# my $balance = getBalance( "jb65" );
+##
+sub getBalance {
+    ( my $user ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $balance = readFileValue( "$userDirName/balance" );
+
+    return $balance;
 }
 
 

@@ -178,5 +178,222 @@ sub extractAbstractQuote {
 
 
 
+##
+# Purchases all chunks in a document as necessary.
+#
+# @param0 the purchasing user.
+# @param1 the user owning the document.
+# @param3 the document id.
+#
+# Example:
+# purchaseDocument( "jj55", "jdg1", 10 );
+##
+sub purchaseDocument {
+    ( my $purchasingUser, my $docOwner, my $docID ) = @_;
+
+    my $purchasedDirName = 
+        "$dataDirectory/users/$purchasingUser/purchasedRegions";
+
+    my @docChunks = 
+        tokenWord::documentManager::getAllChunks( $docOwner, $docID );
+    
+    foreach my $chunk ( @docChunks ) {
+        my @chunkElements = extractRegionComponents( $chunk );
+
+        my $chunkOwner = $chunkElements[0];
+        
+        if( $purchasingUser ne $chunkOwner ) {
+
+            my $chunkID = $chunkElements[1];
+            my $startOffset = $chunkElements[2];
+            my $length = $chunkElements[3];
+
+            my $purchasedChunkFile = "$purchasedDirName/$chunkOwner/$chunkID";
+
+            if( not -e "$purchasedDirName/$chunkOwner" ) {
+                # make purchased dir
+                mkdir( "$purchasedDirName/$chunkOwner", oct( "0777" ) );
+            
+                writeFile( $purchasedChunkFile,
+                       "< $chunkOwner, $chunkID, $startOffset, $length >\n" );
+                
+                tokenWord::userManager::transferTokens( $purchasingUser,
+                                                        $chunkOwner,
+                                                        $length );
+            }
+            else {
+                # dir exists for that owner
+                if( not -e $purchasedChunkFile ) {
+                    # make a file
+                    writeFile( $purchasedChunkFile,
+                       "< $chunkOwner, $chunkID, $startOffset, $length >\n" );
+                    
+                    tokenWord::userManager::transferTokens( $purchasingUser,
+                                                            $chunkOwner,
+                                                            $length );
+                }
+                else {
+                    # file already exists for this chunk
+                    my $chunkListString = 
+                        readFileValue( $purchasedChunkFile ); 
+                    
+                    my @chunkList = split( /\n/, $chunkListString );
+                    
+                    my $chunkEmptied = 0;
+
+                    foreach my $purchasedChunk ( @chunkList ) {
+                        my @trimedChunks = 
+                            trimRegion( $chunk, $purchasedChunk );
+                    
+                        if( $#trimedChunks == 0 ) {
+                            # nothing left
+                            # FIXME
+                            $chunkEmptied = 1;
+                            @chunkList = ();
+                        }
+                        elsif( $#trimmedChunks == 1 ) {
+                            $chunk = $trimmedChunks[0];
+                        }
+                        elsif( $#trimmedChunks == 2 ) {
+                            # continue processing first portion
+                            $chunk = $trimmedChunks[0];
+                            # add the excess to the end of our chunk list
+                            push( @docChunks, $trimmedChunks[1] );
+                        }
+                    }
+                    
+                    if( not $chunkEmptied ) {
+                        # we need to pay based on how much of the chunk
+                        # we still need to purchase
+                        my @chunkElements = extractRegionComponents( $chunk );
+                        my $chunkLength = $chunkElements[3];
+                    
+                      tokenWord::userManager::transferTokens( $purchasingUser,
+                                                              $chunkOwner,
+                                                              $chunkLength );
+                        # add the chunk to the end of our purchased file
+                        addToFile( $purchasedChunkFile, "$chunk\n" );
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+##
+# Gets whether two regions intersect.
+#
+# @param0 region A.
+# @param1 region B.
+#
+# @return 1 if regions intersect, 0 otherwise.
+#
+# Example:
+# my $hit = doRegionsIntersect( "<jj55, 10, 4, 32>", "<jj55, 10, 5, 10>" );
+## 
+sub doRegionsIntersect {
+    ( my $regionAString, my $regionBString ) = @_;
+
+    my @regionA = extractRegionComponents( $regionAString );
+    my @regionB = extractRegionComponents( $regionBString );
+
+    if( $regionA[0] ne $regionB[0] ) {
+        return 0;
+    }
+    elsif( $regionA[1] ne $regionB[1] ) {
+        return 0;
+    }
+    else {
+        # same user and document
+
+        my $startA = $regionA[2];
+        my $startB = $regionB[2];
+        my $lengthA = $regionA[3];
+        my $lengthB = $regionB[3];
+        
+        # end is character *after* last character
+        my $endA = $startA + $lengthA;
+        my $endB = $startB + $lengthB;
+
+        if( $endA <= $startB ) {
+            return 0;
+        }
+        elsif( $endB <= $startA ) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
+}
+
+
+
+##
+# Trims one region to exclude intersection with another.
+#
+# @param0 region to trim.
+# @param1 trimming region.
+#
+# @return the string representions of the trimmed region.
+#
+# Example:
+# my @trimmed = trimRegion( "<jj55, 10, 4, 32>", "<jj55, 10, 5, 10>" );
+## 
+sub trimRegion {
+    ( my $regionToTrimString, my $trimmingRegionString ) = @_;
+    
+    if( ! doRegionsIntersect( $regionToTrimString, $trimmingRegionString ) ) {
+        # no intersection
+        return ( $regionToTrimString );
+    }
+    
+    # else an intersection
+
+    my @regionA = extractRegionComponents( $regionToTrimString );
+    my @regionB = extractRegionComponents( $trimmingRegionString );
+
+    my $userA = $regionA[0];
+    my $docA = $region[1];
+
+    my $startA = $regionA[2];
+    my $startB = $regionB[2];
+    my $lengthA = $regionA[3];
+    my $lengthB = $regionB[3];
+        
+    # end is character *after* last character
+    my $endA = $startA + $lengthA;
+    my $endB = $startB + $lengthB;
+
+    if( $startA < $startB && $endB < $endA ) {
+        # trim splits us into two regions
+        my $firstLength = $startB - $startA;
+        my $secondLength = $endA - $endB;
+        return ( "< $userA, $docA, $startA, $firstLength >",
+                 "< $userA, $docA, $endB, $secondLength >" );
+    }
+    
+    if( $startA > $startB && $endB > $endA ) {
+        # trim leaves nothing
+        return ( );
+    }
+
+    if( $startA < $startB ) {
+        # trim leaves only first portion of region A
+        my $firstLength = $startB - $startA;
+        return ( "< $userA, $docA, $startA, $firstLength >" );
+    }
+
+    if( $endB < $endA ) {
+        my $secondLength = $endA - $endB;
+        return ( "< $userA, $docA, $endB, $secondLength >" );
+    }
+}
+
+
+
+
 # end of package
 1;
