@@ -6,6 +6,9 @@ package tokenWord::chunkManager;
 # 2003-January-6   Jason Rohrer
 # Created.
 #
+# 2003-January-7   Jason Rohrer
+# Changed to return new ID when chunk added.
+#
 
 
 use tokenWord::common;
@@ -17,8 +20,10 @@ use tokenWord::common;
 # @param0 the username.
 # @param1 the chunk string.
 #
+# @return the chunkID of the new chunk.
+#
 # Example:
-# addUser( "jb65", "This is a new chunk." );
+# my $chunkID = addChunk( "jb65", "This is a new chunk." );
 ##
 sub addChunk {
     my $username = $_[0];
@@ -38,6 +43,7 @@ sub addChunk {
 
     writeFile( "$chunkDirName/$safeNextID", "$chunkText" );
     
+    return $safeNextID;
 }
 
 
@@ -59,8 +65,6 @@ sub getRegion {
 
     my $chunkDirName = "$dataDirectory/users/$username/text/chunks";
 
-    
-    
     $chunkString = readFileValue( "$chunkDirName/$chunkID" );
     
     return substr( $chunkString, $startOffset, $length );
