@@ -22,6 +22,9 @@ package tokenWord::documentManager;
 # 2003-January-10   Jason Rohrer
 # Added quote counter for each document.
 #
+# 2003-January-13   Jason Rohrer
+# Added function for getting document title.
+#
 
 
 use tokenWord::common;
@@ -226,6 +229,87 @@ sub renderRegionText {
     my @chunks = getRegionChunks( @_ );
 
     return renderMultiChunkText( @chunks );
+}
+
+
+
+##
+# Gets the title (the first paragraph) of a document.
+#
+# @param0 the username.
+# @param1 the documentID.
+#
+# @return the title of the document.
+#
+# Example:
+# my $title = getDocTitle( "jb55", 5 );
+##
+sub getDocTitle {
+    ( my $username, my $docID ) = @_;
+
+    my @chunks = getAllChunks( $username, $docID );
+
+
+    # accumulate text for each chunk in this array
+    my @chunkText = ();
+
+    foreach my $region ( @chunks ) {
+        my @regionElements = extractRegionComponents( $region );
+
+        my $regionText = 
+          tokenWord::chunkManager::getRegionText( @regionElements );
+
+        push( @chunkText, $regionText );
+
+        # try joining to see if we contain two newlines yet
+        my $allText = join( "", @chunkText );
+        
+        if( $allText =~ /\n\n/ ) {
+            # we've already got the title, so return it
+            my @paragraphs = split( /\n\n/, $allText );
+            return $paragraphs[0];
+        }
+    }
+    
+    # if we got here, then the document does not conain 
+    # two consecutive newlines...   the whole doc is the title
+    return join( "", @chunkText );    
+}
+
+
+
+##
+# Gets a list of other documents that quote a document.
+#
+# @param0 the username.
+# @param1 the documentID.
+#
+# @return list of document regions that quote this document.
+#
+# Example:
+# my @quotingRegions = getQuotingDocuments( "jb55", 5 );
+##
+sub getQuotingDocuments {
+    ( my $username, my $docID ) = @_;
+    
+    my $quoteListFileName = 
+  "$dataDirectory/users/$username/text/documents/$docID.quoteList";
+    
+    my $quoteListText = readFileValue( $quoteListFileName );
+    
+    my @quoteList = split( /\n/, $quoteListText );
+
+    # accumulate quoting docs here
+    my @quotingDocs = ();
+
+    foreach $quote ( @quoteList ) {
+        
+        my @quoteParts = split( /\|/, $quote );
+        
+        push( @quotingDocs, $quoteParts[1] );
+    }
+
+    return @quotingDocs;
 }
 
 

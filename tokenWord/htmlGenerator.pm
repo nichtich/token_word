@@ -268,6 +268,58 @@ sub generateQuoteListPage {
 
 
 
+sub generateQuotingDocumentListPage {
+    ( my $loggedInUser, my $docOwner, my $docID, my @quotingDocs ) = @_;
+    
+    generateFullHeader( "quoting documents" );
+    
+    my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
+                                                            $docID );
+    
+    my @quoteListParts = ();
+    
+    # add the head of the list
+    push( @quoteListParts, "<TABLE BORDER=0>" );
+
+    foreach $quotingDoc ( @quotingDocs ) {
+        my @components = 
+            tokenWord::common::extractRegionComponents( $quotingDoc );
+        
+        my $owner = $components[0];
+        my $id = $components[1];
+        my $quoteLength = $components[3];
+
+        my $title = tokenWord::documentManager::getDocTitle( $owner, $id );
+        
+        push( @quoteListParts, "<TR><TD>$owner\'s</TD><TD><A HREF=\"tokenWord.pl?action=showDocument&docOwner=$owner&docID=$id\">$title</A></TD><TD>[$quoteLength characters quoted]</TD></TR>\n" );
+    }
+    
+    if( scalar( @quotingDocs ) == 0 ) {
+        push( @quoteListParts, "<TR><TD>none</TD></TR>\n" );
+    }
+
+    # add the foot of the list
+    push( @quoteListParts, "</TABLE>" );
+
+
+    my $quoteList = join( "", @quoteListParts );
+
+
+    my $pageText = readFileValue( "$htmlDirectory/quotingDocumentList.html" );
+
+    $pageText =~ s/<!--#DOC_OWNER-->/$docOwner/g;
+    $pageText =~ s/<!--#DOC_ID-->/$docID/g;
+    $pageText =~ s/<!--#DOC_TITLE-->/$docTitle/g;
+    $pageText =~ s/<!--#QUOTING_DOCUMENTS-->/$quoteList/g;
+    
+    print $pageText;
+    
+
+    generateFullFooter( $loggedInUser );
+}
+
+
+
 sub generateExtractQuoteForm {
     ( my $user, my $docOwner, my $docID, my $docText ) = @_;
 

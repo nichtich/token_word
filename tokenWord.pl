@@ -230,6 +230,29 @@ else {
                                                              $docID, @chunks );
         
         }
+        elsif( $action eq "listQuotingDocuments" ) {
+        
+            my $docOwner = $cgiQuery->param( "docOwner" ) || '';
+            
+            # might equal 0
+            my $docID = $cgiQuery->param( "docID" );
+            
+
+            #untaint
+            ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
+            ( $docID ) = ( $docID =~ /(\d+)/ );
+            
+            my @quotingDocs = 
+                tokenWord::documentManager::getQuotingDocuments( $docOwner,
+                                                                 $docID );
+            
+            tokenWord::htmlGenerator::generateQuotingDocumentListPage( 
+                                                             $loggedInUser,
+                                                             $docOwner,
+                                                             $docID, 
+                                                             @quotingDocs );
+            
+        }
         elsif( $action eq "showQuoteList" ) {
             
             my @quoteList = 
