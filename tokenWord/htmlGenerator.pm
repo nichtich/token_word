@@ -32,6 +32,9 @@ package tokenWord::htmlGenerator;
 # Added display of quote count in search results list.
 # Added highlight of search words.
 #
+# 2003-April-30   Jason Rohrer
+# Added bypassed file access where appropriate.
+#
 
 
 use tokenWord::common;
@@ -48,7 +51,7 @@ use tokenWord::chunkManager;
 sub generateHeader {
     ( my $title ) = @_;
 
-    my $headerText = readFileValue( "$htmlDirectory/header.html" );
+    my $headerText = bypass_readFileValue( "$htmlDirectory/header.html" );
 
     $headerText =~ s/<!--#TITLE-->/$title/;
     
@@ -62,7 +65,7 @@ sub generateHeader {
 ##
 sub generateFooter {
 
-    my $footerText = readFileValue( "$htmlDirectory/footer.html" );
+    my $footerText = bypass_readFileValue( "$htmlDirectory/footer.html" );
 
     print $footerText;
 }
@@ -80,7 +83,7 @@ sub generateFullHeader {
 
     generateHeader( $title );
 
-    my $headerText = readFileValue( "$htmlDirectory/fullHeader.html" );
+    my $headerText = bypass_readFileValue( "$htmlDirectory/fullHeader.html" );
     
     print $headerText;
 }
@@ -103,7 +106,7 @@ sub generateFullFooter {
 
     
     
-    my $footerText = readFileValue( "$htmlDirectory/fullFooter.html" );
+    my $footerText = bypass_readFileValue( "$htmlDirectory/fullFooter.html" );
     
     $footerText =~ s/<!--#USER-->/$loggedInUser/;
     $footerText =~ s/<!--#TOKEN_BALANCE-->/$balance/;
@@ -209,7 +212,7 @@ sub generateLoginForm {
  
     generateHeader( "login" );
 
-    my $formText = readFileValue( "$htmlDirectory/loginForm.html" );
+    my $formText = bypass_readFileValue( "$htmlDirectory/loginForm.html" );
 
     $formText =~ s/<!--#MESSAGE-->/$message/;
     
@@ -231,7 +234,8 @@ sub generateCreateUserForm {
  
     generateHeader( "create new user" );
 
-    my $formText = readFileValue( "$htmlDirectory/createUserForm.html" );
+    my $formText = 
+        bypass_readFileValue( "$htmlDirectory/createUserForm.html" );
 
     $formText =~ s/<!--#MESSAGE-->/$message/;
     
@@ -253,7 +257,7 @@ sub generateFeedbackForm {
  
     generateFullHeader( "feedback" );
 
-    my $formText = readFileValue( "$htmlDirectory/feedbackForm.html" );
+    my $formText = bypass_readFileValue( "$htmlDirectory/feedbackForm.html" );
     
     print $formText;
 
@@ -273,7 +277,7 @@ sub generateMainPage {
  
     generateFullHeader( "main page" );
 
-    my $pageText = readFileValue( "$htmlDirectory/mainPage.html" );
+    my $pageText = bypass_readFileValue( "$htmlDirectory/mainPage.html" );
 
     $pageText =~ s/<!--#USER-->/$loggedInUser/;
     
@@ -301,7 +305,8 @@ sub generateFailedPurchasePage {
 
     generateFullHeader( "document purchase failed" );
 
-    my $pageText = readFileValue( "$htmlDirectory/failedPurchase.html" );
+    my $pageText = 
+        bypass_readFileValue( "$htmlDirectory/failedPurchase.html" );
 
     $pageText =~ s/<!--#DOC_OWNER-->/$docOwner/g;
     $pageText =~ s/<!--#DOC_ID-->/$docID/g;
@@ -334,7 +339,8 @@ sub generateCreateDocumentForm {
 
     generateFullHeader( "create document" );
 
-    my $formText = readFileValue( "$htmlDirectory/createDocumentForm.html" );
+    my $formText = 
+        bypass_readFileValue( "$htmlDirectory/createDocumentForm.html" );
     
     if( not $showPreview ) {
 
@@ -343,7 +349,7 @@ sub generateCreateDocumentForm {
     }
     else {
         my $previewBlockText = 
-            readFileValue( "$htmlDirectory/documentPreview.html" );
+            bypass_readFileValue( "$htmlDirectory/documentPreview.html" );
         
         my @docElements = split( /\n\n/, $docTextPreview );
         
@@ -412,20 +418,21 @@ sub generateDocPage {
     
     if( $modeFlag == 0 ) {
         $docDisplayText = 
-            readFileValue( "$htmlDirectory/documentDisplay.html" );
+            bypass_readFileValue( "$htmlDirectory/documentDisplay.html" );
     }
     elsif( $modeFlag == 2 ) {
         $docDisplayText = 
-            readFileValue( "$htmlDirectory/highlightDocumentDisplay.html" );
+            bypass_readFileValue( 
+                "$htmlDirectory/highlightDocumentDisplay.html" );
     }
     elsif( $modeFlag == 3 ) {
         $docDisplayText = 
-            readFileValue( 
+            bypass_readFileValue( 
                     "$htmlDirectory/wordHighlightDocumentDisplay.html" );
     }
     else {
         $docDisplayText = 
-            readFileValue( "$htmlDirectory/quoteDocumentDisplay.html" );
+            bypass_readFileValue( "$htmlDirectory/quoteDocumentDisplay.html" );
     }
 
     $docDisplayText =~ s/<!--#DOC_TITLE-->/$docTitle/g;
@@ -665,7 +672,7 @@ sub generateQuotingDocumentListPage {
     my $quoteList = join( "", @quoteListParts );
 
 
-    my $pageText = readFileValue( "$htmlDirectory/quotingDocumentList.html" );
+    my $pageText = bypass_readFileValue( "$htmlDirectory/quotingDocumentList.html" );
 
     $pageText =~ s/<!--#DOC_OWNER-->/$docOwner/g;
     $pageText =~ s/<!--#DOC_ID-->/$docID/g;
@@ -695,7 +702,8 @@ sub generateExtractQuoteForm {
 
     generateFullHeader( "extract quote" );
 
-    my $formText = readFileValue( "$htmlDirectory/extractQuoteForm.html" );
+    my $formText = 
+        bypass_readFileValue( "$htmlDirectory/extractQuoteForm.html" );
 
     $formText =~ s/<!--#DOC_OWNER-->/$docOwner/;
     $formText =~ s/<!--#DOC_ID-->/$docID/;
@@ -725,7 +733,7 @@ sub generateSearchResultsPage {
  
     generateFullHeader( "search results: $searchTerms" );
 
-    my $pageText = readFileValue( "$htmlDirectory/searchResults.html" );
+    my $pageText = bypass_readFileValue( "$htmlDirectory/searchResults.html" );
 
     $pageText =~ s/<!--#SEARCH_TERMS-->/$searchTerms/;
     $pageText =~ s/<!--#DOC_COUNT-->/$docCount/;
@@ -797,7 +805,8 @@ sub generateDepositConfirmPage {
     
     generateFullHeader( "confirm token deposit" );
 
-    my $pageText = readFileValue( "$htmlDirectory/depositConfirm.html" );
+    my $pageText = 
+        bypass_readFileValue( "$htmlDirectory/depositConfirm.html" );
 
     $pageText =~ s/<!--#DEPOSIT_TOKENS-->/$tokenCount/g;
     $pageText =~ s/<!--#DEPOSIT_DOLLARS-->/$dollarAmount/g;
@@ -832,7 +841,8 @@ sub generateWithdrawConfirmPage {
     
     generateFullHeader( "confirm token withdrawl" );
 
-    my $pageText = readFileValue( "$htmlDirectory/withdrawConfirm.html" );
+    my $pageText = 
+        bypass_readFileValue( "$htmlDirectory/withdrawConfirm.html" );
 
     $pageText =~ s/<!--#WITHDRAW_TOKENS-->/$tokenCount/g;
     $pageText =~ s/<!--#WITHDRAW_DOLLARS-->/$dollarAmount/g;
@@ -859,7 +869,8 @@ sub generateFailedWithdrawPage {
     
     generateFullHeader( "withdrawl failed" );
 
-    my $pageText = readFileValue( "$htmlDirectory/failedWithdraw.html" );
+    my $pageText = 
+        bypass_readFileValue( "$htmlDirectory/failedWithdraw.html" );
 
     print $pageText;
 

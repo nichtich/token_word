@@ -69,6 +69,7 @@
 # 2003-April-30   Jason Rohrer
 # Changed to use subroutine to check for file existence.
 # Changed to use subroutine to make directories.
+# Added bypassed file access where appropriate.
 #
 
 
@@ -204,13 +205,15 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
                 # discrepancy between payment and num tokens is more than $0.01
                 
                 # note mismatch
-                addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                bypass_addToFile( 
+                           "$dataDirectory/accounting/paymentNotifications", 
                            "Payment mismatch:  $paymentDate  $user  ".
                            "$payerEmail  $paymentGross  $numTokens\n" );
             }
             elsif( $correctEmail ne $payerEmail ) {
                 # note mismatch
-                addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                bypass_addToFile( 
+                           "$dataDirectory/accounting/paymentNotifications", 
                            "Email mismatch:  $paymentDate  $user  ".
                            "$payerEmail  $paymentGross  $numTokens\n" );
             }
@@ -219,7 +222,8 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
                 tokenWord::userManager::depositTokens( $user, $numTokens );
                 
                 # note correct transaction
-                addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                bypass_addToFile( 
+                           "$dataDirectory/accounting/paymentNotifications", 
                            "Transaction complete:  $paymentDate  $user  ".
                            "$payerEmail  $paymentGross  $numTokens\n" );
             }
@@ -228,7 +232,8 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
             # remote host does not match what we expect from 
             # paypal
             # note this mismatch
-            addToFile( "$dataDirectory/accounting/paymentNotifications", 
+            bypass_addToFile( 
+                       "$dataDirectory/accounting/paymentNotifications", 
                        "Bad remote address ($remoteAddress):  ".
                        "$paymentDate  $user  ".
                        "$payerEmail  $paymentGross  $numTokens\n" );
@@ -238,7 +243,7 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
 elsif( $action eq "getDataTarball" ) {
     my $password = $cgiQuery->param( "password" ) || '';
     
-    my $truePassword = readFileValue( "$dataDirectory/admin.pass" );
+    my $truePassword = bypass_readFileValue( "$dataDirectory/admin.pass" );
 
     if( $password eq $truePassword ) {
     
@@ -265,7 +270,7 @@ elsif( $action eq "getDataTarball" ) {
 elsif( $action eq "makeDataTarball" ) {
     my $password = $cgiQuery->param( "password" ) || '';
     
-    my $truePassword = readFileValue( "$dataDirectory/admin.pass" );
+    my $truePassword = bypass_readFileValue( "$dataDirectory/admin.pass" );
 
     if( $password eq $truePassword ) {
     
@@ -290,7 +295,7 @@ elsif( $action eq "makeDataTarball" ) {
 elsif( $action eq "refreshFromDataTarball" ) {
     my $password = $cgiQuery->param( "password" ) || '';
     
-    my $truePassword = readFileValue( "$dataDirectory/admin.pass" );
+    my $truePassword = bypass_readFileValue( "$dataDirectory/admin.pass" );
 
     if( $password eq $truePassword ) {
     
@@ -567,7 +572,7 @@ else {
 
                     my $filePath = "$dataDirectory/temp/$fileName";
                 
-                    writeFile( $filePath, $docTextPreview );
+                    bypass_writeFile( $filePath, $docTextPreview );
 
                     
                     # find ispell program, either global or local
@@ -1090,7 +1095,8 @@ else {
                                                         $tokenCount ); 
             
             if( $success ) {
-                addToFile( "$dataDirectory/accounting/pendingPayments",
+                bypass_addToFile( 
+                           "$dataDirectory/accounting/pendingPayments",
                            "$loggedInUser  $paypalEmail".
                            "  $tokenCount  $netDollarRefund" );
                 showMainPage();
@@ -1135,19 +1141,23 @@ sub showMainPage {
 sub setupDataDirectory {
     if( not -e "$dataDirectory" ) {
         
-        makeDirectory( "$dataDirectory", oct( "0777" ) );
+        bypass_makeDirectory( "$dataDirectory", oct( "0777" ) );
+        
         makeDirectory( "$dataDirectory/users", oct( "0777" ) );
 
         makeDirectory( "$dataDirectory/topDocuments", oct( "0777" ) );
 
         makeDirectory( "$dataDirectory/index", oct( "0777" ) );
-        makeDirectory( "$dataDirectory/temp", oct( "0777" ) );
-        makeDirectory( "$dataDirectory/accounting", oct( "0777" ) );
 
         writeFile( "$dataDirectory/topDocuments/mostQuoted", "" );
         writeFile( "$dataDirectory/topDocuments/mostRecent", "" );
         
         writeFile( "$dataDirectory/index/docCount", "0" );
-        writeFile( "$dataDirectory/admin.pass", "changeme" );
+
+        # these must be real directories
+        bypass_makeDirectory( "$dataDirectory/temp", oct( "0777" ) );
+        bypass_makeDirectory( "$dataDirectory/accounting", oct( "0777" ) );
+
+        bypass_writeFile( "$dataDirectory/admin.pass", "changeme" );
     }
 }
