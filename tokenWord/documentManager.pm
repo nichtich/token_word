@@ -153,9 +153,9 @@ sub getRegionChunks {
 # @return the text for the region.
 #
 # Example:
-# my $text = getRegionText( "jb55", 5, 104, 23 );
+# my $text = renderRegionText( "jb55", 5, 104, 23 );
 ##
-sub getRegionText {
+sub renderRegionText {
     
     my @chunks = getRegionChunks( @_ );
 

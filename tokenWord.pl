@@ -20,6 +20,7 @@ use tokenWord::common;
 use tokenWord::chunkManager;
 use tokenWord::documentManager;
 use tokenWord::userManager;
+use tokenWord::quoteClipboard;
 
 
 print "test\n";
@@ -51,9 +52,16 @@ my $fullDocText =
 print "Full document text = \n$fullDocText\n";
 
 $region = 
-  tokenWord::documentManager::getRegionText( "jj55", $docID, 2, 2 );
+  tokenWord::documentManager::renderRegionText( "jj55", $docID, 2, 2 );
 print "document region = $region\n";
 
+
+my $quoteID = tokenWord::quoteClipboard::addQuote( "jj55", "jj55",
+                                                   $docID, 2, 2 );
+
+$region = 
+  tokenWord::quoteClipboard::renderQuoteText( "jj55", $quoteID );
+print "quote = $region\n";
 
 sub setupDataDirectory {
     if( not -e "$dataDirectory" ) {
