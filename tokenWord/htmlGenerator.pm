@@ -35,6 +35,9 @@ package tokenWord::htmlGenerator;
 # 2003-April-30   Jason Rohrer
 # Added bypassed file access where appropriate.
 #
+# 2003-May-1   Jason Rohrer
+# Reversed quote order.
+#
 
 
 use tokenWord::common;
@@ -571,6 +574,8 @@ sub generateQuoteListPage {
     
     print "<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>\n";
 
+    @quotes = reverse( @quotes );
+
     if( scalar( @quotes ) > 0 ) {
         print "<H1>quotes:</H1>\n";
     
@@ -578,7 +583,7 @@ sub generateQuoteListPage {
         
         print "<TR><TD>quote number</TD><TD>quote</TD></TR>\n";
 
-        my $quoteCounter = 0;
+        my $quoteCounter = scalar( @quotes ) - 1;
         foreach $quote ( @quotes ) {
             print "<TR><TD VALIGN=TOP>&#60;q $quoteCounter&#62;</TD>";
             print "<TD>\n";
@@ -611,7 +616,7 @@ sub generateQuoteListPage {
 
             print "</TD></TR>\n";
             
-            $quoteCounter += 1;
+            $quoteCounter -= 1;
         }
     
         print "</TABLE>\n";
