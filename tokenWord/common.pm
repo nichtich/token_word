@@ -16,6 +16,7 @@ sub BEGIN {
     @EXPORT = qw(
                  $dataDirectory
                  printFile
+                 readFileValue
                  writeFile
                  trimWhitespace );
 }
@@ -44,6 +45,32 @@ sub printFile {
     print @lineList;
 
     close FILE;
+}
+
+
+
+##
+# Reads file as a string.
+#
+# @param0 the name of the file.
+#
+# @return the file contents as a string.
+#
+# Example:
+# my $value = readFileValue( "myFile.txt" );
+##
+sub readFileValue {
+    my $fileName = $_[0];
+    open( FILE, "$fileName" ) or die;
+    flock( FILE, 1 ) or die;
+
+    my @lineList = <FILE>;
+
+    my $value = join( "\n", @lineList );
+
+    close FILE;
+ 
+    return $value;
 }
 
 

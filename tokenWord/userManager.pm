@@ -26,12 +26,8 @@ sub addUser {
     my $username = $_[0];
     my $password = $_[1];
     my $startBalance = $_[2];
-    
-    # use regexp to untaint username
-    my ( $safeUsername ) = 
-        ( $username =~ /(\w+)$/ );
-    
-    my $userDirName = "$dataDirectory/users/$safeUsername";
+
+    my $userDirName = "$dataDirectory/users/$username";
 
    
     mkdir( "$userDirName", oct( "0777" ) );
@@ -47,6 +43,15 @@ sub addUser {
     
     writeFile( "$userDirName/balance", 
                "$startBalance" );
+
+    writeFile( "$userDirName/text/chunks/nextFreeID", 
+               "0" );
+
+    writeFile( "$userDirName/text/documents/nextFreeID", 
+               "0" );
+
+    writeFile( "$userDirName/quoteClipboard/nextFreeID",
+               "0" );
 
     print "userAdded\n";
     
