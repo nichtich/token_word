@@ -171,6 +171,9 @@ sub getRegionText {
 # @param1 the documentID.
 #
 # @return the rendered text of the document.
+#
+# Example:
+# my $text = renderDocumentText( "jb55", 5 );
 ##
 sub renderDocumentText {
     ( my $username, my $docID ) = @_;

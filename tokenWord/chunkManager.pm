@@ -49,16 +49,16 @@ sub addChunk {
 
 
 ##
-# Gets a region.
+# Gets text for a region.
 #
 # @param0 a list, containing username, chunkID, startOffset, and length.
 #
 # @return the text for the region
 #
 # Example:
-# my $text = getRegion( "jb55", 5, 104, 23 );
+# my $text = getRegionText( "jb55", 5, 104, 23 );
 ##
-sub getRegion {
+sub getRegionText {
 
     ( my $username, my $chunkID, my $startOffset, my $length ) = @_;
 

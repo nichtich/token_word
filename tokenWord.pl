@@ -37,7 +37,7 @@ my $chunkID = tokenWord::chunkManager::addChunk( "jj55",
                                                  "This is a test chunk." );
 
 my $region = 
-  tokenWord::chunkManager::getRegion( "jj55", $chunkID, 10, 4 );
+  tokenWord::chunkManager::getRegionText( "jj55", $chunkID, 10, 4 );
 print "chunk region = $region\n";
 
 my $docString = "<jj55, $chunkID, 0, 5>\n<jj55, $chunkID, 10, 4>";
