@@ -69,12 +69,13 @@ my $paypalFee = 0.30;
 my $paypalNotifyIP = "65.206.229.140";   # IP of notify.paypal.com
 
 
+# allow group to write to our data files
+umask( oct( "02" ) );
+
 # make sure data directories exist
 setupDataDirectory();
 
 
-# allow group to write to our data files
-umask( 0002 );
 
 
 my $cgiQuery = CGI->new();
