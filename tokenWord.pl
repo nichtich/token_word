@@ -22,6 +22,7 @@
 #
 # 2003-January-15   Jason Rohrer
 # Added support for deposit page.
+# Added support for withdraw page.
 #
 
 
@@ -393,6 +394,65 @@ else {
                                                             $dollarAmount,
                                                             $netDollarPayment,
                                                             $paypalEmail );
+        }
+        elsif( $action eq "withdraw" ) {
+        
+            my $tokenCount = $cgiQuery->param( "tokenCount" ) || '';
+            
+            #untaint
+            ( $tokenCount ) = ( $tokenCount =~ /(\d+)/ );
+            
+            my $dollarAmount = $tokenCount / 1000000;
+            
+            my $netDollarRefund = $dollarAmount;
+            
+            # round downto nearest whole cent value
+            $netDollarRefund = ($netDollarRefund * 100 );
+            $netDollarRefund = int( $netDollarRefund );
+            $netDollarRefund = $netDollarRefund / 100.0;
+
+            my $paypalEmail = 
+              tokenWord::userManager::getPaypalEmail( $loggedInUser );
+            
+            tokenWord::htmlGenerator::generateWithdrawConfirmPage(
+                                                            $loggedInUser,
+                                                            $tokenCount,
+                                                            $dollarAmount,
+                                                            $netDollarRefund,
+                                                            $paypalEmail );
+        }
+        elsif( $action eq "confirmedWithdraw" ) {
+        
+            my $tokenCount = $cgiQuery->param( "tokenCount" ) || '';
+            
+            #untaint
+            ( $tokenCount ) = ( $tokenCount =~ /(\d+)/ );
+            
+            my $dollarAmount = $tokenCount / 1000000;
+            
+            my $netDollarRefund = $dollarAmount;
+            
+            # round downto nearest whole cent value
+            $netDollarRefund = ($netDollarRefund * 100 );
+            $netDollarRefund = int( $netDollarRefund );
+            $netDollarRefund = $netDollarRefund / 100.0;
+
+            my $paypalEmail = 
+              tokenWord::userManager::getPaypalEmail( $loggedInUser );
+            
+            my $success = 
+                tokenWord::userManager::withdrawTokens( $loggedInUser,
+                                                        $tokenCount ); 
+            
+            if( $success ) {
+                addToFile( "$dataDirectory/accounting/pendingPayments",
+                           "$loggedInUser  $paypalEmail".
+                           "  $tokenCount  $netDollarRefund" );
+                showMainPage();
+            }
+            else {
+                print "you do not have enough tokens for this withdrawl";
+            }
         }
         else {
             # show main page

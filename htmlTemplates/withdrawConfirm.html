@@ -1,0 +1,56 @@
+<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>
+
+<FONT SIZE=5>withdraw confirmation</FONT>
+<BR>
+<BR>
+
+<CENTER>
+<TABLE BORDER=0>
+<TR>
+<TD VALIGN=BOTTOM>you are about to witdraw:</TD>
+<TD VALIGN=BOTTOM><B><!--#WITHDRAW_TOKENS--> tokens</B></TD>
+</TR>
+<TR>
+<TD VALIGN=BOTTOM>which are valued at:</TD>
+<TD VALIGN=BOTTOM><B>$<!--#WITHDRAW_DOLLARS--> US</B></TD>
+</TR>
+<TR>
+<TD VALIGN=BOTTOM>using your paypal email:</TD><TD VALIGN=BOTTOM><B><!--#PAYPAL_EMAIL--></B></TD>
+</TR>
+</TABLE>
+</CENTER>
+<BR>
+
+no <A HREF="http://www.paypal.com/cgi-bin/webscr?cmd=p/gen/fees-outside">paypal fees</A> currently apply when we send you money.<BR>
+<BR>
+Thus, your net refund will be:
+<CENTER>
+<B>$<!--#NET_REFUND_DOLLARS--> US</B>
+</CENTER>
+<BR>
+
+if you wish to proceed with this transaction, click the button below.  We will process your transaction <B>within 24 hours</B>.  You will receive a paypal payment from the email address <B>jcr13@cornell.edu</B>.<BR>
+
+
+<CENTER>
+
+<FORM ACTION="tokenWord.pl">
+
+<INPUT TYPE="hidden" NAME="action" VALUE="confirmedWithdraw">
+
+<INPUT TYPE="hidden" MAXLENGTH=256 SIZE=8 NAME="tokenCount" VALUE="<!--#WITHDRAW_TOKENS-->">
+<INPUT TYPE=submit VALUE="withdraw">
+
+</FORM>
+
+</CENTER>
+
+
+
+
+</TD>
+</TR>
+</TABLE>
+
+
+

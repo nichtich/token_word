@@ -12,6 +12,7 @@ package tokenWord::htmlGenerator;
 #
 # 2003-January-15   Jason Rohrer
 # Added support for deposit page.
+# Added support for withdraw page.
 #
 
 
@@ -563,7 +564,7 @@ sub generateExtractQuoteForm {
 # @param1 the token count to deposit.
 # @param2 the dollar amount of the deposit.
 # @param3 the net dollar payment, including fees.
-# @param4 the paypal email to use..
+# @param4 the paypal email to use.
 ##
 sub generateDepositConfirmPage {          
     ( my $loggedInUser,
@@ -580,6 +581,40 @@ sub generateDepositConfirmPage {
     $pageText =~ s/<!--#DEPOSIT_DOLLARS-->/$dollarAmount/g;
     $pageText =~ s/<!--#PAYPAL_EMAIL-->/$paypalEmail/g;
     $pageText =~ s/<!--#NET_PAYMENT_DOLLARS-->/$netDollarPayment/g;
+    
+    print $pageText;
+
+
+    generateFullFooter( $loggedInUser );
+
+}
+
+
+
+##
+# Generates a page confirming a withdraw action.
+#
+# @param0 the currently logged-in user.
+# @param1 the token count to witdraw.
+# @param2 the dollar amount of the witdrawl.
+# @param3 the net dollar refund, including fees.
+# @param4 the paypal email to use.
+##
+sub generateWithdrawConfirmPage {          
+    ( my $loggedInUser,
+      my $tokenCount,
+      my $dollarAmount,
+      my $netDollarRefund,
+      my $paypalEmail ) = @_;
+    
+    generateFullHeader( "confirm token withdrawl" );
+
+    my $pageText = readFileValue( "$htmlDirectory/withdrawConfirm.html" );
+
+    $pageText =~ s/<!--#WITHDRAW_TOKENS-->/$tokenCount/g;
+    $pageText =~ s/<!--#WITHDRAW_DOLLARS-->/$dollarAmount/g;
+    $pageText =~ s/<!--#PAYPAL_EMAIL-->/$paypalEmail/g;
+    $pageText =~ s/<!--#NET_REFUND_DOLLARS-->/$netDollarRefund/g;
     
     print $pageText;
 
