@@ -18,6 +18,7 @@ package tokenWord::userWorkspace;
 #
 # 2003-January-16   Jason Rohrer
 # Added support for trial tokens.
+# Added check for bad abstract quote.
 #
 
 
@@ -177,7 +178,7 @@ sub submitAbstractDocument {
 # @param3 the quoted documentID.
 # @param4 the abstract document string.
 #
-# @return the id of the new quote.
+# @return the id of the new quote, or -1 if the extraction failed
 #
 # Example:
 # my $quoteID = extractAbstractQuote( "jj55", "jdg1", 10, 
@@ -189,6 +190,13 @@ sub extractAbstractQuote {
     
     # split around quote tags
     my @splitDocument = split( /<\s*\/?\s*q\s*>/, $docText );
+
+    if( scalar( @splitDocument ) != 3 ) {
+        # abstract document document does not contain 2 proper quote
+        # extraction tags
+        return -1;
+    }
+    
 
     my $quoteOffset = length( $splitDocument[0] );
     my $quoteLength = length( $splitDocument[1] );

@@ -546,9 +546,11 @@ sub generateQuotingDocumentListPage {
 # @param1 the owner of the document to extract the quote from.
 # @param2 the ID of the document to extract the quote from.
 # @param3 the text of the document to extract the quote from.
+# @param4 a status message to display
 ##
 sub generateExtractQuoteForm {
-    ( my $loggedInUser, my $docOwner, my $docID, my $docText ) = @_;
+    ( my $loggedInUser, my $docOwner, 
+      my $docID, my $docText, my $message ) = @_;
 
     generateFullHeader( "extract quote" );
 
@@ -557,6 +559,7 @@ sub generateExtractQuoteForm {
     $formText =~ s/<!--#DOC_OWNER-->/$docOwner/;
     $formText =~ s/<!--#DOC_ID-->/$docID/;
     $formText =~ s/<!--#DOC_TEXT-->/$docText/;
+    $formText =~ s/<!--#MESSAGE-->/$message/;
     
     print $formText;
 

@@ -29,6 +29,7 @@
 # Added check for correct remote host address.
 # Added a failed withdraw page.
 # Added MD5 user session ID cookie with corresponding local file.
+# Added check for badly-formatted quote extraction.
 #
 
 
@@ -389,17 +390,28 @@ else {
             ( $docID ) = ( $docID =~ /(\d+)/ );
             
             #first, purchase the document
-            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                        $docOwner,
-                                                        $docID );
-            my @chunks = 
-                tokenWord::documentManager::getAllChunks( $docOwner,
-                                                          $docID );
+            ( my $success, my $amount ) =
+                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                            $docOwner,
+                                                            $docID );
+
+            if( $success ) {
+                my @chunks = 
+                  tokenWord::documentManager::getAllChunks( $docOwner,
+                                                            $docID );
             
-            tokenWord::htmlGenerator::generateDocQuotesPage( $loggedInUser,
-                                                             $docOwner,
-                                                             $docID, @chunks );
-        
+              tokenWord::htmlGenerator::generateDocQuotesPage( $loggedInUser,
+                                                               $docOwner,
+                                                               $docID, 
+                                                               @chunks );
+            }
+            else {
+                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                                                               $loggedInUser,
+                                                               $docOwner,
+                                                               $docID,
+                                                               $amount );
+            }
         }
         elsif( $action eq "listQuotingDocuments" ) {
         
@@ -443,17 +455,29 @@ else {
             ( $docID ) = ( $docID =~ /(\d+)/ );
 
             #first, purchase the document
-            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                        $docOwner,
-                                                        $docID );
-            my $text = 
-                tokenWord::documentManager::renderDocumentText( $docOwner, 
-                                                                $docID );
+            ( my $success, my $amount ) =
+                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                            $docOwner,
+                                                            $docID );
+            if( $success ) {
+                my $text = 
+                  tokenWord::documentManager::renderDocumentText( $docOwner, 
+                                                                  $docID );
             
-            tokenWord::htmlGenerator::generateExtractQuoteForm( $loggedInUser,
-                                                                $docOwner,
-                                                                $docID,
-                                                                $text );
+                tokenWord::htmlGenerator::generateExtractQuoteForm( 
+                                                               $loggedInUser,
+                                                               $docOwner,
+                                                               $docID,
+                                                               $text,
+                                                               "");
+            }
+            else {
+                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                                                               $loggedInUser,
+                                                               $docOwner,
+                                                               $docID,
+                                                               $amount );
+            }
         }
         elsif( $action eq "extractQuote" ) {
             my $abstractQuote = $cgiQuery->param( "abstractQuote" ) || '';
@@ -482,22 +506,51 @@ else {
             # quote makes sense
 
             #first, purchase the document
-            tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
-                                                        $docOwner,
-                                                        $docID );
+            ( my $success, my $amount ) =
+              tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                          $docOwner,
+                                                          $docID );
 
-
-            tokenWord::userWorkspace::extractAbstractQuote( $loggedInUser,
-                                                            $docOwner, 
-                                                            $docID,
-                                                            $abstractQuote );
+            if( $success ) {
+                my $newQuoteID =
+                  tokenWord::userWorkspace::extractAbstractQuote( 
+                                                              $loggedInUser,
+                                                              $docOwner, 
+                                                              $docID,
+                                                              $abstractQuote );
+                if( $newQuoteID == -1 ) {
+                    # failed to extract quote
+                    # show form with a message
+                    my $text = 
+                      tokenWord::documentManager::renderDocumentText(
+                                                                  $docOwner, 
+                                                                  $docID );
             
-            # show the new quote list
-            my @quoteList = 
-                tokenWord::quoteClipboard::getAllQuoteRegions( $loggedInUser );
+                    tokenWord::htmlGenerator::generateExtractQuoteForm( 
+                                                               $loggedInUser,
+                                                               $docOwner,
+                                                               $docID,
+                                                               $text,
+                                         "quote tags not properly formatted" );
+                }
+                else {
+                    # show the new quote list
+                    my @quoteList = 
+                      tokenWord::quoteClipboard::getAllQuoteRegions( 
+                                                              $loggedInUser );
             
-            tokenWord::htmlGenerator::generateQuoteListPage( $loggedInUser,
-                                                             @quoteList );
+                  tokenWord::htmlGenerator::generateQuoteListPage(
+                                                              $loggedInUser,
+                                                              @quoteList );
+                }
+            }
+            else {
+                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                                                               $loggedInUser,
+                                                               $docOwner,
+                                                               $docID,
+                                                               $amount );
+            }
         }
         elsif( $action eq "deposit" ) {
         
