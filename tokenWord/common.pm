@@ -385,7 +385,7 @@ sub updateDatabaseFromDataTarball {
 
     # extract the tar file
     my $outcome = 
-        `/bin/cat ./$dataDirectoryName.tar.gz | /bin/gzip -d - > ./$dataDirectoryName.tar`;
+        `cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar.gz | /bin/gzip -d - > ./$dataDirectoryName.tar`;
 
     # first, get a file list
     my $fileList =
