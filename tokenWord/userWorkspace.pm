@@ -19,6 +19,7 @@ package tokenWord::userWorkspace;
 # 2003-January-16   Jason Rohrer
 # Added support for trial tokens.
 # Added check for bad abstract quote.
+# Added stripping of HTML tags from documents.
 #
 
 
@@ -128,6 +129,10 @@ sub submitAbstractDocument {
         }
         else {
             # a new chunk
+
+            # strip out any lingering HTML brackets
+            $section =~ s/>//g;
+            $section =~ s/<//g;
 
             my $chunkID = 
               tokenWord::chunkManager::addChunk( $username, 

@@ -30,6 +30,7 @@
 # Added a failed withdraw page.
 # Added MD5 user session ID cookie with corresponding local file.
 # Added check for badly-formatted quote extraction.
+# Improved behavior on document creation.
 #
 
 
@@ -339,9 +340,32 @@ else {
                        $loggedInUser, 
                        $abstractDoc );
 
-            print "<BR>doc ID is $docID";
             
-            showMainPage();
+            # show the new document
+            
+            # still need to purchase it, just incase quoted material
+            # is not owned yet
+            ( my $success, my $amount ) =
+                tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
+                                                            $loggedInUser,
+                                                            $docID );
+            if( $success ) {
+                my $text = 
+                    tokenWord::documentManager::renderDocumentText(
+                                                               $loggedInUser, 
+                                                               $docID );
+            
+                tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                           $loggedInUser,
+                                                           $docID, $text, 0 );
+            }
+            else {
+                tokenWord::htmlGenerator::generateFailedPurchasePage(
+                                                               $loggedInUser,
+                                                               $loggedInUser,
+                                                               $docID,
+                                                               $amount );
+            }
         }
         elsif( $action eq "showDocument" ) {
         
