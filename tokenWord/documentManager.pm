@@ -8,6 +8,9 @@ package tokenWord::documentManager;
 #
 # 2003-January-7   Jason Rohrer
 # Fixed regexp matching bugs.
+# Changed to return new ID when document added.
+# Fixed subregion bugs.
+# Added function for rendering entire document.
 #
 
 
@@ -21,8 +24,11 @@ use tokenWord::chunkManager;
 # @param0 the username.
 # @param1 the layout string for the document.
 #
+# @return the documentID of the new document.
+#
 # Example:
-# addUser( "jb65", "<jd45, 12, 104, 20>\n<jd45, 15, 23, 102>" );
+# my $docID = addDocument( "jb65", 
+#                          "<jd45, 12, 104, 20>\n<jd45, 15, 23, 102>" );
 ##
 sub addDocument {
     my $username = $_[0];
@@ -42,6 +48,7 @@ sub addDocument {
 
     writeFile( "$docDirName/$safeNextID", "$layoutString" );
     
+    return $safeNextID;
 }
 
 
@@ -66,28 +73,19 @@ sub getRegionChunks {
     
     
     $docString = readFileValue( "$docDirName/$docID" );
+
+    # replace region separators with newlines
+    $docString =~ s/>\s*</>\n</;
     
-    
+    # accumulate "hit" regions (trimmed when necessary) here 
     my @selectedRegions = ();
     
     my $lengthSum = 0;
     
-    my @regions = split( />\s*</, $docString );
+    my @regions = split( /\n/, $docString );
 
     foreach my $region ( @regions ) {
-        print "Loop region = $region\n";
-        # first remove all < or >
-        $region =~ s/[<>]//g;
-
-        my @regionParts = split( /;/, $region );        
-
-        print "region parts = $regionParts[0]\n";
-
-
-        # we only care about the first part here (discard document info)
-        my @regionElements = split( /\s*,\s*/, $regionParts[0] );
-
-        #FIXME
+        my @regionElements = extractRegionComponents( $region );
 
         my $regionLength = $regionElements[3];
 
@@ -99,14 +97,24 @@ sub getRegionChunks {
         }
         elsif( $lengthSum < $startOffset && 
                  $lengthSum + $regionLength >= $startOffset ) {
-            # partially include this region
-            my $excess = $lengthSum + $regionLength - $startOffset;
+            # partially include this region, trimming start
+            my $startExcess = $startOffset - $lengthSum;
+            
+            my $endExcess = 0;
+            
+            if( $lengthSum + $regionLength > $startOffset + $length ) {
+                # trim end also
+                $endExcess = $lengthSum + $regionLength - 
+                    ( $startOffset + $length );
+            }
+            
 
             my $joinedElements = join( ", ", 
                                        ( $regionElements[0],
                                          $regionElements[1],
-                                         $regionElements[2] + $excess,
-                                         $regionElements[3] - $excess ) );
+                                         $regionElements[2] + $startExcess,
+                                         $regionElements[3] - 
+                                             $startExcess - $endExcess ) );
             push( @selectedRegions, "< $joinedElements >" );
         }
         elsif( $lengthSum >= $startOffset && 
@@ -117,23 +125,22 @@ sub getRegionChunks {
         }
         elsif( $lengthSum >= $startOffset && 
                  $lengthSum + $regionLength > $startOffset + $length ) {
-            # partially include this region
-            my $excess = $lengthSum + $regionLength - 
+            # partially include this region, trimming end
+            my $endExcess = $lengthSum + $regionLength - 
                 ( $startOffset + $length );
 
             my $joinedElements = join( ", ", 
                                        ( $regionElements[0],
                                          $regionElements[1],
                                          $regionElements[2],
-                                         $regionElements[3] - $excess ) );
+                                         $regionElements[3] - $endExcess ) );
             push( @selectedRegions, "< $joinedElements >" );
         }
         
         $lengthSum = $lengthSum += $regionLength;
     }
 
-    return @regions;
-
+    return @selectedRegions;
 }
 
 
@@ -151,18 +158,88 @@ sub getRegionChunks {
 sub getRegionText {
     
     my @chunks = getRegionChunks( @_ );
+
+    return renderMultiChunkText( @chunks );
+}
+
+
+
+##
+# Gets the full content text of a document.
+#
+# @param0 the username.
+# @param1 the documentID.
+#
+# @return the rendered text of the document.
+##
+sub renderDocumentText {
+    ( my $username, my $docID ) = @_;
+
+    my $docDirName = "$dataDirectory/users/$username/text/documents";
+
+    
+    
+    $docString = readFileValue( "$docDirName/$docID" );
+
+    # replace region separators with newlines
+    $docString =~ s/>\s*</>\n</;
+    
+    # accumulate "hit" regions (trimmed when necessary) here 
+    my @selectedRegions = ();
+    
+    my $lengthSum = 0;
+    
+    my @regions = split( /\n/, $docString );
+    
+    return renderMultiChunkText( @regions );
+}
+
+
+
+##
+# Converts the text representation of a region to a list.
+#
+# @param0 the text representation of a region.
+#
+# @return a list of components describing the region.
+#
+# Example:
+# my @regionComponents = extractRegionComponents( "<jb55, 5, 104, 23>" );
+##
+sub extractRegionComponents {
+    my $regionText = $_[0];
+    
+    # first remove all < or >
+    $regionText =~ s/[<>]//g;
+    trimWhitespace( $regionText );
+
+    # replace ; with ,
+    $regionText =~ s/;/,/;
+    
+    my @regionElements = split( /\s*,\s*/, $regionText );
+
+    return @regionElements;
+}
+
+
+
+##
+# Gets the text rendering of a series of chunks.
+#
+# @param0 a list of chunks.
+#
+# @return the text rendering of the chunks.
+##
+sub renderMultiChunkText {
+    my @chunks = @_;
     
     
     # accumulate text for each chunk in this array
     my @chunkText = ();
 
     foreach my $region ( @chunks ) {
+        my @regionElements = extractRegionComponents( $region );
 
-        # first remove all < or >
-        $region =~ s/[<>]//g;
-
-        my @regionElements = split( /\s*,\s*/, $region );
-        
         my $regionText = 
           tokenWord::chunkManager::getRegion( @regionElements );
 
