@@ -429,14 +429,15 @@ docUserID, docID, startOffset>}
 \end{center}
 The portion of the reference before the ``;'' describes the chunk region of the reference.  
 The second portion, which is optional, describes the document region context of the reference.  
-Note that {\tt chunkUserID} may differ from {\tt docUserID}, since the quote context may be part of a quote in another document.
+Note that {\tt chunkUserID} may differ from {\tt docUserID}, since the quoted region may itself be part of a quote in the context document (in the case of a nested quote).
 Consider our previous example, which is shown in Figure \ref{fig:referenceChain}, and suppose that documents $B$ and  $C$ are owned by {\tt userY} and {\tt userZ}, respectively.
 %For example, document $A$ may quote from document $B$, but the portion that $A$ quotes may be part of $B$'s quote from document $C$.
 The reference included in document $A$ might look like this:
 \begin{center}
-{\tt <userX, k, 12, 50; userY, B, 125>} 
+{\tt <userZ, k, 12, 50; userY, B, 125>} 
 \end{center}
 In other words, we have 50 characters from chunk $k$, starting with character 13, which were quoted from document $B$, starting at character 126.
+{\tt userZ} owns both document $C$ and chunk $k$, since $k$ was created as original material for use in $C$.
 Note that {\tt length} is not specified for the document region context of a reference, since it would be redundant (in our example, it would be 50).
 
 %With this representation, a reference can be used both to fetch the required text chunk region and to display context in case of a followed quote reference.
@@ -460,7 +461,7 @@ The clipboard representation might look like this:
 
 Since documents and text chunks are static, full text searches can be implemented using an index that is updated in real time as documents are created.
 Each word in the index is associated with a list of documents containing that word.
-When a document is added to the system, it is appended to the end of the index list for each word that it contains.
+When a document is added to the system, its reference is appended to the end of the index list for each word that it contains.
 
 
 \subsubsection{Development}
@@ -482,8 +483,33 @@ The Xanadu model is complex and subtle, and it is easy to get bogged down by det
 Our system started out simple and grew in complexity, feature by feature.
 
 
-\subsubsection{Implementation Limitations}
-The main limitation of our implementation is the use of a filesystem as a data backend.
+\subsubsection{Scalability Limitations}
+The main scalability limitation of our implementation is the use of a filesystem as a data backend.
+Each text chunk and document are stored in a separate file, and these data objects can be quite small.
+A chunk file will be as large as the text it contains, but a document file stores only references.
+For example, if a new document is created that references only one new chunk and contains no quotes, the document file will contain a single reference.
+The example reference given above was represented using only 33 bytes of ASCII text.
+
+The first limitation is in terms of storage efficiency:  most filesystems have a minimum file size, and this minimum is usually larger than 1 kilobyte.
+In our example, 33 bytes of data would occupy at least a kilobyte of disk space.
+
+The second limitation is in terms of filesystem architecture:  Unix-like filesystems use an inode table, and each file must be associated with an inode.
+When a filesystem is created, the number of available inodes is fixed, and this number can be relatively small (the common ratio for modern Linux systems seems to be about 200,000 inodes per gigabyte of disk space). \cite{OperatingSystems}
+Ignoring storage efficiency concerns, our implementation is limited in terms of the number of chunks and documents it can contain.
+
+If our system did need to scale to support millions of users and billions of chunks and documents, several approaches would be possible.
+First, we could use an existing database system as a backend to store chunks and documents.
+This approach would deal with the inode limitations, and it might actually improve performance, since database queries would replace the directory lookups that are currently used to fetch chunks and documents.
+A second approach would be to implement a simple application-level virtual filesystem for chunk and document storage.
+With this approach, we could taylor the storage system to our specific needs, though it would certainly be labor-intensive.
+
+All filesystem operations in \tw \ are wrapped by a single module with only a handful of interface functions.
+By modifying the implementation of these module functions, either of the scalable backends mentioned above could be added to \tw \ with no changes to the rest of the code. 
+
+We chose a filesystem backend, despite its scalability limitations, because of its simplicity.
+This choice fits into our implementation philosophy, since the focus was on producing a working system and adding features iteratively.
+A scalable backend might be seen as a feature to be added in a future iteration.
+Our system, in its current form, is still functional in terms of its goals:  it could support hundreds of users and hundreds of thousands of documents, which is enough to give us an understanding of a xanalogical user experience.
 
 
 \subsection{Xanalogical Improvements}
