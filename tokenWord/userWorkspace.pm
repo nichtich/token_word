@@ -23,6 +23,9 @@ package tokenWord::userWorkspace;
 # Added document preview.
 # Added checks for quote existence.
 #
+# 2003-February-6   Jason Rohrer
+# Fixed a bug in quote extraction.
+#
 
 
 use tokenWord::common;
@@ -274,8 +277,13 @@ sub extractAbstractQuote {
     # split around quote tags
     my @splitDocument = split( /<\s*\/?\s*q\s*>/, $docText );
 
-    if( scalar( @splitDocument ) != 3 ) {
-        # abstract document document does not contain 2 proper quote
+    # If quote tags are correct, this will split document into
+    # 3, 2, or 1 region(s)
+    # 2 regions if one tag is at the start/end of the document
+    # 1 region if tags select the entire document
+
+    if( scalar( @splitDocument ) < 1 ) {
+        # abstract document document does not contain proper quote
         # extraction tags
         return -1;
     }
