@@ -24,6 +24,7 @@ package tokenWord::htmlGenerator;
 # Added a feedback form.
 # Added support for document highlights.
 # Added display of search results.
+# Added a spell checker.
 #
 
 
@@ -317,11 +318,15 @@ sub generateFailedPurchasePage {
 # @param2 the preview rendered text for this document.
 # @param3 the abstract document representation to fill
 #   the creation text box with.
+# @param4 1 to check the spellCheck checkbox by default, or 0 to uncheck it.
+# @param5 an array of misspelled words.
 ##
 sub generateCreateDocumentForm {
     ( my $loggedInUser,
       my $showPreview, my $docTextPreview, 
-      my $abstractDocPrefill ) = @_;
+      my $abstractDocPrefill,
+      my $spellCheckOn,
+      my @misspelledWords ) = @_;
 
     generateFullHeader( "create document" );
 
@@ -359,7 +364,39 @@ sub generateCreateDocumentForm {
         
         # fill in the text area
         $formText =~ s/<!--#ABSTRACT_DOC_PREFILL-->/$abstractDocPrefill/;
+
+        
+        my $misspelledList = "";
+        
+        if( scalar( @misspelledWords ) > 0 ) {
+            my @misspelledListElements = ();
+            # push head
+            push( @misspelledListElements, 
+                  "<TABLE BORDER=0><TR><TD>".
+                  "<B>possible misspellings:</B></TD><TR>" );
+            
+            foreach $misspelledWord ( @misspelledWords ) {
+                push( @misspelledListElements, 
+                      "<TR><TD>$misspelledWord</TD><TR>" );
+            }
+
+            #push foot
+            push( @misspelledListElements, 
+                  "</TABLE BORDER=0>" );
+            
+            $misspelledList = join( "\n", @misspelledListElements );
+        }
+
+        $formText =~ s/<!--#MISSPELLED_LIST-->/$misspelledList/;
     }
+    
+    if( $spellCheckOn ) {
+        $formText =~ s/<!--#SPELLCHECK_ON-->/CHECKED/;
+    }
+    else {
+        $formText =~ s/<!--#SPELLCHECK_ON-->//;
+    }
+
     print $formText;
 
 

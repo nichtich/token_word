@@ -38,6 +38,7 @@
 # Added support for adding created documents to index.
 # Added limited support for searching.
 # Added display of search results.
+# Added a spell checker.
 #
 
 
@@ -373,12 +374,49 @@ else {
                     tokenWord::userWorkspace::previewAbstractDocument( 
                                                                 $loggedInUser,
                                                                 $abstractDoc );
+                
+                my @misspelledWords = ();
 
+                my $spellCheck = $cgiQuery->param( "spellCheck" ) || '';
+                my $spellCheckOn = 0;
+
+                if( $spellCheck == 1 ) {
+                    $spellCheckOn = 1;
+
+                    # take MD5 of doc text to get a unique temp file name
+                    my $md5 = new MD5;
+                    $md5->add( $docTextPreview ); 
+                    my $fileName = $md5->hexdigest();
+
+                    my $filePath = "$dataDirectory/temp/$fileName";
+                
+                    writeFile( $filePath, $docTextPreview );
+
+
+                    # call ispell... this is a safe use of the shell
+                    # untaint and later restore PATH
+                    my $oldPath = $ENV{ "PATH" };
+                    $ENV{ "PATH" } = "";
+                
+                    my $misspelled = 
+                        `/bin/cat ./$filePath | /usr/bin/ispell -l`;
+                
+                    $ENV{ "PATH" } = $oldPath;
+
+                    # delete temp file
+                    unlink( $filePath );
+
+
+                    @misspelledWords = split( /\s+/, $misspelled );
+                }
+                
                 tokenWord::htmlGenerator::generateCreateDocumentForm( 
                                                         $loggedInUser,
                                                         1, 
                                                         $docTextPreview, 
-                                                        $abstractDoc );
+                                                        $abstractDoc,
+                                                        $spellCheckOn,
+                                                        @misspelledWords );
             }
             else {
                 # submit mode
@@ -870,6 +908,7 @@ sub setupDataDirectory {
         mkdir( "$dataDirectory/topDocuments", oct( "0777" ) );
 
         mkdir( "$dataDirectory/index", oct( "0777" ) );
+        mkdir( "$dataDirectory/temp", oct( "0777" ) );
 
         writeFile( "$dataDirectory/topDocuments/mostQuoted", "" );
         writeFile( "$dataDirectory/topDocuments/mostRecent", "" );
