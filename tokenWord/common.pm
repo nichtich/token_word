@@ -389,18 +389,18 @@ sub updateDatabaseFromDataTarball {
 
     # first, get a file list
     my $fileList =
-        `/bin/cat ./$dataDirectoryName.tar | /bin/tar tf -`;
+        `cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/tar tf -`;
 
     my @files = split( /\w+/, $fileList );
 
     foreach $file ( @files ) {
         print "Inserting $file<BR>";
         my $fileContents = 
-            `/bin/cat ./$dataDirectoryName.tar | /bin/tar xOf - $file`;
+            `cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/tar xOf - $file`;
         writeFile( $file, $fileContents );
     }
     my $outcome2 =
-        `/bin/rm ./$dataDirectoryName.tar`;
+        `cd $dataDirectory/..; /bin/rm ./$dataDirectoryName.tar`;
     print "Outcome = $outcome $outcome2 <BR>(blank indicates no error)";
     
     $ENV{ "PATH" } = $oldPath;
