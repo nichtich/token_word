@@ -58,6 +58,8 @@ sub BEGIN {
 }
 
 
+$gtarPath = "/usr/local/bin/gtar";
+
 
 $dataDirectoryName = "tokenWordData";
 $dataDirectory = "../../cgi-data/tokenWordData";
@@ -420,8 +422,7 @@ sub updateDatabaseFromDataTarball {
 	    print "$fileCount/$totalFiles: Inserting file $fullFileName<BR>\n";
 
 	    my $fileContents = 
-		`cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/gtar xOf - $safeFileName`;
-        print "   $fileContents\n";
+		`cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | $gtarPath xOf - $safeFileName`;
 	    writeFile( $fullFileName, $fileContents );
 	}
 	$fileCount = $fileCount + 1;
