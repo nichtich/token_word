@@ -30,6 +30,7 @@ package tokenWord::htmlGenerator;
 #
 # 2003-January-18   Jason Rohrer
 # Added display of quote count in search results list.
+# Added highlight of search words.
 #
 
 
@@ -393,12 +394,13 @@ sub generateCreateDocumentForm {
 # @param1 the owner of the document to display.
 # @param2 the ID of the document to display.
 # @param3 the text to display.
-# @param4 1 to display the document in quote mode, and 0 to display
-#   it in non-quote mode, and 2 to display in highlighted mode
+# @param4 1 to display the document in quote mode, 0 to display
+#   it in non-quote mode, 2 to display in region highlighted mode,
+#   and 3 to display it in word highlighted mode.
 ##
 sub generateDocPage {
     ( my $loggedInUser, my $docOwner, my $docID, 
-      my $docText, my $quoteFlag ) = @_;
+      my $docText, my $modeFlag ) = @_;
     
     my @docElements = split( /\n\n/, $docText );
 
@@ -408,13 +410,18 @@ sub generateDocPage {
     
     my $docDisplayText;
     
-    if( $quoteFlag == 0 ) {
+    if( $modeFlag == 0 ) {
         $docDisplayText = 
             readFileValue( "$htmlDirectory/documentDisplay.html" );
     }
-    elsif( $quoteFlag == 2 ) {
+    elsif( $modeFlag == 2 ) {
         $docDisplayText = 
             readFileValue( "$htmlDirectory/highlightDocumentDisplay.html" );
+    }
+    elsif( $modeFlag == 3 ) {
+        $docDisplayText = 
+            readFileValue( 
+                    "$htmlDirectory/wordHighlightDocumentDisplay.html" );
     }
     else {
         $docDisplayText = 
@@ -724,6 +731,9 @@ sub generateSearchResultsPage {
     $pageText =~ s/<!--#DOC_COUNT-->/$docCount/;
     $pageText =~ s/<!--#SEARCH_TIME-->/$searchTime/;
     
+    my @terms = split( /\s+/, $searchTerms );
+    my $urlSafeTerms = join( "+", @terms );
+
 
     my @resultListParts = ();
     
@@ -744,7 +754,8 @@ sub generateSearchResultsPage {
 
         push( @resultListParts, 
               "<TR><TD>$owner\'s</TD><TD><A HREF=\"tokenWord.pl?".
-              "action=showDocument&docOwner=$owner&docID=$id\">".
+              "action=showDocument&docOwner=$owner&docID=$id".
+              "&highlightWords=$urlSafeTerms\">".
               "$title</A></TD><TD>[$quoteCount]</TD></TR>\n" );
     }
     

@@ -48,6 +48,7 @@
 #
 # 2003-January-18   Jason Rohrer
 # Added working no-cache directives of two types (Pragma and Cache-control).
+# Added highlight of search words.
 #
 
 
@@ -544,7 +545,41 @@ else {
                         tokenWord::documentManager::renderDocumentText( 
                                                                   $docOwner, 
                                                                   $docID );
-                    # check for highlight
+                    
+                    my $highlightWordsString = 
+                        $cgiQuery->param( "highlightWords" ) || '';
+
+                    # 0 for non-highlight-word mode
+                    my $highlightWordFlag = 0;
+
+                    if( $highlightWordsString ne "" ) {
+                        
+                        # 3 for highlight word mode
+                        $highlightWordFlag = 3;
+
+                        # we can stick single-word highlights right
+                        # into the doc text
+                        # This does not work for region highlights,
+                        # so we handle those differently below.
+
+                        my @highlightWords = split( /\s+/, 
+                                                    $highlightWordsString );
+                        
+                        # replace highlight words with red versions
+                        foreach my $word ( @highlightWords ) {
+                            my $redWord = "<FONT COLOR=#FF0000>$word</FONT>";
+                            my $colorStart = "<FONT COLOR=#FF0000>";
+                            my $colorEnd = "</FONT>";
+
+                            # make sure we only highlight true words
+                            # case insensitive
+                            # preserve case on replacement
+                            $text =~ 
+                           s/(\W+)($word)(\W+)/$1$colorStart$2$colorEnd$3/gi;
+                        }
+                    }
+
+                    # check for region highlight
                     
                     # might be 0
                     my $highlightOffset = 
@@ -569,12 +604,12 @@ else {
                                                             $highlightLength );
                     }
                     else {
-                        # show plain document
+                        # show plain document, maybe with highlighted words
                         tokenWord::htmlGenerator::generateDocPage( 
-                                                               $loggedInUser,
-                                                               $docOwner,
-                                                               $docID, $text, 
-                                                               0 );
+                                                         $loggedInUser,
+                                                         $docOwner,
+                                                         $docID, $text, 
+                                                         $highlightWordFlag );
                     }
                 }
                 else {
