@@ -43,6 +43,7 @@
 # Changed to dynamically switch between local and global ispell.
 # Added a umask to give group write permissions.
 # Updated main page document.
+# Replaced expires now with expires -1y to force picky browsers to reload.
 #
 
 
@@ -117,7 +118,7 @@ my $paypalCustom = $cgiQuery->param( "custom" ) || '';
 my $paymentDate = $cgiQuery->param( "payment_date" ) || '';
 
 if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
-    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+    print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
 
 
     # we encode the token_word username and num tokens deposited
@@ -190,7 +191,7 @@ if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
     }
 }
 elsif( $action eq "createUserForm" ) {
-    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+    print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
     tokenWord::htmlGenerator::generateCreateUserForm( "" );
 }
 elsif( $action eq "createUser" ) {
@@ -204,7 +205,7 @@ elsif( $action eq "createUser" ) {
     ( $paypalEmail ) = ( $paypalEmail =~ /(\S+@\S+)/ );
 
     
-    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+    print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
 
     if( $user eq '' ) {
         tokenWord::htmlGenerator::generateCreateUserForm( 
@@ -234,7 +235,7 @@ elsif( $action eq "createUser" ) {
     }
 }
 elsif( $action eq "loginForm" ) {
-    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+    print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
     tokenWord::htmlGenerator::generateLoginForm( "" );
 }
 elsif( $action eq "login" ) {
@@ -249,7 +250,7 @@ elsif( $action eq "login" ) {
     my $correct = tokenWord::userManager::checkLogin( $user, $password );
 
     if( not $correct ) {
-        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+        print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
         tokenWord::htmlGenerator::generateLoginForm( "login failed" );
     }
     else {
@@ -268,7 +269,7 @@ elsif( $action eq "login" ) {
                                                  -expires=>'+1h' );
         
         print $cgiQuery->header( -type=>'text/html',
-                                 -expires=>'now',
+                                 -expires=>'-1y',
                                  -cookie=>[ $userCookie, $sessionIDCookie ] );
         $loggedInUser = $user;
 
@@ -286,7 +287,7 @@ elsif( $action eq "logout" ) {
                                              -value=>"" );
     
     print $cgiQuery->header( -type=>'text/html',
-                             -expires=>'now',
+                             -expires=>'-1y',
                              -cookie=>[ $userCookie, $sessionIDCookie ] );
     
     # leave the old sessionID file in place    
@@ -302,7 +303,7 @@ elsif( $action eq "logout" ) {
 else {
 
     if( $loggedInUser eq '' ) {
-        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+        print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
@@ -311,13 +312,13 @@ else {
            readFileValue( "$dataDirectory/users/$loggedInUser/sessionID" ) ) {
         
         # bad session ID returned in cookie
-        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+        print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
     elsif( not -e "$dataDirectory/users/$loggedInUser/sessionID" ) {
         # session ID file does not exist
-        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+        print $cgiQuery->header( -type=>'text/html', -expires=>'-1y' );
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
@@ -332,7 +333,7 @@ else {
                                                  -value=>"$sessionID",
                                                  -expires=>'+1h' );
         print $cgiQuery->header( -type=>'text/html',
-                                 -expires=>'now',
+                                 -expires=>'-1y',
                                  -cookie=>[ $userCookie, $sessionIDCookie ] );
 
         if( $action eq "test" ) {
