@@ -1,4 +1,4 @@
-#!/usr/bin/perl -wT
+#!/usr/local/bin/perl -wT
 
 #!/usr/bin/perl -wT
 
@@ -71,6 +71,7 @@
 #
 # 2003-June-1   Jason Rohrer
 # Added functions for deleting files.
+# Added support for deleting quotes from clipboards.
 #
 
 
@@ -874,6 +875,24 @@ else {
             
         }
         elsif( $action eq "showQuoteList" ) {
+            my @quoteList = 
+                tokenWord::quoteClipboard::getAllQuoteRegions( $loggedInUser );
+            
+            tokenWord::htmlGenerator::generateQuoteListPage( $loggedInUser,
+                                                             @quoteList );
+        }
+        elsif( $action eq "deleteQuotes" ) {
+            # quoteNumber parameter might occur multiple times, once for
+            # each quote that is flagged for deletion.
+            @quoteNumbersToDelete = $cgiQuery->param( "quoteNumber" ) || '';
+
+            if( scalar( @quoteNumbersToDelete > 0 ) {
+                foreach $quoteNumber ( @quoteNumbersToDelete ) {
+                    deleteQuote( $loggedInUser, $quoteNumber );
+                }
+            }
+
+            # now show quote list 
             my @quoteList = 
                 tokenWord::quoteClipboard::getAllQuoteRegions( $loggedInUser );
             

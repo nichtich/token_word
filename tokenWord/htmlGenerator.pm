@@ -38,6 +38,9 @@ package tokenWord::htmlGenerator;
 # 2003-May-1   Jason Rohrer
 # Reversed quote order.
 #
+# 2003-June-1   Jason Rohrer
+# Added support for deleting quotes from clipboards.
+#
 
 
 use tokenWord::common;
@@ -579,20 +582,31 @@ sub generateQuoteListPage {
     if( scalar( @quotes ) > 0 ) {
         print "<H1>quotes:</H1>\n";
     
+        print "<FORM ACTION=\"tokenWord.pl\" METHOD=POST>\n";
+
+        print 
+            "<INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"deleteQuotes\">\n";
         print "<TABLE CELLPADDING=5 BORDER=1>\n";
         
-        print "<TR><TD>quote number</TD><TD>quote</TD></TR>\n";
+        print "<TR><TD ALIGN=CENTER>";
+        print "<INPUT TYPE=\"submit\" VALUE=\"delete marked\"></TD>";
+        print "<TD>quote number</TD><TD>quote</TD></TR>\n";
 
-        my $quoteCounter = scalar( @quotes ) - 1;
         foreach $quote ( @quotes ) {
-            print "<TR><TD VALIGN=TOP>&#60;q $quoteCounter&#62;</TD>";
-            print "<TD>\n";
-            
             my @components = extractRegionComponents( $quote );
             my $docOwner = $components[0];
             my $docID =  $components[1];
             my $offset =  $components[2];
             my $length = $components[3];
+            # quoteClipboard puts quote number in as last component of region
+            my $quoteNumber = $components[4];
+            
+            print "<TR><TD VALIGN=TOP ALIGN=CENTER>";
+            print "<INPUT TYPE=\"checkbox\" NAME=\"quoteNumber\"";
+            print " VALUE=\"$quoteNumber\"></TD>";
+            print "<TD VALIGN=TOP>&#60;q $quoteNumber&#62;</TD>";
+            print "<TD>\n";
+            
             my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
                                                                     $docID );
 
@@ -604,7 +618,7 @@ sub generateQuoteListPage {
 
             my $quoteText = tokenWord::quoteClipboard::renderQuoteText( 
                                                               $loggedInUser,
-                                                              $quoteCounter );
+                                                              $quoteNumber );
             
             my @quoteParagraphs = split( /\n\n/, $quoteText );
             
@@ -615,12 +629,13 @@ sub generateQuoteListPage {
             
 
             print "</TD></TR>\n";
-            
-            $quoteCounter -= 1;
         }
     
+        print "<TR><TD><INPUT TYPE=\"submit\" VALUE=\"delete marked\"></TD>";
+        print "<TD></TD><TD></TD></TR>\n";
+
         print "</TABLE>\n";
-        
+        print "</FORM>\n";
     }
     else {
         print "no quotes present\n";

@@ -15,6 +15,10 @@ package tokenWord::quoteClipboard;
 # 2003-April-30   Jason Rohrer
 # Changed to use subroutine to check for file existence.
 #
+# 2003-June-1   Jason Rohrer
+# Changed to skip missing quotes and pass quote numbers in region list.
+# Added function for deleting quotes.
+#
 
 
 use tokenWord::common;
@@ -179,9 +183,11 @@ sub renderAllQuotes {
     my @quoteList = ();
 
     for( my $quoteNumber=0; $quoteNumber < $numQuotes; $quoteNumber++ ) { 
-        my $text = renderQuoteText( $user, $quoteNumber );
+        if( doesQuoteExist( $user, $quoteNumber ) ) {
+            my $text = renderQuoteText( $user, $quoteNumber );
         
-        push( @quoteList, $text );          
+            push( @quoteList, $text );          
+        }
     }
     
     return @quoteList;
@@ -194,7 +200,8 @@ sub renderAllQuotes {
 #
 # @param0 the username.
 #
-# @return the regions of all quotes in an array.
+# @return the regions of all quotes in an array, with quote number included
+#   in region for each quote.
 #
 # Example:
 # my @quoteRegionList = renderAllQuoteRegions( "jj55" );
@@ -207,14 +214,37 @@ sub getAllQuoteRegions {
     my @quoteList = ();
 
     for( my $quoteNumber=0; $quoteNumber < $numQuotes; $quoteNumber++ ) { 
-        my @region = getQuoteRegion( $user, $quoteNumber );
+        if( doesQuoteExist( $user, $quoteNumber ) ) {
+            my @region = getQuoteRegion( $user, $quoteNumber );
         
-        my $joinedRegion = join( ", ", @region );
+            my $joinedRegion = join( ", ", @region );
 
-        push( @quoteList, "< $joinedRegion >" );          
+            # add quote number to end of region
+            push( @quoteList, "< $joinedRegion, $quoteNumber >" );
+        }     
     }
     
     return @quoteList;
+}
+
+
+
+##
+# Deletes a quote.
+#
+# @param0 the username.
+# @param1 the quoteID.
+#
+# Example:
+# my $exists = deleteQuote( "jj55", 3 );
+##
+sub deleteQuote {
+    ( my $username, my $quoteID ) = @_;
+    
+    my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";   
+    
+    deleteFile( "$quoteDirName/$quoteID" ) ) {
+    
 }
 
 
