@@ -19,6 +19,9 @@ package tokenWord::documentManager;
 # 2003-January-9   Jason Rohrer
 # Fixed a bug in chunk inclusion.
 #
+# 2003-January-10   Jason Rohrer
+# Added quote counter for each document.
+#
 
 
 use tokenWord::common;
@@ -58,6 +61,9 @@ sub addDocument {
     # create a quote list
     writeFile( "$docDirName/$safeNextID.quoteList", "" );
     
+    # create quote count
+    writeFile( "$docDirName/$safeNextID.quoteCount", "0" );
+    
     return $safeNextID;
 }
 
@@ -84,6 +90,25 @@ sub noteQuote {
   "$dataDirectory/users/$quotedUsername/text/documents/$quotedDocID.quoteList";
     
     addToFile( $quoteListFileName, "$quotedDocRegion|$quotingDocRegion\n" );
+
+    my $quoteCountFileName = 
+ "$dataDirectory/users/$quotedUsername/text/documents/$quotedDocID.quoteCount";
+
+    # for backwards compat with old database
+    if( not -e $quoteCountFileName ) {
+        writeFile( $quoteCountFileName, "0" );
+    }
+
+
+    my $quoteCount = readFileValue( $quoteCountFileName );
+
+    # untaint quote count
+    ( $quoteCount ) = ( $quoteCount =~ /(\d+)/ );
+
+
+    my $newCount = $quoteCount + 1;
+
+    writeFile( $quoteCountFileName, $newCount );
 }
 
 
