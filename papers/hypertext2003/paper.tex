@@ -20,6 +20,7 @@
 % 2003-February-15 Jason Rohrer
 % Added changes in response to Jim's comments.
 % Spell-checked.
+% Finished final round of proof reading.
 %
 
 
@@ -51,7 +52,7 @@
 We describe \tokenWord, a web-based xanalogical hypertext system.  
 Our system supports almost every core feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
 Features include deep quotation, unbreakable references, two-way reference chasing, and frictionless micropayments that are backed by real-world currency.
-To our knowledge, \tokenWord \  is the first xanalogical system implementation to included all of these features.  Furthermore, \tokenWord \  is the first xanalogical system of any kind to be accessible by a web browser with no additional software.
+To our knowledge, \tokenWord \  is the first xanalogical system implementation to included all of these features.  Furthermore, \tokenWord \  is the first xanalogical system of any kind to be accessible using a web browser with no additional software.
 Previous attempts at full xanalogical implementations took many years and were ultimately never completed.
 Given this historical backdrop, an additional contribution of this paper is in analyzing the development strategies that led to a relatively novel success.
 A live \tokenWord \  system is running at:
@@ -72,7 +73,7 @@ A live \tokenWord \  system is running at:
 \label{sec:Introduction}
 Xanadu has been floating in the collective mind of the hypertext research community for nearly forty years.
 Xanadu is a dream and an ideal.  
-We know it would be great (or at least interesting) if a xanalogical system existed, but we are also resigned to the notion that such a system will probably never exist.
+We know that it would be great (or at least interesting) if a xanalogical system existed, but we are also resigned to the notion that such a system will probably never exist.
 Is Xanadu impossible?
 
 That question by itself, the impossibility question, is extraordinarily intriguing.  We \textit{know} that Xanadu is not impossible.  
@@ -143,8 +144,7 @@ Whenever $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the
 Thus, even though $A$'s owner has quoted document $B$, the quoted owner still retains control over the distribution and licensing of his or her words.
 %Avoiding copying led us to transclusion, and making transclusion work will lead us to the rest of the Xanadu model.
 
-Transclusion creates a serious problem, at least in combination with how we commonly interact with electronic documents.
-Electronic documents change constantly.
+Transclusion creates a serious problem, at least in combination with how we commonly interact with electronic documents:  they change constantly.
 If $B$ changes or is deleted, $A$'s quote can break.
 Xanadu's solution is to forbid document change but encourage document versioning.
 Thus, as $B$ is updated, all previous versions are maintained, and $A$'s quote can point to the particular version that $A$'s owner quoted.
@@ -172,7 +172,7 @@ Each user accumulates a ``library'' of acquired text regions over time and pays 
 
 When a document is accessed that contains quotes from multiple authors, the micropayments are divided and routed to the original authors on a per-character basis. 
 Though reading content requires payment, quoting is essentially free, since the content is not accessed during the act of quoting.
-In practice, an author will need to read a document before quoting it, but this reading requires only the normal first-access payment, no matter how widely the new, quoting document is expected to be read.
+In practice, an author will need to read a document before quoting from it, but this reading requires only the normal first-access payment, no matter how widely the new, quoting document is expected to be read.
 However, the more a document is quoted and read in quoted form, the more micropayments the original author will receive.
 Thus, authors benefit from the unrestricted quotation and reuse of their work:  they have no financial motivation for imposing any limits.
 
@@ -212,17 +212,6 @@ The \tokenWord \  document display interface can be seen in Figure \ref{fig:main
 \label{fig:mainScreen}
 \end{figure}  
 
-Quotes can be extracted from documents and saved to a user's quote clipboard for later reference or use.
-To extract a document region as a quote, the user inserts $<$\texttt{q}$>$ $<$$/$\texttt{q}$>$ tags around the desired region in a text area.
-This interaction mechanism is arguably more elegant and less error-prone than mouse-based selection highlighting, especially when extracting large regions that span several screens full of text.
-Figure \ref{fig:extractQuote} shows the interface for quote extraction. 
-Each quote is assigned a $<$\texttt{q N}$>$ tag to be used when inserting the quote into new documents---$<$\texttt{q 3}$>$ refers to the quote at index three on the clipboard.
-The use of these abreviated handles hides the complexity of references and document regions from the user.
-After extracting a quote, the user never needs to deal directly with the document region again, though the original context of a quote can be seen with a single click from the quote clipboard.
-The clipboard interface is shown in Figure \ref{fig:quoteClipboard}.
-When creating a new document, a user can enter new text along with handle tags for quotes from his or her quote clipboard, as seen in Figure \ref{fig:docCreate}.
-A preview mode shows the new document with all quote references expanded, as seen in Figure \ref{fig:docPreview}.
-
 
 \begin{figure}[t]
 \centering
@@ -237,6 +226,20 @@ A preview mode shows the new document with all quote references expanded, as see
 \caption{The quote clipboard interface.  Each quote is associated with a $<$\texttt{q N}$>$ reference tag, where \texttt{N} is the quote's index on the clipboard.}
 \label{fig:quoteClipboard}
 \end{figure}
+
+Quotes can be extracted from documents and saved to a user's quote clipboard for later reference or use.
+To extract a document region as a quote, the user inserts $<$\texttt{q}$>$ $<$$/$\texttt{q}$>$ tags around the desired region in a text area.
+Though it was motivated by the limitations of a web-based user interface, this interaction mechanism is arguably more elegant and less error-prone than mouse-based selection highlighting, especially when extracting large regions that span several screens full of text.
+Figure \ref{fig:extractQuote} shows the interface for quote extraction. 
+Each quote is assigned a $<$\texttt{q N}$>$ tag to be used when inserting the quote into new documents---$<$\texttt{q 3}$>$ refers to the quote at index three on the clipboard.
+The use of these abreviated handles hides the complexity of references and document regions from the user.
+After extracting a quote, the user never needs to deal directly with the document region again, though the original context of a quote can be accessed from the clipboard with a single click.
+The clipboard interface is shown in Figure \ref{fig:quoteClipboard}.
+When creating a new document, a user can enter new text along with handle tags for quotes from his or her quote clipboard, as seen in Figure \ref{fig:docCreate}.
+A preview mode shows the new document with all quote references expanded, as seen in Figure \ref{fig:docPreview}.
+
+
+
 
 Figures \ref{fig:extractQuote} through \ref{fig:docPreview} show a sequence of actions from a common usage scenario:  extracting a quote, viewing the quote on the clipboard, creating a new document that uses the quote, and previewing the document.
 After correcting the spelling mistake highlighted in Figure \ref{fig:docPreview}, the final step would be to submit the document.
@@ -286,13 +289,6 @@ Keeping with the Xanadu model, \tokenWord \  separates documents from the text t
 There are two types of data objects in \tokenWord:  documents and chunks.
 A chunk contains a raw block of contiguous text, while a document is a list of references to text chunks.
 Some of the referenced chunks in a document may have been created at the same time as the document (for new text in the document), while others may be part of quotes taken from other documents.
-
-Each reference in a document contains a pointer to a text chunk region and an optional pointer to a document context region.
-The document context pointer tracks which document the material was quoted from and is used for quote reference chasing.
-If a document refers to a new text chunk that has not appeared in any previous documents, the document context pointer is omitted:  such chunks are not part of quotes and have no references that can be chased.
-With this two-pointer model, we can distinguish ``original'' material in a document from quoted material.  % and support recursive reference chasing.
-By following references recursively for a nested quotation, the original author and document context of particular words can be obtained.
-%When following a quote reference, a chain of references may need to be chased before the original context of the text is found. 
 
 
 \begin{figure*}[t]
@@ -376,6 +372,20 @@ By following references recursively for a nested quotation, the original author 
 \end{center}
 
 \end{figure*}
+
+
+
+
+
+
+Each reference in a document contains a pointer to a text chunk region and an optional pointer to a document context region.
+The document context pointer tracks which document the material was quoted from and is used for quote reference chasing.
+If a document refers to a new text chunk that has not appeared in any previous documents, the document context pointer is omitted:  such chunks are not part of quotes and have no references that can be chased.
+With this two-pointer model, we can distinguish ``original'' material in a document from quoted material.  % and support recursive reference chasing.
+By following references recursively for a nested quotation, the original author and document context of particular words can be obtained.
+%When following a quote reference, a chain of references may need to be chased before the original context of the text is found. 
+
+
 
 
 
@@ -514,12 +524,12 @@ Perl-based CGI programming seems to be the modern method of choice for rapidly d
 Other systems that have used this development method successfully are discussed in Section \ref{sec:RelatedWork}.
 
 Even though the full development cycle was short, we used an iterative process.
-Features were added one at a time to \tokenWord, and the system was maintained in a usable form at all times.
+Features were added to \tokenWord \  one by one, and the system was maintained in a usable form at all times.
 For example, we started with a system that managed text chunks, then added document management, then added quotes, and then added tokens transfers.
 Final iterations added features such as spell checking and index-based searching.
 From our understanding of previous xanalogical implementation efforts, this iterative process may have been key to our success.
 The Xanadu model is complex and subtle, and it is easy to get bogged down by details without ever producing a working system.
-Our system started out simple and grew in complexity, feature by feature.
+Our system started out simple and grew in complexity, one feature at a time.
 
 
 \subsubsection{Scalability Limitations}
@@ -572,7 +582,7 @@ Whereas deposits take effect immediately (using PayPal's ``Instant Payment Notif
 From the administrator's point of view, the withdrawl queue can be used to increase security, since any suspicious activity can be investigated before real-world payments are made.  
 
 In our live system, we chose an exchange rate of 1,000,000 tokens for \$1, though this parameter can be changed on a site-by-site basis.
-With this exchange rate, we tried to minimize financial burden on readers while still assigning appreciable value to content.
+With this exchange rate, we tried to minimize the financial burden on readers while still assigning appreciable value to content.
 For example, the full text of this paper would cost about \$0.04, so 25 people would need to read it before it earned \$1 worth of tokens.
 
 
@@ -660,7 +670,7 @@ In many cases, Wikis are open for editing by the public at large.
 
 Despite the fact that their sociological aspects receive most of the attention, Wikis are also interesting from a hypertext perspective.
 Links can be created to documents that do not yet exist without knowing where those documents will eventually reside.
-To create a new document, a user must follow one of these dangling links in an existing page, which leads to a page creation screen.
+To create a new document, a user must follow one of these dangling links in an existing page---this action leads to a page creation screen.
 Thus, in a Wiki, there is no way to create a page in isolation.
 In fact, the name of a new page is determined by the contents of the dangling link and cannot be specified in the page creation screen.
 
@@ -725,7 +735,7 @@ However, using the quotation primitive, a limited form of versioning can be emul
 Second, \tokenWord \  does not support multi-server integration:  each installation of \tokenWord \  operates in isolation, and quotes between documents at different sites are not possible.
 We see multi-server integration as one of the weakpoints in the Xanadu architecture:  how can we ensure that references never break in a system comprised of multiple, separately owned servers?
 Even if fault-tolerant, multi-server integration is possible, it is not essential for the end-user experience. 
-Third, \tokenWord \   does not support side-by-side document comparison with \textit{transpointing} lines, a classic Xanadu interface feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
+Third, \tokenWord \   does not support side-by-side document comparison with transpointing lines, a classic Xanadu interface feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
 The transpointing interface would be difficult, if not impossible, to support in a web browser with no additional software.
 However, a side-by-side document comparison interface, using colored highlighting to indicate identical regions, has been contemplated for \tokenWord.
 Implementing such an interface would be easy, though coming up with a highlighting scheme that works correctly in the general case (for example, without running out of readable colors) is quite difficult.
@@ -739,7 +749,7 @@ Many other presentation styles could be supported in this way by inserting other
 Layers are an ideal feature to add in a future development iteration.
 
 \section{Acknowledgements}
-Thanks are due to Ted Nelson and Jim Whitehead for their contributions to interesting xanalogical discussions over the past year. ``Xanadu'' is a trademark of Ted Nelson.  To prevent confusion, the generic terms (\textit{e.g.}, xanalogical system) have been used wherever possible.
+Thanks are due to Ted Nelson and Jim Whitehead for their contributions to interesting xanalogical discussions over the past year. ``Xanadu'' is a trademark of Ted Nelson.  To prevent confusion, the generic terms (\textit{e.g.}, xanalogical system) have been used whenever possible.
 
 \bibliographystyle{abbrv}
 \bibliography{paper}
