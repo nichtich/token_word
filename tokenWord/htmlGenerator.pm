@@ -19,6 +19,7 @@ package tokenWord::htmlGenerator;
 # Added support for trial balances.
 # Added a failed withdraw page.
 # Added document preview.
+# Improved layout of most- lists.
 #
 
 
@@ -114,7 +115,8 @@ sub generateFullFooter {
         my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
                                                                 $docID );
         if( length( $docTitle ) > 20 ) {
-            $docTitle = substr( $docTitle, 0, 20 );
+            $docTitle = substr( $docTitle, 0, 17 );
+            $docTitle = "$docTitle...";
         }
         my $quotedString =
             "<TR><TD>$docOwner\'s</TD>".
@@ -154,7 +156,8 @@ sub generateFullFooter {
         my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
                                                                 $docID );
         if( length( $docTitle ) > 20 ) {
-            $docTitle = substr( $docTitle, 0, 20 );
+            $docTitle = substr( $docTitle, 0, 17 );
+            $docTitle = "$docTitle...";
         }
         my $recentString =
             "<TR><TD>$docOwner\'s</TD>".

@@ -28,6 +28,9 @@ package tokenWord::documentManager;
 # 2003-January-14   Jason Rohrer
 # Added support for most recent and most quoted lists.
 #
+# 2003-January-14   Jason Rohrer
+# Fixed bug in most-quoted list.
+#
 
 
 use tokenWord::common;
@@ -35,6 +38,7 @@ use tokenWord::chunkManager;
 
 
 my $recentDocumentListSize = 10;
+my $quotedDocumentListSize = 10;
 
 
 
@@ -151,17 +155,49 @@ sub noteQuote {
     # check if this belongs in the most quoted file
     
     my $mostQuotedFile = "$dataDirectory/topDocuments/mostQuoted";
-    
+
+    # keep it simple and inefficient
+    # Remove document from list if it's already there
+
     my $mostQuotedString = readFileValue( $mostQuotedFile );
 
     my @mostQuoted = split( /\n/, $mostQuotedString );
 
-    my $foundSpot = 0;
-    my $foundIndex = 0;
+    my $foundExisting = 0;
+    my $existingIndex = 0;
     my $currentIndex = 0;
+
     foreach $quoted ( @mostQuoted ) {
         ( my $docRegion, my $count ) = split( /\|/, $quoted );
+        
+        my @docRegionElements = extractRegionComponents( $docRegion );
+        
+        if( $docRegionElements[0] eq $quotedUsername and
+            $docRegionElements[1] == $quotedDocID and
+            not $foundExisting ) {
+            
+            # found doc in list
+            $foundExisting = 1;
+            $existingIndex = $currentIndex;
+        }
+        $currentIndex += 1;
+    }
+    
+    if( $foundExisting ) {
+        # remove it from list
+        splice( @mostQuoted, $existingIndex, 1 );
+    }
 
+
+    # now find a spot for the document on the list
+
+    my $foundSpot = 0;
+    my $foundIndex = 0;
+    $currentIndex = 0;
+
+    foreach $quoted ( @mostQuoted ) {
+        ( my $docRegion, my $count ) = split( /\|/, $quoted );
+        
         if( $newCount > $count and not $foundSpot ) {
             $foundSpot = 1;
             $foundIndex = $currentIndex;
@@ -169,10 +205,6 @@ sub noteQuote {
         $currentIndex += 1;
     }
     
-    if( scalar( @mostQuoted ) == 0 ) {
-        $foundSpot = 1;
-        $foundIndex = 0;
-    }
 
     if( $foundSpot ) {
 
@@ -191,7 +223,7 @@ sub noteQuote {
 
         writeFile( $mostQuotedFile, $newMostQuotedString );
     }
-    elsif( scalar( @mostQuoted ) >= $quotedDocumentListSize ) {
+    elsif( scalar( @mostQuoted ) <= $quotedDocumentListSize ) {
         # there's room for this document at the end of the list
 
         my $docString = "< $quotedUsername, $quotedDocID >|$newCount";
