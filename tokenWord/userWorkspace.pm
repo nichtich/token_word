@@ -40,6 +40,11 @@ sub submitAbstractDocument {
 
     my @docRegions = ();
 
+    # for tracking locations of quotes in this document
+    my $netDocOffset = 0;
+    my @quotesToNote = ();
+
+
     foreach my $section ( @docSections ) {
         if( $section =~ m/<\s*q\s*\d+\s*>/ ) {
             # a quote
@@ -58,6 +63,21 @@ sub submitAbstractDocument {
                 tokenWord::quoteClipboard::getQuoteRegion( $username,  
                                                            $quoteNumber );
             
+            # add this quote to our list of quotes to note
+
+            my $quoteLength = $docRegion[3];
+            
+            my $quotedDocRegionString = join( ",", @docRegion );
+            my $quotingDocRegionString = 
+                "$username, DOC_ID, $netDocOffset, $quoteLength";
+
+            push( @quotesToNote, 
+                  "< $quotedDocRegionString > | < $quotingDocRegionString >" );
+
+            $netDocOffset += $quoteLength;
+
+
+
             my @quoteChunks =
                 tokenWord::documentManager::getRegionChunks( @docRegion );
             
@@ -96,14 +116,31 @@ sub submitAbstractDocument {
             my $chunkString = "< $username, $chunkID, 0, $chunkLength >";
             
             push( @docRegions, $chunkString );
+
+            $netDocOffset += $chunkLength;
         }
         
     }
 
     my $concreteDocumentString = join( "\n", @docRegions );
 
-    return tokenWord::documentManager::addDocument( $username, 
+    my $newDocID = tokenWord::documentManager::addDocument( $username, 
                                                     $concreteDocumentString );
+    
+    # note our quotes in the document manager
+
+    foreach my $quoteString ( @quotesToNote ) {
+
+        my @quoteParts = split( /\s*\|\s*/, $quoteString );
+        
+        # insert new doc ID into placeholder
+        $quoteParts[1] =~ s/DOC_ID/$newDocID/;
+        
+        tokenWord::documentManager::noteQuote( @quoteParts );
+    }
+    
+
+    return $newDocID;
 }
 
 

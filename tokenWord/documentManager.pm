@@ -12,6 +12,9 @@ package tokenWord::documentManager;
 # Fixed subregion bugs.
 # Added function for rendering entire document.
 #
+# 2003-January-8   Jason Rohrer
+# Added support for quote lists.
+#
 
 
 use tokenWord::common;
@@ -47,8 +50,36 @@ sub addDocument {
     writeFile( "$docDirName/nextFreeID", "$futureID" );
 
     writeFile( "$docDirName/$safeNextID", "$layoutString" );
+
+    # create a quote list
+    writeFile( "$docDirName/$safeNextID.quoteList", "" );
     
     return $safeNextID;
+}
+
+
+
+##
+# Notes a quote between documents.
+#
+# @param0 the quoted document region string.
+# @param1 the quoting document region string.
+#
+# Example:
+# noteQuote( "<jd45, 12, 104, 20>", "<jcd14, 24, 10, 20>" ); 
+##
+sub noteQuote {
+    ( my $quotedDocRegion, my $quotingDocRegion ) = @_;
+
+    my @quotedRegionElements = extractRegionComponents( $quotedDocRegion );
+
+    my $quotedUsername = $quotedRegionElements[0];
+    my $quotedDocID = $quotedRegionElements[1];
+
+    my $quoteListFileName = 
+  "$dataDirectory/users/$quotedUsername/text/documents/$quotedDocID.quoteList";
+    
+    addToFile( $quoteListFileName, "$quotedDocRegion|$quotingDocRegion\n" );
 }
 
 

@@ -24,6 +24,7 @@ sub BEGIN {
                  printFile
                  readFileValue
                  writeFile
+                 addToFile
                  trimWhitespace
                  extractRegionComponents );
 }
@@ -97,6 +98,30 @@ sub writeFile {
     my $stringToPrint = $_[1];
 
     open( FILE, ">$fileName" ) or die;
+    flock( FILE, 2 ) or die;
+
+    print FILE $stringToPrint;
+
+    close FILE;
+}
+
+
+
+##
+# Appends a string to a file.
+#
+# @param0 the name of the file.
+# @param1 the string to append.
+#
+# Example:
+# addToFile( "myFile.txt", "the new contents of this file" );
+##
+sub addToFile {
+
+    my $fileName = $_[0];
+    my $stringToPrint = $_[1];
+
+    open( FILE, ">>$fileName" ) or die;
     flock( FILE, 2 ) or die;
 
     print FILE $stringToPrint;
