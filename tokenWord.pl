@@ -269,10 +269,18 @@ else {
                 tokenWord::quoteClipboard::renderAllQuotes( $loggedInUser );
             
             
-            tokenWord::htmlGenerator::generateQuoteListPage( @quoteList );
+            tokenWord::htmlGenerator::generateQuoteListPage( $loggedInUser,
+                                                             @quoteList );
         }
         else {
-            tokenWord::htmlGenerator::generateMainPage( $loggedInUser );
+            # show main page
+            my $text = 
+                tokenWord::documentManager::renderDocumentText( "jcr13", 
+                                                                0 );
+            
+            tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                       "jcr13",
+                                                       0, $text );
         }
     }
 }

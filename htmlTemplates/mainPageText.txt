@@ -12,6 +12,8 @@ what happens when quotation and reference-chasing becomes automatic?  Quotation 
 
 along with frictionless, deep quotation, token_word delivers a frictionless micropayment system.  Each character in the token_word universe is worth one token.  Thus, a 3000-character article is worth 3000 tokens.  When a user accesses the article for the first time, he or she pays 3000 tokens.  This payment does not go entirely to the author of the article, but is instead split-up among the original authors of the words in the article (some of which may have been written by the author of the article).  If the 3000-character article contains 2300 original characters and a 700-character quote, 2300 tokens are transfered to the article author and 700 are transfered to the quote author.
 
+Readers only spend tokens for the words in an article once.  Whenever an article quotes words that the reader already owns, those words are free, and only the new words use up tokens.
+
 with both reference-chasing and micropayments in place, authors can encourage free reuse of their writing.  The more an author's words are reused, the more tokens that author is likely to receive.   
 
 token_word is inspired by the ideas of Ted Nelson, the inventor of hypertext, transclusion, and transcopyright.

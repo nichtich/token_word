@@ -9,8 +9,9 @@ package tokenWord::userWorkspace;
 # 2003-January-8   Jason Rohrer
 # Added function for extracting abstract quotes.
 #
-# 2003-January-8   Jason Rohrer
+# 2003-January-9   Jason Rohrer
 # Fixed a taint checking bug.
+# Fixed a bug that missed multiple quotes.
 #
 
 
@@ -36,10 +37,17 @@ sub submitAbstractDocument {
     ( my $username, my $docText ) = @_;
     
     # replace < and > with @< and >@
-    $docText =~ s/</@</;
-    $docText =~ s/>/>@/;
+    $docText =~ s/</@</g;
+    $docText =~ s/>/>@/g;
     
+        
     my @docSections = split( /@/, $docText );
+
+
+    if( $docSections[0] eq "" ) {
+        # avoid blank first section if doc starts with a quote
+        shift( @docSections );
+    }
 
     my @docRegions = ();
 
@@ -54,7 +62,7 @@ sub submitAbstractDocument {
             
             #extract the quote number
             $section =~ s/[<q>]//g;
-            $section =~ s/\s//;
+            $section =~ s/\s//g;
 
             my $quoteNumber = $section;
             
