@@ -52,7 +52,7 @@ if( $action eq "login" ) {
     my $password = $cgiQuery->param( "password" ) || '';
     
 
-    $cookie = $query->cookie( -name=>"loggedInUser",
+    $cookie = $cgiQuery->cookie( -name=>"loggedInUser",
                               -value=>"$user",
                               -expires=>'+1h' );
     $setCookie = 1;

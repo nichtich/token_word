@@ -21,6 +21,7 @@ sub BEGIN {
     @ISA = qw( Exporter );
     @EXPORT = qw(
                  $dataDirectory
+                 $htmlDirectory
                  printFile
                  readFileValue
                  writeFile
