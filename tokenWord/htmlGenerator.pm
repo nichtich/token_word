@@ -21,6 +21,7 @@ package tokenWord::htmlGenerator;
 # Added document preview.
 # Improved layout of most- lists.
 # Added support for error page.
+# Added a feedback form.
 #
 
 
@@ -229,6 +230,26 @@ sub generateCreateUserForm {
 
 
     generateFooter();
+}
+
+
+
+##
+# Generates the feedback form.
+#
+# @param0 the currently logged-in user.
+##
+sub generateFeedbackForm {
+    ( my $loggedInUser ) = @_;
+ 
+    generateFullHeader( "feedback" );
+
+    my $formText = readFileValue( "$htmlDirectory/feedbackForm.html" );
+    
+    print $formText;
+
+
+    generateFullFooter( $loggedInUser );
 }
 
 

@@ -33,6 +33,7 @@
 # Improved behavior on document creation.
 # Added document preview.
 # Added checks for document existence.
+# Added a feedback form.
 #
 
 
@@ -320,6 +321,17 @@ else {
 
         if( $action eq "test" ) {
             print "test for user $loggedInUser\n";
+        }
+        elsif( $action eq "feedbackForm" ) {            
+            tokenWord::htmlGenerator::generateFeedbackForm( $loggedInUser );
+        }
+        elsif( $action eq "feedback" ) { 
+            my $message = $cgiQuery->param( "message" ) || '';
+
+            addToFile( "$dataDirectory/feedback",
+                       "$loggedInUser :\n$message\n\n" );
+            
+            showMainPage();
         }
         elsif( $action eq "createDocumentForm" ) {            
             tokenWord::htmlGenerator::generateCreateDocumentForm( 
