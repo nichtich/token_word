@@ -239,7 +239,7 @@ sub generateQuoteListPage {
 
         my $quoteCounter = 0;
         foreach $quote ( @quotes ) {
-            print "<TR><TD>&#60;q $quoteCounter&#62;</TD>";
+            print "<TR><TD VALIGN=TOP>&#60;q $quoteCounter&#62;</TD>";
             print "<TD>\n";
 
             my @quoteElements = split( /\n\n/, $quote );
