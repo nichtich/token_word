@@ -61,7 +61,6 @@ make this scenario explicit in the text.
 links (last paragraph before 3.2). If I hadn't seen the system demo, I
 wouldn't have understood the text in this section.
 
-GOT HERE
 
 
 --- end of first batch of comments ---
@@ -82,9 +81,12 @@ experience.
 rate, or how this is set? Can there be variable pricing in the system, with
 some content costing more than other content?
 
+
 * Section 4.1 - might want to explain the example in a little more detail.
 Took me a minute to understand how you got from the first to the second
 table.
+
+GOT HERE
 
 * You might want to explicitly reference the Udanax Gold project.
 

@@ -547,8 +547,7 @@ By modifying the implementation of these module functions, either of the scalabl
 We chose a filesystem backend, despite its scalability limitations, because of its simplicity.
 This choice fits into our implementation philosophy, since the focus was on producing a working system and adding features iteratively.
 A scalable backend might be seen as a feature to be added in a future iteration.
-Our system, in its current form, is still functional in terms of its goal:  it can potentially support thousands of users and hundreds of thousands of documents, which is enough to give us an understanding of a xanalogical user experience.
-
+Our system, in its current form, is still functional in terms of its goal, which is to support exploration of a multi-user xanalogical system.
 
 %\subsection{Xanalogical Improvements}
 
@@ -569,6 +568,11 @@ Similarly, withdrawing tokens in exchange for real-world currency is not frictio
 PayPal does not support an automated payment mechanism, so withdrawl requests must be queued for manual processing by the \tw \  system administrator.
 Whereas deposits take effect immediately (using PayPal's ``Instant Payment Notification'' service), withdrawn token refunds are delayed by the response of the human administrator.
 From the administrator's point of view, the withdrawl queue can be used to increase security, since any suspicious activity can be investigated before real-world payments are made.  
+
+In our live system, we chose an exchange rate of 1,000,000 tokens for \$1, though this parameter can be changed on a site-by-site basis.
+With this exchange rate, we tried to minimize financial burden on readers while still assigning appreciable value to content.
+For example, the full text of this paper would cost about \$0.04, so 25 people would need to read it before it earned \$1 worth of tokens.
+
 
 \subsection{Balancing Risk}
 Given that micropayments in \tw \  are mandatory and automatic, a major barrier to system adoption might exist:  trying \tw \  would require the deposit of real-world currency.
@@ -605,6 +609,9 @@ $C$&10 &0  \\
 \end{tabular}
 \end{center}
 Suppose that user $A$ reads a new 100-chracter document that is owned by $B$, but that the document contains a 20-character quote by $C$.
+User $A$ must pay 100 tokens to access this new content, with 80 going to $B$ and 20 going to $C$.
+The transfer logic favors trial tokens, so $A$'s trial balance is exhausted first by transfering 50 tokens to $B$.
+The remaining payment to $B$ is made with 30 real tokens, and 20 real tokens are also transfered to $C$.
 The resulting balances are shown in the following table:
 \begin{center}
 \begin{tabular}{|l||r|r|}
@@ -620,12 +627,13 @@ $C$&10 &20  \\
 \end{tabular}
 \end{center}
 
+
 %$A$'s new balance would be 0:150, $B$'s new balance would be 50:520, and $C$'s new balance would be 10:20. 
 
 This two-type scheme allows users to try \tw \  extensively without a monetary investment, and it also poses no financial risks to the administrators.
 Note that though trial tokens have no real-world value, they still have value in \tw, since they can always be used to purchase new content.
 Inside \tw, a user that amasses many trial tokens is just as wealthy as a user that has many real tokens.
-A user that actively published popular content in \tw \  could effectively use the system forever without depositing any real-world money.
+A user that actively publishes popular content in \tw \  could effectively use the system forever without depositing any real-world money.
 
 \section{Related Work}
 \label{sec:RelatedWork}
