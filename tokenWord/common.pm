@@ -394,12 +394,13 @@ sub updateDatabaseFromDataTarball {
     my @files = split( /\n/, $fileList );
 
     foreach $file ( @files ) {
+        print "Inserting $file<BR>";
         my $fileContents = 
             `/bin/cat ./$dataDirectoryName.tar | /bin/tar xOf - $file`;
         writeFile( $file, $fileContents );
     }
     my $outcome2 =
-        `rm ./$dataDirectoryName.tar`;
+        `/bin/rm ./$dataDirectoryName.tar`;
     print "Outcome = $outcome $outcome2 <BR>(blank indicates no error)";
     
     $ENV{ "PATH" } = $oldPath;
