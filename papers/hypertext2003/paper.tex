@@ -53,6 +53,7 @@ http://hypertext.sf.net/token\_word
 \keywords{Micropayments, quotation, transclusion, Xanadu}
 
 \section{Introduction}
+\label{sec:Introduction}
 Xanadu has been floating in the collective mind of the hypertext research community for nearly forty years.
 Xanadu is a dream and an ideal.  
 We know it would be great (or at least interesting) if a xanalogical system existed, but we are also resigned to the notion that such a system will probably never exist.
@@ -104,6 +105,7 @@ We have acheived a novel success, where past attempts have failed, and we feel t
 
 \section{The Xanadu Model}
 
+\label{sec:Xanadu}
 As mentioned in the above quote, Xanadu's underlying ideas were first incubated by Nelson in the 1960s \cite{Nelson1965}.  
 These ideas evolved somewhat over the next forty years, receiving one of their most verbose presentations in Nelson's book {\it Literary Machines}, which was first published in 1981 \cite{NelsonLiteraryMachines}.  
 Nelson's more recent paper on the xanalogical model is up to date in terms of modern technological trends, but the core ideas have not changed \cite{Nelson1999}.  
@@ -466,11 +468,12 @@ When a document is added to the system, its reference is appended to the end of 
 
 \subsubsection{Development}
 The entire \tw \  system is implemented as a single CGI script written in Perl, though the script is broken up into eight modules for organization purposes.
-Perl's built-in support for regular expressions was very useful for the rather complicated text processing done by \tw.
-Many of these text processing operations could be expressed in succinct and elegant ways using Perl.
+Perl's built-in support for regular expressions was useful for the rather complicated text processing done by \tw.
+Many of these text processing operations can be expressed in succinct and elegant ways using Perl.
 For example, highlighting possible misspellings in preview mode was a minor addition that required less than fifteen lines of code.
 
-CGI programming is well-supported in Perl, and HTML made user interface layout and user action processing easy to implement.
+User interfaces can be layed out easily with HTML, and CGI processing is well-supported by existing Perl modules.
+The CGI model requires a stateless action-response programming style, which makes it easy to focus on one feature at a time during development.
 Perl-based CGI programming seems to be the modern method of choice for rapidly developing complex, multi-user applications.
 Other systems that have used this development method successfully are discussed in Section \ref{sec:RelatedWork}.
 
@@ -512,22 +515,88 @@ A scalable backend might be seen as a feature to be added in a future iteration.
 Our system, in its current form, is still functional in terms of its goals:  it could support hundreds of users and hundreds of thousands of documents, which is enough to give us an understanding of a xanalogical user experience.
 
 
-\subsection{Xanalogical Improvements}
+%\subsection{Xanalogical Improvements}
 
 
-\subsection{Missing Features}
-
+%\subsection{Missing Features}
 
 
 \section{Micropayment Issues}
+With our micropyament system, we wanted to leverage PayPal's \cite{paypal} immense popularity and familiarity.
+By handling real-world currency exclusively through PayPal, instead of through our own virtual money system, we can process payments in a secure and trustworthy fashion.
 
+However, PayPal's currency model does not support the microdollar resolution that we need, so we cannot rely on this service alone for transfering tokens between users.
+Even if PayPal did support high-resolution payments, it does not allow a third party to initiate transfers between account holders in a transparent and frictionless way (and for good reason, given the security issues).
+
+To deal with these issues, we built an internal token balance system and used PayPal integration only for deposits and withdrawls of real-world currency.
+For example, a deposit is by no means frictionless (logging in to PayPal is required), but after the deposit has been made, token payments are completely transparent as the user accesses \tw \ documents.
+Similarly, withdrawing tokens in exchange for real-world currency is not frictionless: 
+PayPal does not support an automated payment mechanism, so withdrawl requests are queued for manual processing by the \tw \ system administrator.
+Whereas deposits take effect immediately (using PayPal's ``Instant Payment Notification'' service), withdrawn token refunds are delayed by the response of the human administrator.
+From the administrator's point of view, the withdrawl queue can be used to increase security, since any suspicious activity can be investigated before real-world payments are made.  
 
 \subsection{Balancing Risk}
+Given that micropayments in \tw \ are mandatory and automatic, a major barrier to system adoption might exist:  trying \tw \ would require the deposit of real-world currency.
+Even the main page displayed after login is a first-class \tw \ document, so a new user with no tokens would not be able to read a description of \tw, let alone try any of its features.
 
+One way of dealing with this adoption barrier would be to give each new user a small number of ``free'' tokens to start with (for example, at least enough tokens to read the main page).
+This solution would allow new users to try the system with no monetary investment, but it carries an enormous risk for the \tw \ system administrators.
+A small group of users could create many fake accounts and then use each account to read a large dummy document owned by one user.
+This kind of scam could be used to consolodate the free starting tokens from many accounts into one account, and then a withdrawl could be made in exchange for a large amount of real-world currency.
+Even if users are not trying to intentially scam the system, doling out free tokens poses considerable risk.
+One user might write documents that are popular with new users (for example, a collection of how-to documents) and ammass a large number of free tokens over time---the withdrawl of these tokens could financially devastate the \tw \ administrators.
 
+We have devised a risk-free mechanism that deals with the adoption barrier.  
+Our approach uses two token types.
+The first type of tokens, called {\it trial} tokens, have no real-world value.
+Each new account starts out with a small number of trial tokens (in our live system, each account starts with 50,000 trial tokens).
+The second type of tokens, called {\it real} tokens, can be exchanged for real-world currency.
+Token transfers inside \tw \ keeps track of token types:  trial tokens can only be transfered between users' trial balances, and real tokens can only be transfered between real balances.
+Trial tokens are favored, and real tokens are only spent when a user has no trial tokens.
+
+For example, suppose the balances of three users are as shown in following table:
+%suppose user $A$ has a trial:real token balance of 50:200, user $B$ has a balance of 0:500, and user $C$ has a balance of 10:0.
+\begin{center}
+\begin{tabular}{|l||r|r|}
+\hline
+User&Trial balance &Real balance\\
+\hline
+$A$&50 &200\\
+\hline
+$B$&0  &500\\
+\hline
+$C$&10 &0  \\
+\hline
+\end{tabular}
+\end{center}
+Suppose that user $A$ reads a new 100-chracter document that is owned by $B$, but that the document contains a 20-character quote by $C$.
+The resulting balances are shown in the following table:
+\begin{center}
+\begin{tabular}{|l||r|r|}
+\hline
+User&Trial balance &Real balance\\
+\hline
+$A$&0 &150\\
+\hline
+$B$&50  &520\\
+\hline
+$C$&10 &20  \\
+\hline
+\end{tabular}
+\end{center}
+
+%$A$'s new balance would be 0:150, $B$'s new balance would be 50:520, and $C$'s new balance would be 10:20. 
+
+This two-type scheme allows users to try \tw \ extensively without a monetary investment, and it also poses no financial risks to the administrators.
+Note that though trial tokens have no real-world value, they still have value inside \tw, since they can always be used to purchase new content.
+Inside \tw, a user that amasses many trial tokens is just as wealthy as a user with many real tokens.
+A user that actively published popular content in \tw \ could effectively use the system forever without depositing any real-world money.
 
 \section{Related Work}
 \label{sec:RelatedWork}
+
+Much of the existing work on xanalogical systems was discussed in Sections \ref{sec:Introduction} and \ref{sec:Xanadu}.
+
 
 Wikis
 \cite{WikiWikiWeb}
