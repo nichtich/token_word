@@ -18,7 +18,14 @@ package tokenWord::common;
 #
 # 2003-April-30   Jason Rohrer
 # Added skeleton for using db database instead of filesystem.
+# Added db implementation.
 #
+
+
+
+# the db file interface
+use DB_File;
+
 
 
 # define our exported variables and subroutines
@@ -71,6 +78,13 @@ sub printFile {
     my $fileName = $_[0];
 
     if( $useDB ) {
+        tie my %db_hash, 
+            "DB_File", $dbFile, O_CREAT | O_RDONLY | O_SHLOCK, 
+            0666, $DB_HASH;
+        my $value = $db_hash{ $fileName };
+        untie %db_hash;
+        
+        print $value;
     }
     else {    
         bypass_printFile( $fileName );
@@ -116,9 +130,16 @@ sub readFileValue {
     my $fileName = $_[0];
     
     if( $useDB ) {
+        tie my %db_hash, 
+            "DB_File", $dbFile, O_CREAT | O_RDONLY | O_SHLOCK, 
+            0666, $DB_HASH;
+        my $value = $db_hash{ $fileName };
+        untie %db_hash;
+        
+        return $value;
     }
     else {
-        bypass_readFileValue( $fileName );
+        return bypass_readFileValue( $fileName );
     }
 }
 
@@ -164,6 +185,16 @@ sub doesFileExist {
     my $fileName = $_[0];
         
     if( $useDB ) {
+        tie my %db_hash, 
+            "DB_File", $dbFile, O_CREAT | O_RDONLY | O_SHLOCK, 
+            0666, $DB_HASH;
+        my $exists = 0;
+        if( $db_hash{ $fileName } ) {
+            $exists = 1;
+        }
+        untie %db_hash;
+        
+        return $exists;
     }
     else {
         return bypass_doesFileExist( $fileName ); 
@@ -208,6 +239,11 @@ sub writeFile {
     my $stringToPrint = $_[1];
     
     if( $useDB ) {
+        tie my %db_hash, 
+            "DB_File", $dbFile, O_CREAT | O_RDWR | O_EXLOCK, 
+            0666, $DB_HASH;
+        $db_hash{ $fileName } = $stringToPrint;
+        untie %db_hash;
     }
     else {
         bypass_writeFile( $fileName, $stringToPrint );
@@ -253,6 +289,13 @@ sub addToFile {
     my $stringToPrint = $_[1];
         
     if( $useDB ) {
+        tie my %db_hash, 
+            "DB_File", $dbFile, O_CREAT | O_RDWR | O_EXLOCK, 
+            0666, $DB_HASH;
+        my $oldValue = $db_hash{ $fileName };
+        $db_hash{ $fileName } = "$oldValue$stringToPrint";
+        untie %db_hash;
+
     }
     else {
         bypass_addToFile( $fileName, $stringToPrint );
@@ -298,6 +341,12 @@ sub makeDirectory {
     my $permissionMask = $_[1];
     
     if( $useDB ) {
+        tie my %db_hash, 
+            "DB_File", $dbFile, O_CREAT | O_RDWR | O_EXLOCK, 
+            0666, $DB_HASH;
+        # marker entry
+        $db_hash{ $fileName } = "directory";
+        untie %db_hash;
     }
     else {
         bypass_makeDirectory( $fileName, $permissionMask );
