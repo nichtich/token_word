@@ -21,6 +21,7 @@ use tokenWord::chunkManager;
 use tokenWord::documentManager;
 use tokenWord::userManager;
 use tokenWord::quoteClipboard;
+use tokenWord::userWorkspace;
 
 
 print "test\n";
@@ -62,6 +63,17 @@ my $quoteID = tokenWord::quoteClipboard::addQuote( "jj55", "jj55",
 $region = 
   tokenWord::quoteClipboard::renderQuoteText( "jj55", $quoteID );
 print "quote = $region\n";
+
+$docID = 
+  tokenWord::userWorkspace::submitAbstractDocument(
+      "jj55", "I am quoting myself here:  <q $quoteID>" );
+
+$fullDocText =
+  tokenWord::documentManager::renderDocumentText( "jj55", $docID );
+
+print "Full quote document text = \n$fullDocText\n";
+
+
 
 sub setupDataDirectory {
     if( not -e "$dataDirectory" ) {
