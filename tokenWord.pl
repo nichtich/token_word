@@ -41,6 +41,7 @@
 # Added a spell checker.
 # Changed to highlight-only spell checking display.
 # Changed to dynamically switch between local and global ispell.
+# Added a umask to give group write permissions.
 #
 
 
@@ -71,6 +72,9 @@ my $paypalNotifyIP = "65.206.229.140";   # IP of notify.paypal.com
 # make sure data directories exist
 setupDataDirectory();
 
+
+# allow group to write to our data files
+umask( 0002 );
 
 
 my $cgiQuery = CGI->new();
