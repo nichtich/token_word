@@ -60,6 +60,7 @@ sub BEGIN {
 
 $dataDirectoryName = "tokenWordData";
 $dataDirectory = "../../cgi-data/tokenWordData";
+$dataDirectoryPath = "../../cgi-data/";
 $htmlDirectory = "htmlTemplates";
 
 $dbFile = "../../cgi-data/tokenWordData.db";
@@ -391,13 +392,37 @@ sub updateDatabaseFromDataTarball {
     my $fileList =
         `cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/tar tf -`;
 
-    my @files = split( /\w+/, $fileList );
+    my @files = split( /\s+/, $fileList );
+
+    my $fileCount = 1;
+    my $totalFiles = scalar( @files );
 
     foreach $file ( @files ) {
-        print "Inserting $file<BR>";
-        my $fileContents = 
-            `cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/tar xOf - $file`;
-        writeFile( $file, $fileContents );
+	my ( $safeFileName ) = ( $file =~ /([\w\/]+)/ );
+        
+	$fullFileName = "$dataDirectoryPath$safeFileName";
+
+	my @fileNameParts = split( //, $fullFileName );
+
+	if( $fileNameParts[ length( $fullFileName ) - 1 ] eq "/" ) {
+	    # a directory
+
+	    # strip off trailing "/"
+	    pop( @fileNameParts );
+	    $fullFileName = join( "", @fileNameParts );
+
+	    print 
+	     "$fileCount/$totalFiles: Inserting directory $fullFileName<BR>\n";
+	    makeDirectory( $fullFileName, oct( "0777" ) )
+	    }
+	else {
+	    print "$fileCount/$totalFiles: Inserting file $fullFileName<BR>\n";
+
+	    my $fileContents = 
+		`cd $dataDirectory/..; /bin/cat ./$dataDirectoryName.tar | /bin/tar xOf - $safeFileName`;
+	    writeFile( $fullFileName, $fileContents );
+	}
+	$fileCount = $fileCount + 1;
     }
     my $outcome2 =
         `cd $dataDirectory/..; /bin/rm ./$dataDirectoryName.tar`;
