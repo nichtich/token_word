@@ -8,9 +8,11 @@
 
 \documentclass{acm_proc_article-sp}
 
+\newcommand{\tw}{token\_word}
+
 \begin{document}
 
-\title{token\_word:  Building a Xanalogical System in Nine Days}
+\title{\tw:  Building a Xanalogical System in Nine Days}
 
 \numberofauthors{1}
 
@@ -28,7 +30,13 @@
 \maketitle
 
 \begin{abstract}
-Test
+We describe \tw, a web-based xanalogical hypertext system.  Our system supports almost every feature associated with Xanadu, an architecture that has been actively discussed for nearly forty years.
+Features include deep quotation, unbreakable references, two-way reference chasing, and frictionless micropayments backed by real-world currency.
+To our knowledge, \tw \ is the first xanalogical system implementation to included all of these features.  Also, \tw \ is the first xanalogical system of any kind to be accessible through a web browser with no additional software.
+
+Though previous attempts at xanalogical implementations took many years and ultimately were never completed, \tw \ was implented from scratch in nine days by one person.  
+We attribute this success to the maturity of modern technology and design techniques.  
+In particular, choosing Perl as the implementation language allowed the rather complex xanalogical text processing operations to be expressed in elegant ways.
 
 \end{abstract}
 
@@ -41,13 +49,88 @@ Test
 \keywords{Micropayments, quotation, transclusion, Xanadu}
 
 \section{Introduction}
+Xanadu has been floating in the collective mind of the hypertext research community for nearly forty years.
+Xanadu is a dream and an ideal.  
+We know it would be great (or at least interesting) if a xanalogical system existed, but we are also resigned to the notion that such a system will probably never exist.
+Is Xanadu impossible?
 
-\cite{NelsonLiteraryMachines}
+That question by itself, the impossibility question, is extraordinarily intriguing.  We {\it know} that Xanadu is not impossible.  
+The design, on paper, is clear enough:  we just need to build it.  
+The problem might be that no one tried to build it.  
+But many people did try to build Xanadu over the years.  
+The problem might be that the people trying to build it did not have sufficient resources.  But people with extraordinary resources did try to build it.  
+Will anyone argue that Autodesk did not have extraordinary software development resources in the late 1980s?  
+Furthermore, Autodesk {\it believed} in Xanadu.  
+The following quote from a 1988 Autodesk press release is most telling:
+
+\begin{quote}
+In 1964, Xanadu was a dream in a single mind.  In 1980, it was the
+shared goal of a small group of brilliant technologists.  By 1989, it
+will be a product.  And by 1995 it will begin to change the world.
+Much work remains to be done to realise the potential of Xanadu--it
+will take the Xanadu development team 18 months to field the first
+Xanadu system. \cite{AutodeskPress} 
+\end{quote}
+
+In that same press release, Autodesk claims 1987 sales figures topping \$79 million.  
+Indeed, Autodesk had extraordinary resources for its time.  
+In 1992, after four years of development and \$5 million spent \cite{AutodeskCost},  Autodesk ceased development of Xanadu \cite{AutodeskPressDrop}.  
+Ironically, this decision was made just when the world was ripe for its first global hypertext system \cite{BernersLee92}.
+
+We are scared of Xanadu.  
+We hear its siren song and are tempted, but we know that many have tried and many have failed.  
+The most frustrating factor is that none of us really know how useful Xanadu would be, even if it {\it did} exist.  
+We can look at architecture drawings and pictures of cardboard mock-ups\cite{Nelson1999}, but these do not give us any sense of what it would be like to use a xanalogical system.  
+Few of us have ever played with a xanalogical software prototype, even fewer have paid or received a true micropayment (xanalogical or otherwise), and almost none have transcluded the work of another or had our work transcluded.
+
+What is using a xanalogical system really like?
+Is it as useful as it sounds?  
+This paper attempts to answer this question by describing the first fully-realized xanalogical implementation.
+
+
+\section{The Xanadu Model}
+
+As mentioned in the above quote, Xanadu's underlying ideas were first incubated by Nelson in the 1960s \cite{Nelson1965}.  
+These ideas evolved somewhat over the next forty years, receiving one of their most verbose presentations in Nelson's book {\it Literary Machines}, which was first published in 1981 \cite{NelsonLiteraryMachines}.  
+Nelson's more recent paper on the xanalogical model is up to date in terms of modern technological trends, but the core ideas have not changed \cite{Nelson1999}.  
+The high-level description and interpretation of Xanadu given here is based on information culled from {\it Literary Machines}, Nelson's recent lectures, and personal conversations with Nelson.
+
+The goal of Xanadu, distilled into a single phrase, is {\it frictionless content reuse}.  
+This goal would be easily realized in a frictionless, copyright-free world:  authors could simply copy whatever they want and reuse it however they want.  
+In our world, however, we have copyright.
+Unlike other systems \cite{Clark2000}, Xanadu does not attempt to undermine copyright, but instead tries to work with it. 
+All of the design choices and complications in the Xanadu model can be seen as mechanisms for making reuse frictionless in the face of copyright.
+When trying to implement unrestricted reuse in a way that works with copyright, we are faced with the following fact:  {\it copyright forbids unrestricted copying}.
+
+Xanadu's central mechanism is {\it transclusion}, a form of quotation.  
+Transclusion differs from quotation in that it does not involve copying of any kind.  
+When document $A$ transcludes a quote from document $B$ the quote is stored as a deep reference to the quoted material in $B$:  words from $B$ are not copied into $A$. 
+Whenver $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the necessary word from $B$ are fetched from $B$'s owner.
+Thus, even though $A$'s owner has quoted document $B$, the quoted owner still retains control over his or her words.
+Avoiding copying led us to transclusion, and making transclusion work will lead us to the rest of the Xanadu model.
+
+Transclusion creates a serious problem, at least in combination with how we commonly think of electronic documents.
+Electronic documents change constantly.
+If $B$ changes or is deleted, $A$'s quote can break.
+Xanadu's solution is to forbid document change but encourage document versioning.
+Thus, as $B$ changes, all previous versions are maintained, and $A$'s quote can point to the particular version that $A$'s owner quoted.
+A particular version of $B$ is immutable, so $A$'s quote will never break.
+
+The Xanadu model refines this versioning model further by describing an ever-growing, add-only, content space.  
+When a document is created, its text is added to this space.
+When a document quotes this document, it points not to the document itself, but to the quoted words in the content space.
+Thus, a document in Xanadu is a series of pointers to regions in the content space, and no text is contained in the documents themselves.
+Versioning with this mechanism is particularly space-efficient:  unchanged portions of the document can be quoted from the content space instead of being duplicated.
+
+
 
 \section{System Architecture}
 
 
 \subsection{Xanalogical Improvements}
+
+
+\subsection{Missing Features}
 
 
 \section{Implementation}
@@ -78,7 +161,7 @@ Xanadu
 
 
 \section{Acknowledgements}
-Thanks are due to Ted Nelson and Jim Whitehead for their contributions to interesting Xanalogical discussions over the past year.
+Thanks are due to Ted Nelson and Jim Whitehead for their contributions to interesting xanalogical discussions over the past year. ``Xanadu'' is a trademark of Ted Nelson.  To prevent confusion, the generic terms ({\it e.g.}, xanalogical) have been used wherever possible.
 
 \bibliographystyle{abbrv}
 \bibliography{paper}
