@@ -26,6 +26,7 @@ package tokenWord::htmlGenerator;
 # Added display of search results.
 # Added a spell checker.
 # Changed to highlight-only spell checking display.
+# Enabled highlights in links on quote clipboard.
 #
 
 
@@ -568,12 +569,16 @@ sub generateQuoteListPage {
             my @components = extractRegionComponents( $quote );
             my $docOwner = $components[0];
             my $docID =  $components[1];
+            my $offset =  $components[2];
+            my $length = $components[3];
             my $docTitle = tokenWord::documentManager::getDocTitle( $docOwner,
                                                                     $docID );
 
             print "from $docOwner\'s ";
             print "<A HREF=\"tokenWord.pl?action=showDocument";
-            print "&docOwner=$docOwner&docID=$docID\">$docTitle</A>:<BR><BR>";
+            print "&docOwner=$docOwner&docID=$docID";
+            print "&highlightOffset=$offset&highlightLength=$length";
+            print "\">$docTitle</A>:<BR><BR>";
 
             my $quoteText = tokenWord::quoteClipboard::renderQuoteText( 
                                                               $loggedInUser,
