@@ -73,6 +73,9 @@
 # Added functions for deleting files.
 # Added support for deleting quotes from clipboards.
 #
+# 2003-June-2   Jason Rohrer
+# Added support for extracting multiple quotes with the same operation.
+#
 
 
 
@@ -981,13 +984,13 @@ else {
                                                                 $docID );
 
                 if( $success ) {
-                    my $newQuoteID =
-                        tokenWord::userWorkspace::extractAbstractQuote( 
+                    my @newQuoteIDs =
+                        tokenWord::userWorkspace::extractAbstractQuotes( 
                                                               $loggedInUser,
                                                               $docOwner, 
                                                               $docID,
                                                               $abstractQuote );
-                    if( $newQuoteID == -1 ) {
+                    if( $newQuoteID[0] == -1 ) {
                         # failed to extract quote
                         # show form with a message
                         my $text = 

@@ -30,6 +30,9 @@ package tokenWord::userWorkspace;
 # Changed to use subroutine to check for file existence.
 # Changed to use subroutine to make directories.
 #
+# 2003-June-2   Jason Rohrer
+# Added support for extracting multiple quotes with the same operation.
+#
 
 
 use tokenWord::common;
@@ -261,30 +264,26 @@ sub previewAbstractDocument {
 
 
 ##
-# Extracts a quoted region from abstract document (text and quote tag pair).
+# Extracts a quoted regions from abstract document (text and quote tag pairs).
 #
 # @param0 the quoting user.
 # @param1 the quoted user.
 # @param3 the quoted documentID.
 # @param4 the abstract document string.
 #
-# @return the id of the new quote, or -1 if the extraction failed
+# @return the ids of the new quotes, or -1 if the extraction failed
 #
 # Example:
-# my $quoteID = extractAbstractQuote( "jj55", "jdg1", 10, 
-#                                     "This is a <q>test document</q>." );
+# my @quoteIDs = extractAbstractQuotes( "jj55", "jdg1", 10, 
+#                                   "This <q>is</q> a <q>test document</q>." );
 ##
-sub extractAbstractQuote {
+sub extractAbstractQuotes {
     ( my $quotingUser, my $quotedUser, my $docID, my $docText ) = @_;
     
     
     # split around quote tags
     my @splitDocument = split( /<\s*\/?\s*q\s*>/, $docText );
 
-    # If quote tags are correct, this will split document into
-    # 3, 2, or 1 region(s)
-    # 2 regions if one tag is at the start/end of the document
-    # 1 region if tags select the entire document
 
     if( scalar( @splitDocument ) < 1 ) {
         # abstract document document does not contain proper quote
@@ -292,26 +291,32 @@ sub extractAbstractQuote {
         return -1;
     }
     
-    my $quoteOffset;
+    my @newQuoteIDs = ();
+
+    my $quoteOffset = 0;
     my $quoteLength;
     
-    if( scalar( @splitDocument ) == 1 ) {
-        # the whole document is quoted
-        $quoteOffset = 0;
-        $quoteLength = length( $splitDocument[0] );
-    }
-    else {
-        # take only the first quote
-        $quoteOffset = length( $splitDocument[0] );
-        $quoteLength = length( $splitDocument[1] );
+    # take every other part as a quote
+    my $takePart = 0;
+    foreach $part ( @splitDocument ) {
+        $quoteLength = length( $part );
+        if( takePart ) {
+            my $newID = tokenWord::quoteClipboard::addQuote( $quotingUser,
+                                                             $quotedUser,
+                                                             $docID,
+                                                             $quoteOffset,
+                                                             $quoteLength );
+            push( @newQuoteIDs, $newID );
+            $takePart = 0;
+        }
+        else {
+            $takePart = 1;
+        }
+        $quoteOffset += $quoteLength;
     }
 
 
-    tokenWord::quoteClipboard::addQuote( $quotingUser,
-                                         $quotedUser,
-                                         $docID,
-                                         $quoteOffset,
-                                         $quoteLength );
+    return @newQuoteIDs;
 }
 
 
