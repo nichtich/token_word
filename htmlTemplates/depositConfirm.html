@@ -29,25 +29,26 @@ Thus, your net payment will be:
 </CENTER>
 <BR>
 
-if you wish to proceed with this transaction, click the button below, which will take you to paypal.  We receive paypal payments through the email address <B>jcr13@cornell.edu</B>.<BR>
+if you wish to proceed with this transaction, click the button below, which will take you to paypal.  We receive paypal payments through the email address <B>jcr13@users.sourceforge.net</B>.<BR>
 
 <CENTER>
 
 
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_xclick">
-<input type="hidden" name="business" value="jcr13@cornell.edu">
+<input type="hidden" name="business" value="jcr13@users.sourceforge.net">
 <input type="hidden" name="item_name" value="token_word token deposit">
 <input type="hidden" name="amount" value="<!--#NET_PAYMENT_DOLLARS-->">
 <input type="hidden" name="no_shipping" value="1">
 <input type="hidden" name="login_email" value="<!--#PAYPAL_EMAIL-->">
 <input type="hidden" name="email" value="<!--#PAYPAL_EMAIL-->">
-<input type="hidden" name="return" value="http://localhost/cgi-bin/tw/tokenWord.pl">
-<input type="hidden" name="cancel_return" value="http://localhost/cgi-bin/tw/tokenWord.pl">
+<input type="hidden" name="return" value="http://monolith.2y.net/cgi-bin/tw/tokenWord.pl">
+<input type="hidden" name="cancel_return" value="http://monolith.2y.net/cgi-bin/tw/tokenWord.pl">
 <input type="hidden" name="cn" value="Special Instructions (optional">
 <input type="hidden" name="no_note" value="1">
 <input type="hidden" name="currency_code" value="USD">
 <input type="hidden" name="tax" value="0">
+<input type="hidden" name="custom" value="<!--#USERNAME-->|<!--#DEPOSIT_TOKENS-->">
 <input type="submit"value="go to paypal">
 </form>
 

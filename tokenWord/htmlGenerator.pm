@@ -13,6 +13,7 @@ package tokenWord::htmlGenerator;
 # 2003-January-15   Jason Rohrer
 # Added support for deposit page.
 # Added support for withdraw page.
+# Added support for paypal instant payment notification.
 #
 
 
@@ -581,6 +582,7 @@ sub generateDepositConfirmPage {
     $pageText =~ s/<!--#DEPOSIT_DOLLARS-->/$dollarAmount/g;
     $pageText =~ s/<!--#PAYPAL_EMAIL-->/$paypalEmail/g;
     $pageText =~ s/<!--#NET_PAYMENT_DOLLARS-->/$netDollarPayment/g;
+    $pageText =~ s/<!--#USERNAME-->/$loggedInUser/g;
     
     print $pageText;
 

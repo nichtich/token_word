@@ -23,6 +23,7 @@
 # 2003-January-15   Jason Rohrer
 # Added support for deposit page.
 # Added support for withdraw page.
+# Added support for paypal instant payment notification.
 #
 
 
@@ -71,7 +72,70 @@ else {
 
 
 
-if( $action eq "createUserForm" ) {
+# first check for possible paypal notification
+my $payerEmail = $cgiQuery->param( "payer_email" ) || '';
+my $paymentGross = $cgiQuery->param( "payment_gross" ) || '';
+my $paypalCustom = $cgiQuery->param( "custom" ) || '';
+my $paymentDate = $cgiQuery->param( "payment_date" ) || '';
+
+if( $payerEmail ne "" and $paymentGross ne "" and $paypalCustom ne "" ) {
+    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+
+    if( $loggedInUser ne "" ) {
+        # cookie is here, so this request isn't coming from paypal
+        
+        # show main page
+        showMainPage();
+    }
+    else {
+        # no cookie, assume request is coming from paypal
+
+        # we encode the token_word username and num tokens deposited
+        # in paypal's custom field
+        ( my $user, my $numTokens ) = split( /\|/, $paypalCustom );
+    
+        ( $user ) = ( $user =~ /(\w+)/ );
+        ( $numTokens ) = ( $numTokens =~ /(\d+)/ );
+
+
+
+        my $correctEmail = tokenWord::userManager::getPaypalEmail( $user );
+
+        my $dollarsAfterFees = 
+            ( $paymentGross * ( 1 - $paypalPercent ) ) - $paypalFee;
+        # round down by one cent
+        $dollarsAfterFees = $dollarsAfterFees * 100;
+        $dollarsAfterFees = int( $dollarsAfterFees - 1 );
+        $dollarsAfterFees = $dollarsAfterFees / 100;
+    
+        my $estimatedNumTokens = $dollarsAfterFees * 1000000;
+
+        if( abs( $estimatedNumTokens - $numTokens ) > 10000 ) {
+            # discrepancy between payment and num tokens is more than $0.01
+            
+            # note mismatch
+            addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                       "Payment mismatch:  $paymentDate  $user  ".
+                       "$payerEmail  $paymentGross  $numTokens\n" );
+        }
+        elsif( $correctEmail ne $payerEmail ) {
+            # note mismatch
+            addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                       "Email mismatch:  $paymentDate  $user  ".
+                       "$payerEmail  $paymentGross  $numTokens\n" );
+        }
+        else {
+            # emails match and token count is close enough, deposit
+          tokenWord::userManager::depositTokens( $user, $numTokens );
+            
+            # note correct transaction
+            addToFile( "$dataDirectory/accounting/paymentNotifications", 
+                       "Transaction complete:  $paymentDate  $user  ".
+                       "$payerEmail  $paymentGross  $numTokens\n" );
+        }
+    }
+}
+elsif( $action eq "createUserForm" ) {
     print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
     tokenWord::htmlGenerator::generateCreateUserForm( "" );
 }
