@@ -35,6 +35,9 @@ package tokenWord::documentManager;
 # 2003-January-16   Jason Rohrer
 # Added function for getting the quote count.
 #
+# 2003-April-30   Jason Rohrer
+# Changed to use subroutine to check for file existence.
+#
 
 
 use tokenWord::common;
@@ -139,7 +142,7 @@ sub noteQuote {
  "$dataDirectory/users/$quotedUsername/text/documents/$quotedDocID.quoteCount";
 
     # for backwards compat with old database
-    if( not -e $quoteCountFileName ) {
+    if( not doesFileExist( $quoteCountFileName ) ) {
         writeFile( $quoteCountFileName, "0" );
     }
 
@@ -316,7 +319,7 @@ sub doesDocumentExist {
     my $docDirName = "$dataDirectory/users/$username/text/documents";
 
     
-    if( -e "$docDirName/$docID" ) { 
+    if( doesFileExist( "$docDirName/$docID" ) ) { 
         return 1;
     }
     else {

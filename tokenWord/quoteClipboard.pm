@@ -12,6 +12,9 @@ package tokenWord::quoteClipboard;
 # 2003-January-16   Jason Rohrer
 # Added function for checking quote existence.
 #
+# 2003-April-30   Jason Rohrer
+# Changed to use subroutine to check for file existence.
+#
 
 
 use tokenWord::common;
@@ -99,7 +102,7 @@ sub doesQuoteExist {
     
     my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";   
     
-    if( -e "$quoteDirName/$quoteID" ) {
+    if( doesFileExist( "$quoteDirName/$quoteID" ) ) {
         return 1;
     }
     else {

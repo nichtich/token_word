@@ -26,6 +26,9 @@ package tokenWord::userWorkspace;
 # 2003-February-6   Jason Rohrer
 # Fixed a bug in quote extraction.
 #
+# 2003-April-30   Jason Rohrer
+# Changed to use subroutine to check for file existence.
+#
 
 
 use tokenWord::common;
@@ -352,7 +355,7 @@ sub purchaseDocument {
 
             my $purchasedChunkFile = "$purchasedDirName/$chunkOwner/$chunkID";
 
-            if( not -e "$purchasedDirName/$chunkOwner" ) {
+            if( not doesFileExist( "$purchasedDirName/$chunkOwner" ) ) {
                 
                 my $purchaseString = 
                         "< $chunkOwner, $chunkID, $startOffset, $length >";
@@ -376,7 +379,7 @@ sub purchaseDocument {
             }
             else {
                 # dir exists for that owner
-                if( not -e $purchasedChunkFile ) {
+                if( not doesFileExist( $purchasedChunkFile ) ) {
 
                     my $purchaseString = 
                         "< $chunkOwner, $chunkID, $startOffset, $length >";
@@ -490,7 +493,7 @@ sub purchaseDocument {
 
             my $purchaseString = $transferElements[4];
 
-            if( not -e "$purchasedDirName/$owner" ) {
+            if( not doesFileExist( "$purchasedDirName/$owner" ) ) {
                 # make purchased dir
                 mkdir( "$purchasedDirName/$owner", oct( "0777" ) );
             
@@ -499,7 +502,7 @@ sub purchaseDocument {
             }
             else {
                 # dir exists for that owner
-                if( not -e $purchasedChunkFile ) {
+                if( not doesFileExist( $purchasedChunkFile ) ) {
                     # start file
                     # add to end of file
                     writeFile( $purchasedChunkFile, "$purchaseString\n" );

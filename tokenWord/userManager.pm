@@ -18,6 +18,9 @@ package tokenWord::userManager;
 # 2003-January-16   Jason Rohrer
 # Added support for trial balances.
 #
+# 2003-April-30   Jason Rohrer
+# Changed to use subroutine to check for file existence.
+#
 
 
 use tokenWord::common;
@@ -47,7 +50,7 @@ sub addUser {
 
     my $userDirName = "$dataDirectory/users/$username";
     
-    if( not -e $userDirName ) {
+    if( not doesFileExist( $userDirName ) ) {
    
         mkdir( "$userDirName", oct( "0777" ) );
         mkdir( "$userDirName/text", oct( "0777" ) );
@@ -101,7 +104,7 @@ sub checkLogin {
     
     my $userDirName = "$dataDirectory/users/$user";
     
-    if( not -e $userDirName ) {
+    if( not doesFileExist( $userDirName ) ) {
         # user doesn't exist 
         return 0;
     }

@@ -66,6 +66,9 @@
 # Added support for backup/restore of data directory as a tarball.
 # Added creation of accounting directory.
 #
+# 2003-April-30   Jason Rohrer
+# Changed to use subroutine to check for file existence.
+#
 
 
 
@@ -467,7 +470,7 @@ else {
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
-    elsif( -e "$dataDirectory/users/$loggedInUser/sessionID" and
+    elsif( doesFileExist( "$dataDirectory/users/$loggedInUser/sessionID" ) and
            $sessionID ne 
            readFileValue( "$dataDirectory/users/$loggedInUser/sessionID" ) ) {
         
@@ -477,7 +480,8 @@ else {
 
         tokenWord::htmlGenerator::generateLoginForm( "" );
     }
-    elsif( not -e "$dataDirectory/users/$loggedInUser/sessionID" ) {
+    elsif( 
+        not doesFileExist( "$dataDirectory/users/$loggedInUser/sessionID" ) ) {
         # session ID file does not exist
         print $cgiQuery->header( -type=>'text/html', -expires=>'now',
                                  -Cache_control=>'no-cache' );
@@ -1106,7 +1110,7 @@ else {
 
 sub showMainPage {
     
-    if( -e "$dataDirectory/users/jcr13/text/documents/2" ) {
+    if( doesFileExist( "$dataDirectory/users/jcr13/text/documents/2" ) ) {
 
         #first, purchase the document
         tokenWord::userWorkspace::purchaseDocument( $loggedInUser,

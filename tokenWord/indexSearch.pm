@@ -10,6 +10,9 @@ package tokenWord::indexSearch;
 # 2003-January-18   Jason Rohrer
 # Changed to sort documents in most-quoted-first order.
 #
+# 2003-April-30   Jason Rohrer
+# Changed to use subroutine to check for file existence.
+#
 
 use tokenWord::common;
 
@@ -64,7 +67,7 @@ sub addToIndex {
         
             my $letterDirectory = "$indexDirectory/$firstLetter";
 
-            if( not -e "$letterDirectory" ) {
+            if( not doesFileExist( "$letterDirectory" ) ) {
                 mkdir( "$letterDirectory", oct( "0777" ) );
             }
             addToFile( "$letterDirectory/$word", "$docRegion\n" );
@@ -149,7 +152,7 @@ sub searchIndex {
 
         my $wordFile = "$dataDirectory/index/$firstLetter/$firstWord";
         
-        if( -e $wordFile ) {
+        if( doesFileExist( $wordFile ) ) {
 
             my @docRegions = split( /\n/, readFileValue( $wordFile ) );
             
@@ -242,7 +245,7 @@ sub doesDocContainWords {
         my $firstLetter = substr( $word, 0, 1 );
         my $wordFile = "$dataDirectory/index/$firstLetter/$word";
         
-        if( -e $wordFile ) {
+        if( doesFileExist( $wordFile ) ) {
             my @docRegions = split( /\n/, readFileValue( $wordFile ) );
             
             $miss = 1;
