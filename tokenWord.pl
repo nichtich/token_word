@@ -39,6 +39,7 @@
 # Added limited support for searching.
 # Added display of search results.
 # Added a spell checker.
+# Changed to highlight-only spell checking display.
 #
 
 
@@ -344,7 +345,7 @@ else {
         elsif( $action eq "createDocumentForm" ) {            
             tokenWord::htmlGenerator::generateCreateDocumentForm( 
                                                         $loggedInUser,
-                                                        0, "", "" );
+                                                        0, "", "", 0 );
         }
         elsif( $action eq "createDocument" ) {
             my $buttonSubmit = $cgiQuery->param( "buttonSubmit" ) || '';
@@ -380,7 +381,7 @@ else {
                 my $spellCheck = $cgiQuery->param( "spellCheck" ) || '';
                 my $spellCheckOn = 0;
 
-                if( $spellCheck == 1 ) {
+                if( $spellCheck eq "1" ) {
                     $spellCheckOn = 1;
 
                     # take MD5 of doc text to get a unique temp file name
@@ -408,6 +409,15 @@ else {
 
 
                     @misspelledWords = split( /\s+/, $misspelled );
+                    
+                    # replace misspelled words with red versions
+                    foreach my $word ( @misspelledWords ) {
+                        my $redWord = "<FONT COLOR=#FF0000>$word</FONT>";
+                        
+                        # make sure we only replace those that have
+                        # not yet been replaced.
+                        $docTextPreview =~ s/([^>])$word([^<])/$1$redWord$2/;
+                    }
                 }
                 
                 tokenWord::htmlGenerator::generateCreateDocumentForm( 
@@ -415,8 +425,7 @@ else {
                                                         1, 
                                                         $docTextPreview, 
                                                         $abstractDoc,
-                                                        $spellCheckOn,
-                                                        @misspelledWords );
+                                                        $spellCheckOn );
             }
             else {
                 # submit mode
