@@ -7,6 +7,7 @@
 % 2003-February-13 Jason Rohrer
 % Finished initial draft.
 % Spell-checked.
+% Finished first round of proof reading.
 %
 
 
@@ -98,7 +99,7 @@ What made implementing Xanadu so difficult for so many people?
 This paper attempts to answer these question by describing the first fully-realized xanalogical implementation.
 
 Given this historical perspective, the contributions of this paper are threefold.
-First, this paper analyzes the process that lead from a paper design to real world xanalogical software.
+First, this paper analyzes the process that lead from a paper design to real-world xanalogical software.
 Second, this paper shows that modern technology and techniques are of utmost importance for making this implementation process {\it possible}, let alone quick.
 Third, this paper describes a full xanalogical system implementation from the perspective of an end-user.
 The novelty of this paper hinges on the implementation, which has a modern flavor, though the underlying ideas are quite old.
@@ -134,7 +135,7 @@ Electronic documents change constantly.
 If $B$ changes or is deleted, $A$'s quote can break.
 Xanadu's solution is to forbid document change but encourage document versioning.
 Thus, as $B$ is updated, all previous versions are maintained, and $A$'s quote can point to the particular version that $A$'s owner quoted.
-A particular version of $B$ is immutable, so $A$'s quote will never break.
+Each version of $B$ is immutable, so $A$'s quote will never break.
 
 The Xanadu model refines versioning further by describing an ever-growing, add-only, content space.  
 When a document is created, its text is added to this space.
@@ -159,7 +160,7 @@ Each user accumulates a ``library'' of acquired text regions over time and pays 
 When a document is accessed that contains quotes from multiple authors, the micropayments are divided and routed to the original authors on a per-character basis. 
 Though reading content requires payment, quoting is essentially free, since the content is not accessed during the act of quoting.
 In practice, an author will need to read a document before quoting it, but this reading requires only the normal first-access payment, no matter how widely the new, quoting document is expected to be read.
-In fact, the more a document is quoted and read in quoted form, the more micropayments the original author will receive.
+However, the more a document is quoted and read in quoted form, the more micropayments the original author will receive.
 Thus, authors benefit from the unrestricted quotation and reuse of their work:  they have no financial motivation for imposing any limits.
 
 We can summarize the Xanadu model with the following feature list:  deep quotation by reference; static underlying content; and per-character, one-time micropayments.
@@ -167,25 +168,25 @@ We can summarize the Xanadu model with the following feature list:  deep quotati
 
 \section{System Architecture}
 We designed and built \tw, a full-featured xanalogical system, from scratch in only ten days.
-To achieve this kind of rapid development, we relied heavily on modern technology and design techniques.
+To achieve this kind of rapid development, we relied heavily on modern technology and development techniques.
 We do not view past Xanadu failures with disdain.
 Those early attempts were simply ahead of their time:  the technology of the day was not ready for Xanadu.
 The central technologies that made \tw \   development possible were the web, CGI, Perl, and PayPal \cite{paypal}.
 
 Our system, though full-featured, was not designed to be ``the'' scalable xanalogical system that will carry us all into the future.
-Instead, we focused on building a usable implementation of xanalogical features for the purpose of experimentation.
+Instead, we focused on building a usable implementation of core xanalogical features for the purpose of experimentation.
 Though scalability was not a design goal, \tw \  was built on top of technologies that have scaled well for other web-based projects \cite{Everything2, WikiWikiWeb, Wikipedia}.
-We claim that \tw \   could be scaled into a globally accessible system, albeit with minor code modifications and a sufficient hardware investment. 
+Given these precedents, we believe that \tw \   could be scaled into a globally accessible system, albeit with minor code modifications and a sufficient hardware investment. 
 
 \subsection{User Perspective}
 In describing the \tw \  user experience, we are faced with the very issue that motivated \tw \  development in the first place:  descriptions in words and pictures do not give us a true sense of what it is like to {\it use} a system.
-Since this paper's focus is on a real-world implementation and not just a paper description, we encourage readers to visit {\tt http://hypertext.sf.net/token\_word} to try our system for themselves. 
+Since this paper's focus is on a real-world implementation and not just an abstract description, we encourage readers to visit {\tt http://hypertext.sf.net/token\_word} to try our system for themselves. 
 
 From the end-user's perspective, \tw \  has many sal\-ient features.
 Users access \tw \  with a web browser, and they must create accounts and log in to use the system.  
 The central elements of the system are documents, which can contain quotes of other documents.
 Quote markers can be hidden or displayed, and quotes can be followed to see the context from which they were taken.
-Each document also features a list of documents that quote it, so references can be chased in both directions.
+Each document also features a list of documents that quote it, so references can be followed in both directions.
 The \tw \   document display interface can be seen in Figure \ref{fig:mainScreen}.
 
 % opera window size for figures:
@@ -199,7 +200,7 @@ The \tw \   document display interface can be seen in Figure \ref{fig:mainScreen
 
 Quotes can be extracted from documents and saved to a user's quote clipboard for later reference or use.
 Figure \ref{fig:extractQuote} shows the interface for quote extraction. 
-Quotes on a clipboard can be followed to see quote context.
+Quote references on a clipboard can be followed to see a quote's context.
 The clipboard interface is shown in Figure \ref{fig:quoteClipboard}.
 When creating a new document, a user can enter new text along with references to quotes from his or her quote clipboard, as seen in Figure \ref{fig:docCreate}.
 A preview mode shows the new document with all quote references expanded, as seen in Figure \ref{fig:docPreview}.
@@ -237,17 +238,18 @@ Users only pay for each piece of text once---repeat viewings of the same text, i
 \label{fig:docPreview}
 \end{figure}
 
-Full text searches are supported across the entire document database, and search terms are highlighted when result documents are displayed.
-Search results (and other lists in \tw) are sorted with most-quoted documents first, since frequently quoted documents are likely to contain the best information. 
+Full text searches are supported across the entire document space, and search terms are highlighted when result documents are displayed.
+Search results (and other lists in \tw) are sorted with most-quoted documents first, since frequently quoted documents are likely to contain the best information.
+This ranking mechanism is similar to Google's PageRank algorithm \cite{Brin1998}. 
 
-\tw \  provides no explicit linking mechanism.
-However, since quote context can be obtained easily, brief quotes can be used as links between documents.
-For an example of quotes used to link, see Figure \ref{fig:quotesAsLinks}.
+\tw \  provides no explicit document linking mechanism.
+However, since quote context can be obtained easily, brief quotes can be used to emulate links between documents.
+For an example of quotes used as links, see Figure \ref{fig:quotesAsLinks}.
 
 \begin{figure}[t]
 \centering
 \epsfig{file=images/quotesAsLinks.eps, width=20pc}
-\caption{Brief portions of documents can be quoted to form links.}
+\caption{Brief portions of documents can be quoted to emulate links.}
 \label{fig:quotesAsLinks}
 \end{figure}
 
@@ -256,21 +258,21 @@ For an example of quotes used to link, see Figure \ref{fig:quotesAsLinks}.
 \subsubsection{Data Model}
 Keeping with the Xanadu model, \tw \  separates documents from the text they contain.
 There are two types of data objects in \tw:  documents and chunks.
-A chunk contains a raw block of contiguous text, while a document is a list of reference to text chunks.
+A chunk contains a raw block of contiguous text, while a document is a list of references to text chunks.
 Some of the referenced chunks in a document may have been created at the same time as the document (for new text in the document), while others may be part of quotes taken from other documents.
 
-Each reference in a document contains a pointer to text chunk region and an optional pointer to a document context region.
+Each reference in a document contains a pointer to a text chunk region and an optional pointer to a document context region.
 The document context pointer tracks which document the material was quoted from and is used for quote reference chasing.
 If a document refers to a new text chunk that has not appeared in any previous documents, the document context pointer is omitted:  such chunks are not part of quotes and have no references that can be chased.
-With this two-pointer model, we can distinguish ``original'' material in a document from quoted material and support recursive reference chasing.
-By following context repeatedly for a nested quotation, the original author and document context of particular words can be obtained.
+With this two-pointer model, we can distinguish ``original'' material in a document from quoted material.  % and support recursive reference chasing.
+By following references recursively for a nested quotation, the original author and document context of particular words can be obtained.
 %When following a quote reference, a chain of references may need to be chased before the original context of the text is found. 
 
-For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote original material, residing in chunk $k$, from document $C$.  
+For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote of original material, residing in chunk $k$, from document $C$.  
 $A$'s reference will contain both a pointer to the text chunk $k$ and to the document context $B$.  
 $B$'s reference will point to both chunk $k$ and document $C$.  
 At the end of this reference chain, $C$'s reference will point only to $k$.
-Figure \ref{fig:referenceChain} shows a diagram of this reference chain.
+Figure \ref{fig:referenceChain} shows a diagram of our model applied to this reference chain.
 
 
 
@@ -343,13 +345,13 @@ Figure \ref{fig:referenceChain} shows a diagram of this reference chain.
 \dirbow{QuoteInBEndAnchor}{QuoteInKEndAnchor}{-0.19}[\grapharrowtype{1}]
 
 
-\dirbow{kInCStartAnchor}{kStartAnchor}{.17}[\grapharrowtype{1}]
-\dirbow{kInCEndAnchor}{kEndAnchor}{.17}[\grapharrowtype{1}]
+\dirbow{kInCStartAnchor}{kStartAnchor}{.17}[\grapharrowtype{1}\graphlinecolour{0.65}]
+\dirbow{kInCEndAnchor}{kEndAnchor}{.17}[\grapharrowtype{1}\graphlinecolour{0.65}]
 
 
 \end{graph}
 
-\caption{An example reference chain model.  Dotted lines represent document region pointers, and solid arcs represent chunk region pointers.  Light gray regions represent text from chunk $k$.  Dark gray regions in $A$ and $B$ represent portions of $A$'s quote from $B$ that do not come from chunk $k$ (other chunks are omitted from this diagram for clarity).}
+\caption{An example reference chain model.  Dotted lines represent document region pointers, and solid arcs represent chunk region pointers.  Light gray regions represent text from chunk $k$.  Dark gray regions in $A$ and $B$ represent portions of $A$'s quote from $B$ that do not come from chunk $k$ (other chunks have been omitted from this diagram).  Arcs between $C$ and $k$ have been colored gray for clarity.}
 \label{fig:referenceChain}
 
 \end{center}
@@ -360,12 +362,12 @@ Figure \ref{fig:referenceChain} shows a diagram of this reference chain.
 
 
 
-Quote clipboards are modeled in the following way.
+Quote clipboards are modeled like documents, but with minor differences.
 Each quote on the clipboard points to a contiguous document region.
 Since a  document region can be comprised of regions from multiple chunks, we might want to model each quote as a list of references, just like we model a document.
 However, we simplify the clipboard by modeling each quote as a single document region pointer with no chunk region pointers.
 To insert a clipboard quote into a new document, we can resolve the chunk region references for the quote and set the document region for each of these references to the document from which the quote was extracted.
-This model allows us both to track the extraction context of the quote and to store the quote clipboard efficiently.
+This simple model allows us both to track the extraction context of the quote and to store the quote clipboard efficiently.
 Figure \ref{fig:quoteClipboardModel} shows a diagram of a quote clipboard modeled in this way.
 The alternative list model mentioned above could not be easily used to track quote extraction context, and the clipboard representation would be much larger.
 
@@ -430,8 +432,8 @@ To support two-way reference chasing, each document has a file that tracks the d
 
 References in documents are represented using the following format:
 \begin{center}
-{\tt <chunkUserID, chunkID, startOffset, length;\\ 
-docUserID, docID, startOffset>} 
+{\tt <chunkUserID, chunkID, chunkStartOffset, length;\\ 
+docUserID, docID, docStartOffset>} 
 \end{center}
 The portion of the reference before the ``;'' describes the chunk region of the reference.  
 The second portion, which is optional, describes the document region context of the reference.  
@@ -482,8 +484,8 @@ Perl-based CGI programming seems to be the modern method of choice for rapidly d
 Other systems that have used this development method successfully are discussed in Section \ref{sec:RelatedWork}.
 
 Even though the full development cycle was short, we used an iterative process.
-Features were added one at a time to the system, and the system was maintained in a usable form at all times.
-For example, we started with a system that managed text chunks, then added document management, then added quotes, then added tokens transfers, {\it etc.}
+Features were added one at a time to \tw, and the system was maintained in a usable form at all times.
+For example, we started with a system that managed text chunks, then added document management, then added quotes, and then added tokens transfers.
 Final iterations added features such as spell checking and index-based searching.
 From our understanding of previous xanalogical implementation efforts, this iterative process may have been key to our success.
 The Xanadu model is complex and subtle, and it is easy to get bogged down by details without ever producing a working system.
@@ -498,9 +500,9 @@ For example, if a new document is created that references only one new chunk and
 The example reference given above was represented using only 33 bytes of ASCII text.
 
 The first limitation is in terms of storage efficiency:  most filesystems have a minimum file size, and this minimum is usually larger than 1 kilobyte.
-In our example, 33 bytes of data would occupy at least a kilobyte of disk space.
+In our example, 33 bytes of document data would occupy at least a kilobyte of disk space.
 
-The second limitation is in terms of filesystem architecture:  Unix-like filesystems use an inode table, and each file must be associated with an inode.
+The second limitation is in terms of filesystem architecture:  Unix-like filesystems use an inode table, and each file must be associated with a unique inode.
 When a filesystem is created, the number of available inodes is fixed, and this number can be relatively small (the common ratio for modern Linux systems seems to be about 200,000 inodes per gigabyte of disk space). \cite{OperatingSystems}
 Thus, even if we ignore storage efficiency concerns, our implementation is limited in terms of the number of chunks and documents it can contain.
 
@@ -508,7 +510,7 @@ If our system did need to scale to support millions of users and billions of chu
 First, we could use an existing database system as a backend to store chunks and documents.
 This approach would deal with the inode limitations, and it might actually improve performance, since database queries would replace the directory lookups that are currently used to fetch chunks and documents.
 A second approach would be to implement a simple application-level virtual filesystem for chunk and document storage.
-With this approach, we could taylor the storage system to our specific needs, though it would certainly be labor-intensive.
+With this approach, we could taylor the storage system to our specific needs, though its development would certainly be labor-intensive.
 
 All filesystem operations in \tw \  are wrapped by a single module with only a handful of interface functions.
 By modifying the implementation of these module functions, either of the scalable backends mentioned above could be added to \tw \  with no changes to the rest of the code. 
@@ -516,7 +518,7 @@ By modifying the implementation of these module functions, either of the scalabl
 We chose a filesystem backend, despite its scalability limitations, because of its simplicity.
 This choice fits into our implementation philosophy, since the focus was on producing a working system and adding features iteratively.
 A scalable backend might be seen as a feature to be added in a future iteration.
-Our system, in its current form, is still functional in terms of its goals:  it can potentially support hundreds of users and hundreds of thousands of documents, which is enough to give us an understanding of a xanalogical user experience.
+Our system, in its current form, is still functional in terms of its goal:  it can potentially support thousands of users and hundreds of thousands of documents, which is enough to give us an understanding of a xanalogical user experience.
 
 
 %\subsection{Xanalogical Improvements}
@@ -535,13 +537,13 @@ Even if PayPal did support high-resolution payments, it does not allow a third p
 To deal with these issues, we built an internal token balance system and used PayPal integration only for deposits and withdrawls of real-world currency.
 With this configuration, a deposit is by no means frictionless (logging in to PayPal is required), but after the deposit has been made, token payments are completely transparent as the user accesses \tw \  documents.
 Similarly, withdrawing tokens in exchange for real-world currency is not frictionless: 
-PayPal does not support an automated payment mechanism, so withdrawl requests are queued for manual processing by the \tw \  system administrator.
+PayPal does not support an automated payment mechanism, so withdrawl requests must be queued for manual processing by the \tw \  system administrator.
 Whereas deposits take effect immediately (using PayPal's ``Instant Payment Notification'' service), withdrawn token refunds are delayed by the response of the human administrator.
 From the administrator's point of view, the withdrawl queue can be used to increase security, since any suspicious activity can be investigated before real-world payments are made.  
 
 \subsection{Balancing Risk}
 Given that micropayments in \tw \  are mandatory and automatic, a major barrier to system adoption might exist:  trying \tw \  would require the deposit of real-world currency.
-Even the main page displayed after login is a first-class \tw \  document, so a new user with no tokens would not be able to read a description of \tw, let alone try any of its features.
+Even the main page displayed after login is a first-class \tw \  document, so a new user with no tokens would not even be able to read a description of \tw, let alone try any of its features.
 
 One way of dealing with this adoption barrier would be to give each new user a small number of ``free'' tokens to start with (for example, at least enough tokens to read the main page).
 This solution would allow new users to try the system with no monetary investment, but it carries an enormous risk for the \tw \  system administrators.
@@ -555,10 +557,10 @@ Our approach uses two token types.
 The first type of tokens, called {\it trial} tokens, have no real-world value.
 Each new account starts out with a small number of trial tokens (in our live system, each account starts with 50,000 trial tokens).
 The second type of tokens, called {\it real} tokens, can be exchanged for real-world currency.
-Token transfers inside \tw \  keeps track of token types:  trial tokens can only be transfered between users' trial balances, and real tokens can only be transfered between real balances.
+The token transfer logic in \tw \  keeps track of token types:  trial tokens can only be transfered between users' trial balances, and real tokens can only be transfered between real balances.
 Trial tokens are favored, and real tokens are only spent when a user has no trial tokens.
 
-For example, suppose the balances of three users are as shown in following table:
+For example, suppose that the balances of three users are as shown in following table:
 %suppose user $A$ has a trial:real token balance of 50:200, user $B$ has a balance of 0:500, and user $C$ has a balance of 10:0.
 \begin{center}
 \begin{tabular}{|l||r|r|}
@@ -582,7 +584,7 @@ User&Trial balance &Real balance\\
 \hline
 $A$&0 &150\\
 \hline
-$B$&50  &520\\
+$B$&50  &530\\
 \hline
 $C$&10 &20  \\
 \hline
@@ -592,15 +594,15 @@ $C$&10 &20  \\
 %$A$'s new balance would be 0:150, $B$'s new balance would be 50:520, and $C$'s new balance would be 10:20. 
 
 This two-type scheme allows users to try \tw \  extensively without a monetary investment, and it also poses no financial risks to the administrators.
-Note that though trial tokens have no real-world value, they still have value inside \tw, since they can always be used to purchase new content.
-Inside \tw, a user that amasses many trial tokens is just as wealthy as a user with many real tokens.
+Note that though trial tokens have no real-world value, they still have value in \tw, since they can always be used to purchase new content.
+Inside \tw, a user that amasses many trial tokens is just as wealthy as a user that has many real tokens.
 A user that actively published popular content in \tw \  could effectively use the system forever without depositing any real-world money.
 
 \section{Related Work}
 \label{sec:RelatedWork}
 
 Much of the existing work on xanalogical systems was discussed in Sections \ref{sec:Introduction} and \ref{sec:Xanadu}, so we will focus on related non-xanalogical systems here.
-However, we should mention that interest in xanalogical systems has not waned in recent years.
+However, we should mention that interest in Xanadu has not waned in recent years.
 For example, Lukka and Fallenstein describe a system that uses ideas taken from Freenet for xanalogical content storage and retrieval \cite{FreenetXanadu}. 
 
 
@@ -610,27 +612,27 @@ In terms of implementation, \tw \  is closely related to a recent class of hyper
 Wikis are reader-edited web sites, and web-based HTML forms are used as the interface for page authoring.
 In many cases, Wikis are open for editing by the public at large.
 
-Aside from the sociological issues, Wikis approach hypertext in an interesting way.
-Links can be created in a document to documents that do not exist without knowing where those documents will eventually reside.
+Despite the fact that their sociological aspects receive most of the attention, Wikis are also interesting from a hypertext perspective.
+Links can be created to documents that do not yet exist without knowing where those documents will eventually reside.
 To create a new document, a user must follow one of these dangling links in an existing page, which leads to a page creation screen.
 Thus, in a Wiki, there is no way to create a page in isolation.
 In fact, the name of a new page is determined by the contents of the dangling link and cannot be specified in the page creation screen.
 
-\tw \  differs from a Wiki in its approach to hypertext, since a \tw \  quote can only be taken from an existing document.
-No mechanism is provided for refering to a document that does not yet exist.
+%\tw \  differs from a Wiki in its approach to hypertext, since a \tw \  quote can only be taken from an existing document.
+%No mechanism is provided for refering to a document that does not yet exist.
 
 
-The first Wiki was created by Ward Cunningham in 1995 and is still active today\cite{WikiWikiWeb}.
+The first Wiki was created by Ward Cunningham in 1995 and is still active today \cite{WikiWikiWeb}.
 The most ambitious Wiki-based project is Wikipedia, a user-edited encyclopedia, which recently grew to over 100,000 entries \cite{Wikipedia}.
 
 
 \subsection{Everything2}
-Like \tw \  and Wikis, Everything2 is a web-based hypertext system implemented using CGI and Perl \cite{Everything2}.
+Like \tw \  and Wikis, Everything2 \cite{Everything2} is a web-based hypertext system implemented using CGI and Perl.
 Everything2 supports dangling links to pages that do not exist yet, but it handles these links differently than a Wiki does.
-When a user follows a dangling link, a search is performed for the title of the non-existant page.
-Thus, dangling links are fuctional from a reader's point of view.
-We might conclude that Wikis favor authors, while Everything2 favors readers.
-As soon as a page is created that matches the title of a dangling link, that link points to the new page directly.
+When a user follows a dangling link, a search is performed for the title words of the non-existant page.
+Thus, dangling links are more fuctional in Everything2 from a reader's point of view.
+Using this comparison point, we might conclude that Wikis favor authors, while Everything2 favors readers.
+%As soon as a page is created that matches the title of a dangling link, that link points to the new page directly.
 
 In addition to in-line, user-created links (dangling or otherwise), each node in Everything2 features a list of automatically generated links.
 These links are culled from user traversal paths:  when a user leaves one page and enters another (either by clicking a link or performing a search), a two-way link is added between the pages.   
@@ -639,7 +641,7 @@ These links are culled from user traversal paths:  when a user leaves one page a
 \subsection{Weblogs}
 Another class of related web based hypertext systems are weblogs, or ``blogs.''
 These systems allow content to be added to a web site serially, one post at a time.
-Some blogs are used by individuals as a means of sharing daily thoughts with the world, while others aim to be collaborative information spaces filled with moderated comments posted by the public.
+Some blogs are used by individuals as a means of sharing daily thoughts with the world, while others aim to be collaborative information spaces and feature moderated comments posted by the public.
 One of the most interesting collaborative weblogs is Kuro5hin (pronounced ``corrosion''), which features high-quality news and culture stories submitted and moderated by the public \cite{kuro5hin}.
 Many blogs are implemented using CGI and Perl, though more recent efforts seem to favor PHP.
 
@@ -665,30 +667,29 @@ Thus, these systems are closely related in terms of implementation, but their go
 Thoughout this paper, we have discussed the strategies that made \tw \  development possible, including an interative process and heavy use of existing technology.
 
 One additional strategy was crucial, though it has not been mention explicitly:  a focus on a core xanalogical feature set.
-We set out to build a system that supported deep quotation, unbreakable references, and frictionless micropayments.
-In Section \ref{sec:Xanadu}, we distilled these features from the Xanadu model.
-However, {\it Literary Machines} is over 250 pages long, and it is choked full of features that an ideal xanalogical system might have \cite{NelsonLiteraryMachines}.
-Perhaps previous Xanadu efforts aimed for this ideal feature set, and perhaps this is why they failed.
+We aimed to build a system that supported deep quotation, unbreakable references, and frictionless micropayments---we distilled these features from the Xanadu model in Section \ref{sec:Xanadu}.
+However, {\it Literary Machines} is over 250 pages long, and it is chocked full of features that an ideal xanalogical system might have \cite{NelsonLiteraryMachines}.
+Perhaps previous Xanadu efforts aimed to support this entire feature set, and perhaps that is why they failed.
 
-\tw \  is by no means the ideal xanalogical system, and many features are missing.
+\tw \  is by no means an ideal xanalogical system, and many features are missing.
 However, it is still the first system to implement the core features of the Xanadu architecture.
 Though one would be hard-pressed to argue that the features included in \tw \  are not crucial, three important features are missing.
 First, \tw \  does not explicitly support document versioning.
 However, using the quotation primitive, a limited form of versioning can be emulated (a user can quote unchanged regions of the previous version when creating a new version).
 Second, \tw \  does not support multi-server integration:  each installation of \tw \  operates in isolation, and quotes between documents at different sites are not possible.
-We see multi-server integration as one of the weakpoints in the Xanadu model:  how can we ensure that references never break in a system comprised of multiple, separately owned servers?
+We see multi-server integration as one of the weakpoints in the Xanadu architecture:  how can we ensure that references never break in a system comprised of multiple, separately owned servers?
 Even if fault-tolerant, multi-server integration is possible, it is not essential for the end-user experience. 
-Third, \tw \   does not support the side-by-side document comparission with {\it transpointing} lines, a classic Xanadu feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
+Third, \tw \   does not support side-by-side document comparission with {\it transpointing} lines, a classic Xanadu interface feature that Nelson's recent paper describes in detail \cite{Nelson1999}.
 The transpointing interface would be difficult, if not impossible, to support in a web browser with no additional software.
 However, a side-by-side document comparisson interface, using colored highlighting to indicate itentical regions, has been contemplated for \tw.
 Implementing such an interface would be easy, though coming up with a highlighting scheme that works correctly in the general case (for example, without running out of readable colors) is quite difficult.
 
 In recent personal conversations, Nelson has described a layered presentation model that could work in conjunction with a xanalogical storage system.
 For example, a presentation layer could specify font sizes, links, or annotations, and multiple layers could be stacked when rendering a particular piece of content.
-Given \tw's data model and presentation code, adding layers would not be difficult.
+Given \tw's current data model and presentation logic, adding layers would not be difficult.
 In fact, particular types of layers are already implemented:  highlights for misspellings, quote context, and hit search terms are applied to document text after it is assembled.
 Highlights are achieved by inserting presentation tags (in this case, HTML font color tags) around particular character spans.
-Many other presentation styles could be supported with a similar mechanism by inserting other tag types.
+Many other presentation styles could be supported in this way by inserting other tag types.
 Layers are an ideal feature to add in a future development iteration.
 
 \section{Acknowledgements}
