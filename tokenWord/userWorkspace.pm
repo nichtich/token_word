@@ -300,7 +300,7 @@ sub extractAbstractQuotes {
     my $takePart = 0;
     foreach $part ( @splitDocument ) {
         $quoteLength = length( $part );
-        if( takePart ) {
+        if( $takePart ) {
             my $newID = tokenWord::quoteClipboard::addQuote( $quotingUser,
                                                              $quotedUser,
                                                              $docID,
