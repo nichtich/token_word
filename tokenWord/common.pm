@@ -6,6 +6,9 @@ package tokenWord::common;
 # 2003-January-6   Jason Rohrer
 # Created.
 #
+# 2003-January-7   Jason Rohrer
+# Added a function for extracting region components.
+#
 
 
 # define our exported variables and subroutines
@@ -18,7 +21,8 @@ sub BEGIN {
                  printFile
                  readFileValue
                  writeFile
-                 trimWhitespace );
+                 trimWhitespace
+                 extractRegionComponents );
 }
 
 
@@ -116,6 +120,33 @@ sub trimWhitespace {
         # trim from end of string
         s/\s+$//;
     }
+}
+
+
+
+##
+# Converts the text representation of a region to a list.
+#
+# @param0 the text representation of a region.
+#
+# @return a list of components describing the region.
+#
+# Example:
+# my @regionComponents = extractRegionComponents( "<jb55, 5, 104, 23>" );
+##
+sub extractRegionComponents {
+    my $regionText = $_[0];
+    
+    # first remove all < or >
+    $regionText =~ s/[<>]//g;
+    trimWhitespace( $regionText );
+
+    # replace ; with ,
+    $regionText =~ s/;/,/;
+    
+    my @regionElements = split( /\s*,\s*/, $regionText );
+
+    return @regionElements;
 }
 
 
