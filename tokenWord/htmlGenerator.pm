@@ -28,6 +28,9 @@ package tokenWord::htmlGenerator;
 # Changed to highlight-only spell checking display.
 # Enabled highlights in links on quote clipboard.
 #
+# 2003-January-18   Jason Rohrer
+# Added display of quote count in search results list.
+#
 
 
 use tokenWord::common;
@@ -736,10 +739,13 @@ sub generateSearchResultsPage {
 
         my $title = tokenWord::documentManager::getDocTitle( $owner, $id );
         
+        my $quoteCount = 
+          tokenWord::documentManager::getQuoteCount( $owner, $id );
+
         push( @resultListParts, 
               "<TR><TD>$owner\'s</TD><TD><A HREF=\"tokenWord.pl?".
               "action=showDocument&docOwner=$owner&docID=$id\">".
-              "$title</A></TD>\n" );
+              "$title</A></TD><TD>[$quoteCount]</TD></TR>\n" );
     }
     
     if( scalar( @results ) == 0 ) {

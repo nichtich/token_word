@@ -32,6 +32,9 @@ package tokenWord::documentManager;
 # Fixed bug in most-quoted list.
 # Added function for checking document existence.
 #
+# 2003-January-16   Jason Rohrer
+# Added function for getting the quote count.
+#
 
 
 use tokenWord::common;
@@ -236,6 +239,24 @@ sub noteQuote {
         writeFile( $mostQuotedFile, $newMostQuotedString );
     }
 
+}
+
+
+
+##
+# Gets the number of quotes pointing at a document
+#
+# @param0 the username.
+# @param1 the docID.
+#
+# @return the quote count.
+##
+sub getQuoteCount {
+    ( my $username, my $docID ) = @_;
+    my $quoteCountFileName = 
+        "$dataDirectory/users/$username/text/documents/$docID.quoteCount";
+
+    return readFileValue( $quoteCountFileName );
 }
 
 

@@ -7,6 +7,9 @@ package tokenWord::indexSearch;
 # Created.
 # Fixed a bug in indexing empty words.
 #
+# 2003-January-18   Jason Rohrer
+# Changed to sort documents in most-quoted-first order.
+#
 
 use tokenWord::common;
 
@@ -150,6 +153,32 @@ sub searchIndex {
 
             my @docRegions = split( /\n/, readFileValue( $wordFile ) );
             
+            # collect quote count for each document
+            my @quoteCounts = ();
+
+            foreach $region ( @docRegions ) {
+                ( my $docOwner, my $docID ) = 
+                    extractRegionComponents( $region );
+
+                my $quoteCount = 
+                  tokenWord::documentManager::getQuoteCount( $docOwner,
+                                                             $docID );
+                push( @quoteCounts, $quoteCount );
+            }
+            
+            # sort indices by comparing their quote counts
+            # sort in decending order
+            my @sortedIndices = 
+                sort { $quoteCounts[ $b ] <=> $quoteCounts[ $a ] } 
+                     0 .. $#quoteCounts;
+            
+            # now re-order the document regions
+            @docRegions = @docRegions[ @sortedIndices ];
+            
+            # note:  We only need to do this sort for the documents
+            # containing the first word, since only those documents
+            # are possible hit documents
+
             if( scalar( @cleanSearchWords ) > 0 ) {
 
                 foreach $region ( @docRegions ) {
@@ -180,6 +209,13 @@ sub searchIndex {
     
     return @foundDocs;
 }
+
+
+
+##
+# Used internally
+##
+
 
 
 
