@@ -9,6 +9,9 @@ package tokenWord::userWorkspace;
 # 2003-January-8   Jason Rohrer
 # Added function for extracting abstract quotes.
 #
+# 2003-January-8   Jason Rohrer
+# Fixed a taint checking bug.
+#
 
 
 use tokenWord::common;
@@ -54,6 +57,9 @@ sub submitAbstractDocument {
             $section =~ s/\s//;
 
             my $quoteNumber = $section;
+            
+            # untaint
+            ( $quoteNumber ) = ( $quoteNumber =~ /(\d+)/ );
             
             # build a < chunkLocator; docLocator > style locator for each 
             # chunk in this quote, where the docLocator points to the
@@ -112,6 +118,10 @@ sub submitAbstractDocument {
               tokenWord::chunkManager::addChunk( $username, 
                                                  $section );
             my $chunkLength = length( $section );
+            
+            # untaint, since the taint will be passed on to 
+            # $netDocOffset (taint checking is *too* paranoid)
+            ( $chunkLength ) = ( $chunkLength =~ /(\d+)/ );
 
             my $chunkString = "< $username, $chunkID, 0, $chunkLength >";
             

@@ -1,0 +1,44 @@
+
+
+
+<CENTER>
+
+
+<H2>Extract quote:</H2>
+
+<TABLE BORDER=0>
+<TR><TD>
+Insert &#60;q&#62; &#60;/q&#62; tags around the text you want to quote.<BR>
+For example, inserting tags &#60;q&#62;like this&#60;/q&#62; would select the words <FONT COLOR=#00AF00>like this</FONT> as your quote.<BR>
+You can only insert one pair of tags (in other words, around one contiguous region).
+</TD></TR>
+</TABLE>
+
+<FORM METHOD=POST ACTION="tokenWord.pl">
+
+<INPUT TYPE="hidden" NAME="action" VALUE="extractQuote">
+<INPUT TYPE="hidden" NAME="docOwner" VALUE="<!--#DOC_OWNER-->">
+<INPUT TYPE="hidden" NAME="docID" VALUE="<!--#DOC_ID-->">
+
+
+<TABLE BORDER=0>
+
+<TR>
+<TD ALIGN=LEFT>
+<TEXTAREA COLS=40 ROWS=20 NAME="abstractQuote"><!--#DOC_TEXT--></TEXTAREA>
+</TD>
+<TD ALIGN=LEFT>
+</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT>
+<INPUT TYPE=submit VALUE="extract">
+</TD>
+</TR>
+
+
+</TABLE>
+
+</FORM>
+
+</CENTER>

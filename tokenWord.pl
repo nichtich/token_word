@@ -46,6 +46,7 @@ my $loggedInUser;
 
 if( $userCookie ) {
     $loggedInUser = $userCookie;
+    # untaint
     ( $loggedInUser ) = ( $loggedInUser =~ /(\w+)/ );
 }
 else {
@@ -55,7 +56,7 @@ else {
 
 
 if( $action eq "createUserForm" ) {
-    print $cgiQuery->header( -type=>'text/html' );
+    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
     tokenWord::htmlGenerator::generateCreateUserForm( "" );
 }
 elsif( $action eq "createUser" ) {
@@ -68,7 +69,7 @@ elsif( $action eq "createUser" ) {
 
 
     if( $user eq '' or length( $password ) < 4 ) {
-        print $cgiQuery->header( -type=>'text/html' );
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
         tokenWord::htmlGenerator::generateCreateUserForm( 
                         "password must be at least 4 characters long" );
     }
@@ -77,19 +78,19 @@ elsif( $action eq "createUser" ) {
           tokenWord::userManager::addUser( $user, $password, 10000 );
     
         if( not $success ) {
-            print $cgiQuery->header( -type=>'text/html' );
+            print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
             tokenWord::htmlGenerator::generateCreateUserForm( 
                                                  "username already exists" );
         }
         else {
-            print $cgiQuery->header( -type=>'text/html' );
+            print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
             tokenWord::htmlGenerator::generateLoginForm( 
                                         "user $user created, please log in" );
         }
     }
 }
 elsif( $action eq "loginForm" ) {
-    print $cgiQuery->header( -type=>'text/html' );
+    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
     tokenWord::htmlGenerator::generateLoginForm( "" );
 }
 elsif( $action eq "login" ) {
@@ -104,7 +105,7 @@ elsif( $action eq "login" ) {
     my $correct = tokenWord::userManager::checkLogin( $user, $password );
 
     if( not $correct ) {
-        print $cgiQuery->header( -type=>'text/html' );
+        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
         tokenWord::htmlGenerator::generateLoginForm( "login failed" );
     }
     else {
@@ -113,6 +114,7 @@ elsif( $action eq "login" ) {
                                         -expires=>'+1h' );
         
         print $cgiQuery->header( -type=>'text/html',
+                                 -expires=>'now',
                                  -cookie=>$cookie );
         
         tokenWord::htmlGenerator::generateMainPage( "$user" );
@@ -123,13 +125,14 @@ elsif( $action eq "logout" ) {
                                         -value=>"" );
     
     print $cgiQuery->header( -type=>'text/html',
+                             -expires=>'now',
                              -cookie=>$cookie );
     
     tokenWord::htmlGenerator::generateLoginForm( 
                                      "$loggedInUser has logged out\n" );
 }
 else {
-    print $cgiQuery->header( -type=>'text/html' );
+    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
     
 
 
@@ -146,12 +149,11 @@ else {
         elsif( $action eq "createDocument" ) {
             my $abstractDoc = $cgiQuery->param( "abstractDoc" ) || '';
             
-            writeFile( "docBefore.txt", $abstractDoc );
+            
             # fix "other" newline style.
             $abstractDoc =~ s/\r/\n/g;
             
-            writeFile( "docAfter.txt", $abstractDoc );
-
+            
             # convert non-standard paragraph breaks (with extra whitespace)
             # to newline-newline breaks
             $abstractDoc =~ s/\s*\n\s*\n/\n\n/g;
@@ -179,9 +181,74 @@ else {
             my $text = 
                 tokenWord::documentManager::renderDocumentText( $docOwner, 
                                                                 $docID );
-            # print "owner = $docOwner, ID= $docID";    
-            tokenWord::htmlGenerator::generateDocPage( $text );
+            
+            tokenWord::htmlGenerator::generateDocPage( $docOwner,
+                                                       $docID, $text );
         
+        }
+        elsif( $action eq "showQuoteList" ) {
+            
+            my @quoteList = 
+                tokenWord::quoteClipboard::renderAllQuotes( $loggedInUser );
+            
+            
+            tokenWord::htmlGenerator::generateQuoteListPage( @quoteList );
+        
+        }
+        elsif( $action eq "extractQuoteForm" ) {
+            my $docOwner = $cgiQuery->param( "docOwner" ) || '';
+            
+            # might equal 0
+            my $docID = $cgiQuery->param( "docID" );
+            
+
+            #untaint
+            ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
+            ( $docID ) = ( $docID =~ /(\d+)/ );
+
+            my $text = 
+                tokenWord::documentManager::renderDocumentText( $docOwner, 
+                                                                $docID );
+            
+            tokenWord::htmlGenerator::generateExtractQuoteForm( $docOwner,
+                                                                $docID,
+                                                                $text );
+        }
+        elsif( $action eq "extractQuote" ) {
+            my $abstractQuote = $cgiQuery->param( "abstractQuote" ) || '';
+
+            my $docOwner = $cgiQuery->param( "docOwner" ) || '';
+            
+            # might equal 0
+            my $docID = $cgiQuery->param( "docID" );
+            
+
+            # untaint
+            ( $docOwner ) = ( $docOwner =~ /(\w+)/ );
+            ( $docID ) = ( $docID =~ /(\d+)/ );
+
+
+            # fix "other" newline style.
+            $abstractQuote =~ s/\r/\n/g;
+            
+            
+            # convert non-standard paragraph breaks (with extra whitespace)
+            # to newline-newline breaks
+            $abstractQuote =~ s/\s*\n\s*\n/\n\n/g;
+
+
+            tokenWord::userWorkspace::extractAbstractQuote( $loggedInUser,
+                                                            $docOwner, 
+                                                            $docID,
+                                                            $abstractQuote );
+            
+            # show the new quote list
+
+            my @quoteList = 
+                tokenWord::quoteClipboard::renderAllQuotes( $loggedInUser );
+            
+            
+            tokenWord::htmlGenerator::generateQuoteListPage( @quoteList );
         }
         else {
             tokenWord::htmlGenerator::generateMainPage( $loggedInUser );

@@ -98,7 +98,7 @@ sub generateCreateDocumentForm {
 
 
 sub generateDocPage {
-    ( my $docText ) = @_;
+    ( my $docOwner, my $docID, my $docText ) = @_;
     
     my @docElements = split( /\n\n/, $docText );
 
@@ -111,13 +111,86 @@ sub generateDocPage {
     print "<H1>$docTitle</H1>\n";
 
     foreach $paragraph ( @docElements ) {
-        print "<p>$paragraph</p>\n";
+        print "$paragraph<BR><BR>\n";
     }
     
-    print "</TD></TR></TABLE></CENTER>\n";
+    print "<BR><BR>\n";
+
+    print "<A HREF=\"tokenWord.pl?action=extractQuoteForm";
+    print "&docOwner=$docOwner&docID=$docID\">";
+    print "extract a quote</A>\n";
+
+    print "</TD></TR></TABLE>\n";
+
+    print "</CENTER>\n";
 
     generateFooter();
 }
+
+
+
+sub generateQuoteListPage {
+    my @quotes = @_;
+
+    generateHeader( "quote list" );
+    
+    print "<CENTER><TABLE WIDTH=75% BORDER=0><TR><TD>\n";
+
+    if( scalar( @quotes ) > 0 ) {
+        print "<H1>Quotes:</H1>\n";
+    
+        print "<TABLE CELLSPACING=5 BORDER=1>\n";
+        
+        print "<TR><TD>quote number</TD><TD>quote</TD></TR>\n";
+
+        my $quoteCounter = 0;
+        foreach $quote ( @quotes ) {
+            print "<TR><TD>&#60;q $quoteCounter&#62;</TD>";
+            print "<TD>\n";
+
+            my @quoteElements = split( /\n\n/, $quote );
+            
+            foreach $paragraph ( @quoteElements ) {
+                print "$paragraph<BR><BR>\n";
+            }
+            
+            
+
+            print "</TD></TR>\n";
+            
+            $quoteCounter += 1;
+        }
+    
+        print "</TABLE>\n";
+        
+    }
+    else {
+        print "no quotes present\n";
+    }
+    print "</TD></TR></TABLE></CENTER>\n";
+    
+    generateFooter();
+}
+
+
+
+sub generateExtractQuoteForm {
+    ( my $docOwner, my $docID, my $docText ) = @_;
+
+    generateHeader( "extract quote" );
+
+    my $formText = readFileValue( "$htmlDirectory/extractQuoteForm.html" );
+
+    $formText =~ s/<!--#DOC_OWNER-->/$docOwner/;
+    $formText =~ s/<!--#DOC_ID-->/$docID/;
+    $formText =~ s/<!--#DOC_TEXT-->/$docText/;
+    
+    print $formText;
+
+
+    generateFooter();
+}
+
 
 
 # end of package

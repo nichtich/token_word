@@ -16,6 +16,9 @@ package tokenWord::documentManager;
 # Added support for quote lists.
 # Added more untainting.
 #
+# 2003-January-9   Jason Rohrer
+# Fixed a bug in chunk inclusion.
+#
 
 
 use tokenWord::common;
@@ -43,7 +46,7 @@ sub addDocument {
     my $nextID = readFileValue( "$docDirName/nextFreeID" );
 
     # untaint next id
-    my ( $safeNextID ) = ( $nextID =~ /(\d+)/ );
+    ( my $safeNextID ) = ( $nextID =~ /(\d+)/ );
 
 
     my $futureID = $safeNextID + 1;
@@ -154,7 +157,11 @@ sub getRegionChunks {
         elsif( $lengthSum >= $startOffset && 
                  $lengthSum + $regionLength <= $startOffset + $length ) {
             # fully include this region
-            my $joinedElements = join( ", ", @regionElements );
+            my $joinedElements = join( ", ", 
+                                       ( $regionElements[0],
+                                         $regionElements[1],
+                                         $regionElements[2],
+                                         $regionElements[3] ) );
             push( @selectedRegions, "< $joinedElements >" );
         }
         elsif( $lengthSum >= $startOffset && 

@@ -66,7 +66,9 @@ sub addQuote {
 # my $numberOfQuotes = getQuoteCount( "jj55" );
 ##
 sub getQuoteCount {
-    my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";
+    ( my $user ) = @_;
+    
+    my $quoteDirName = "$dataDirectory/users/$user/quoteClipboard";
 
     my $nextID = readFileValue( "$quoteDirName/nextFreeID" );
 
@@ -95,10 +97,10 @@ sub getQuoteRegion {
 
     my $quoteDirName = "$dataDirectory/users/$username/quoteClipboard";   
     
-    $quoteRegionString = readFileValue( "$quoteDirName/$quoteID" );
+    my $quoteRegionString = readFileValue( "$quoteDirName/$quoteID" );
 
     # untaint
-    my ( $safeQuoteRegionString ) = 
+    ( my $safeQuoteRegionString ) = 
         ( $quoteRegionString =~ 
           /(<\s*\w+\s*,\s*\d+\s*,\s*\d+\s*,\s*\d+\s*>)/ );
 
@@ -116,13 +118,41 @@ sub getQuoteRegion {
 # @return the text rendering of a quote.
 #
 # Example:
-# my @quoteText = renderQuoteText( "jj55", 3 );
+# my $quoteText = renderQuoteText( "jj55", 3 );
 ##
 sub renderQuoteText {
     ( my $username, my $quoteID ) = @_;
                                         
     return tokenWord::documentManager::renderRegionText( 
         getQuoteRegion( $username, $quoteID ) );
+}
+
+
+
+##
+# Gets the text content for all of user's quotes.
+#
+# @param0 the username.
+#
+# @return the text rendering of all quotes in an array.
+#
+# Example:
+# my @quoteList = renderAllQuotes( "jj55" );
+##
+sub renderAllQuotes {
+    ( my $user ) = @_;
+    
+    my $numQuotes = getQuoteCount( $user );
+
+    my @quoteList = ();
+
+    for( my $quoteNumber=0; $quoteNumber < $numQuotes; $quoteNumber++ ) { 
+        my $text = renderQuoteText( $user, $quoteNumber );
+        
+        push( @quoteList, $text );          
+    }
+    
+    return @quoteList;
 }
 
 
