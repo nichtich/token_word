@@ -12,6 +12,9 @@
 # 2003-January-8   Jason Rohrer
 # Started working on CGI interface.
 #
+# 2003-January-13   Jason Rohrer
+# Fixed behavior when main page document does not exist.
+#
 
 
 use lib '.';
@@ -332,14 +335,22 @@ else {
 }
 
 
+
 sub showMainPage {
-    my $text = 
-      tokenWord::documentManager::renderDocumentText( "jcr13", 
-                                                      0 );
     
-    tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
-                                               "jcr13",
-                                               0, $text );
+    if( -e "$dataDirectory/users/jcr13/text/documents/0" ) {
+
+        my $text = 
+          tokenWord::documentManager::renderDocumentText( "jcr13", 
+                                                          0 );
+        
+        tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
+                                                   "jcr13",
+                                                   0, $text );
+    }
+    else {
+        tokenWord::htmlGenerator::generateMainPage( $loggedInUser );
+    }                                            
 }
 
 
