@@ -42,6 +42,7 @@
 # Changed to highlight-only spell checking display.
 # Changed to dynamically switch between local and global ispell.
 # Added a umask to give group write permissions.
+# Updated main page document.
 #
 
 
@@ -907,19 +908,19 @@ else {
 
 sub showMainPage {
     
-    if( -e "$dataDirectory/users/jcr13/text/documents/0" ) {
+    if( -e "$dataDirectory/users/jcr13/text/documents/2" ) {
 
         #first, purchase the document
         tokenWord::userWorkspace::purchaseDocument( $loggedInUser,
                                                     "jcr13",
-                                                    0 );
+                                                    2 );
         my $text = 
           tokenWord::documentManager::renderDocumentText( "jcr13", 
-                                                          0 );
+                                                          2 );
         
         tokenWord::htmlGenerator::generateDocPage( $loggedInUser,
                                                    "jcr13",
-                                                   0, $text, 0 );
+                                                   2, $text, 0 );
     }
     else {
         tokenWord::htmlGenerator::generateMainPage( $loggedInUser );
