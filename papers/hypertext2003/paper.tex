@@ -262,7 +262,8 @@ When following a quote reference, a chain of referneces may need to be chased be
 For example, suppose that document $A$ quotes a block of text from $B$, and that block contains a quote original material, residing in chunk $k$, from document $C$.  
 $A$'s reference will contain both a pointer to the text chunk $k$ and to the document context $B$.  
 $B$'s reference will point to both chunk $k$ and document $C$.  
-At the end of this reference chain, $C$'s reference will point only to $k$.   
+At the end of this reference chain, $C$'s reference will point only to $k$.
+Figure \ref{fig:referenceChain} shows a diagram of this reference chain.
 
 
 
@@ -352,9 +353,66 @@ At the end of this reference chain, $C$'s reference will point only to $k$.
 
 
 
-Quote clipboards, like documents, contain a list of references.
-However, to support showing the context of a quote, the references are not to chunks, but to the context documents themselves.
-The chunks associated with a quote are only resolved when the quote is used as part of a new document.
+Quote clipboards are modeled in the following way.
+Each quote on the clipboard points to a contiguous document region.
+Since a  document region can be comprised of regions from multiple chunks, we might want to model each quote as a list of references, just like we model a document.
+However, we simplify the clipboard by modeling each quote as a single document region pointer with no chunk region pointers.
+To insert a clipboard quote into a new document, we can resolve the chunk region references for the quote and set the document region for each of these references to the document from which the quote was extracted.
+This model allows us both to track the extraction context of the quote and to store the quote clipboard efficiently.
+Figure \ref{fig:quoteClipboardModel} shows a diagram of a quote clipboard modeled in this way.
+The alternative list model mentioned above could not be easily used to track quote extraction context, and the clipboard representation would be much larger.
+
+
+\begin{figure}[b]
+\begin{center}
+
+\begin{graph}(6.5,2.5)(-3.25,-1.25)
+\graphnodesize{0.6}
+\graphnodecolour{1}
+\opaquetextfalse
+
+
+\rectnode{q0}[1.0,0.5](0,0)
+\nodetext{q0}{$q0$}
+\autonodetext{q0}[n]{Clipboard}
+\roundnode{q0Anchor}(.5,0)[\graphnodecolour{0}\graphnodesize{0}]
+\rectnode{q1}[1.0,0.5](0,-.5)
+\nodetext{q1}{$q1$}
+\roundnode{q1Anchor}(-.5,-.5)[\graphnodecolour{0}\graphnodesize{0}]
+
+
+\rectnode{A}[1.5,2](2.5,0)     
+\autonodetext{A}[n]{Document $A$}
+\rectnode{AQuote}[1.5,0.75](2.5,.25)  
+\roundnode{QuoteInAStartAnchor}(1.75,.625)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{QuoteInAEndAnchor}(1.75,-.125)[\graphnodecolour{0}\graphnodesize{0}]
+
+
+\rectnode{B}[1.5,2](-2.5,0)     
+\autonodetext{B}[n]{Document $B$}
+\rectnode{BQuote}[1.5,0.5](-2.5,-.25)  
+\roundnode{QuoteInBStartAnchor}(-1.75,0)[\graphnodecolour{0}\graphnodesize{0}]
+\roundnode{QuoteInBEndAnchor}(-1.75,-.5)[\graphnodecolour{0}\graphnodesize{0}]
+
+
+
+\diredge{q0Anchor}{QuoteInAStartAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+\diredge{q0Anchor}{QuoteInAEndAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+
+\diredge{q1Anchor}{QuoteInBStartAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+\diredge{q1Anchor}{QuoteInBEndAnchor}[\graphlinedash{4 4}\grapharrowtype{2}]
+
+\end{graph}
+
+\caption{An example quote clipboard.  Dotted lines represent document region pointers.}
+\label{fig:quoteClipboardModel}
+
+\end{center}
+
+\end{figure}
+
+
+
 
 
 
