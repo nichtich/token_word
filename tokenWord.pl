@@ -20,6 +20,9 @@
 # it first.
 # Added creation of mostRecent and mostQuoted files.
 #
+# 2003-January-15   Jason Rohrer
+# Added support for deposit page.
+#
 
 
 use lib '.';
@@ -36,6 +39,10 @@ use tokenWord::quoteClipboard;
 use tokenWord::userWorkspace;
 
 use tokenWord::htmlGenerator;
+
+
+my $paypalPercent = 0.029;
+my $paypalFee = 0.30;
 
 
 # make sure data directories exist
@@ -70,28 +77,38 @@ if( $action eq "createUserForm" ) {
 elsif( $action eq "createUser" ) {
     my $user = $cgiQuery->param( "user" ) || '';
     my $password = $cgiQuery->param( "password" ) || '';
+    my $paypalEmail = $cgiQuery->param( "paypalEmail" ) || '';
 
     #untaint
     ( $user ) = ( $user =~ /(\w+)/ );
     ( $password ) = ( $password =~ /(\w+)/ );
+    ( $paypalEmail ) = ( $paypalEmail =~ /(\S+@\S+)/ );
 
+    
+    print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
 
-    if( $user eq '' or length( $password ) < 4 ) {
-        print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
+    if( $user eq '' ) {
+        tokenWord::htmlGenerator::generateCreateUserForm( 
+                        "invalid username" );
+    }
+    elsif( length( $password ) < 4 ) {
         tokenWord::htmlGenerator::generateCreateUserForm( 
                         "password must be at least 4 characters long" );
     }
+    elsif( not ( $paypalEmail =~ /\S+@\S+/ ) ) {
+        tokenWord::htmlGenerator::generateCreateUserForm( 
+                        "invalid email address" );
+    }
     else {
         my $success = 
-          tokenWord::userManager::addUser( $user, $password, 10000 );
+          tokenWord::userManager::addUser( $user, $password, $paypalEmail,
+                                           50000 );
     
         if( not $success ) {
-            print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
             tokenWord::htmlGenerator::generateCreateUserForm( 
                                                  "username already exists" );
         }
         else {
-            print $cgiQuery->header( -type=>'text/html', -expires=>'now' );
             tokenWord::htmlGenerator::generateLoginForm( 
                                         "user $user created, please log in" );
         }
@@ -349,6 +366,33 @@ else {
             
             tokenWord::htmlGenerator::generateQuoteListPage( $loggedInUser,
                                                              @quoteList );
+        }
+        elsif( $action eq "deposit" ) {
+        
+            my $tokenCount = $cgiQuery->param( "tokenCount" ) || '';
+            
+            #untaint
+            ( $tokenCount ) = ( $tokenCount =~ /(\d+)/ );
+            
+            my $dollarAmount = $tokenCount / 1000000;
+            
+            my $netDollarPayment = ($dollarAmount + $paypalFee ) / 
+                                   ( 1.0 - $paypalPercent );
+            
+            # round up to nearest whole cent value
+            $netDollarPayment = ($netDollarPayment * 100 )+ 1;
+            $netDollarPayment = int( $netDollarPayment );
+            $netDollarPayment = $netDollarPayment / 100.0;
+
+            my $paypalEmail = 
+              tokenWord::userManager::getPaypalEmail( $loggedInUser );
+            
+            tokenWord::htmlGenerator::generateDepositConfirmPage(
+                                                            $loggedInUser,
+                                                            $tokenCount,
+                                                            $dollarAmount,
+                                                            $netDollarPayment,
+                                                            $paypalEmail );
         }
         else {
             # show main page

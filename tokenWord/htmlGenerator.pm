@@ -10,6 +10,9 @@ package tokenWord::htmlGenerator;
 # Added missing comments.
 # Added support for most recent and most quoted lists.
 #
+# 2003-January-15   Jason Rohrer
+# Added support for deposit page.
+#
 
 
 use tokenWord::common;
@@ -549,6 +552,40 @@ sub generateExtractQuoteForm {
 
 
     generateFullFooter( $loggedInUser );
+}
+
+
+
+##
+# Generates a page confirming a deposit action.
+#
+# @param0 the currently logged-in user.
+# @param1 the token count to deposit.
+# @param2 the dollar amount of the deposit.
+# @param3 the net dollar payment, including fees.
+# @param4 the paypal email to use..
+##
+sub generateDepositConfirmPage {          
+    ( my $loggedInUser,
+      my $tokenCount,
+      my $dollarAmount,
+      my $netDollarPayment,
+      my $paypalEmail ) = @_;
+    
+    generateFullHeader( "confirm token deposit" );
+
+    my $pageText = readFileValue( "$htmlDirectory/depositConfirm.html" );
+
+    $pageText =~ s/<!--#DEPOSIT_TOKENS-->/$tokenCount/g;
+    $pageText =~ s/<!--#DEPOSIT_DOLLARS-->/$dollarAmount/g;
+    $pageText =~ s/<!--#PAYPAL_EMAIL-->/$paypalEmail/g;
+    $pageText =~ s/<!--#NET_PAYMENT_DOLLARS-->/$netDollarPayment/g;
+    
+    print $pageText;
+
+
+    generateFullFooter( $loggedInUser );
+
 }
 
 

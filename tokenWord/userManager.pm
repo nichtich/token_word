@@ -26,18 +26,20 @@ use tokenWord::common;
 #
 # @param0 the username.
 # @param1 the user's password.
-# @param2 the user's starting token balance.
+# @param2 the user's paypal email.
+# @param3 the user's starting token balance.
 #
 # @return 1 if user created successfully, or 0 otherwise
 #    (for example, 0 is returned if the user already exists).
 #
 # Example:
-# my $userCreated = addUser( "jb65", "letMeIn", 15000 );
+# my $userCreated = addUser( "jb65", "letMeIn", "jb65@server.com", 15000 );
 ##
 sub addUser {
     my $username = $_[0];
     my $password = $_[1];
-    my $startBalance = $_[2];
+    my $paypalEmail = $_[2];
+    my $startBalance = $_[3];
 
     my $userDirName = "$dataDirectory/users/$username";
     
@@ -56,6 +58,9 @@ sub addUser {
     
         writeFile( "$userDirName/balance", 
                    "$startBalance" );
+
+        writeFile( "$userDirName/paypalEmail", 
+                   "$paypalEmail" );
 
         writeFile( "$userDirName/text/chunks/nextFreeID", 
                    "0" );
@@ -203,6 +208,26 @@ sub getBalance {
     my $balance = readFileValue( "$userDirName/balance" );
 
     return $balance;
+}
+
+
+
+##
+# Gets a user's paypal email.
+#
+# @param0 the user.
+#
+# Example:
+# my $email = getPaypalEmail( "jb65" );
+##
+sub getPaypalEmail {
+    ( my $user ) = @_;
+
+    my $userDirName = "$dataDirectory/users/$user";
+    
+    my $email = readFileValue( "$userDirName/paypalEmail" );
+
+    return $email;
 }
 
 

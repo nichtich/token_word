@@ -60,8 +60,52 @@ show document:
 <HR WIDTH=50%>
 </CENTER>
 
-Token balance:<BR>
+token balance:<BR>
 <!--#TOKEN_BALANCE-->
+
+<CENTER>
+<HR WIDTH=50%>
+</CENTER>
+
+<!-- token deposit form -->
+<FORM ACTION="tokenWord.pl">
+
+<INPUT TYPE="hidden" NAME="action" VALUE="deposit">
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+
+<TR>
+<TD>
+deposit <INPUT TYPE="text" MAXLENGTH=256 SIZE=8 NAME="tokenCount" VALUE=""> tokens</TD>
+</TR>
+
+<TR>
+<TD ALIGN=RIGHT><INPUT TYPE=submit VALUE="deposit"></TD>
+</TR>
+
+</TABLE>
+</FORM>
+
+<!-- token witdraw form -->
+<FORM ACTION="tokenWord.pl">
+
+<INPUT TYPE="hidden" NAME="action" VALUE="witdraw">
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+
+<TR>
+<TD>
+withdraw <INPUT TYPE="text" MAXLENGTH=256 SIZE=8 NAME="tokenCount" VALUE=""> tokens</TD>
+</TR>
+
+<TR>
+<TD ALIGN=RIGHT><INPUT TYPE=submit VALUE="withdraw"></TD>
+</TR>
+
+</TABLE>
+</FORM>
+
+
 
 
 </TD>
@@ -114,6 +158,11 @@ Token balance:<BR>
 
 </TD>
 </TR>
+
+
+
+
+
 
 </TABLE>
 
