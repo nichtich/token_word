@@ -1,4 +1,4 @@
-#!/usr//bin/perl -wT
+#!/usr/bin/perl -wT
 
 # for apnrecords.org server
 #!/usr/local/bin/perl -wT
@@ -64,6 +64,7 @@
 #
 # 2003-February-11   Jason Rohrer
 # Added support for backup/restore of data directory as a tarball.
+# Added creation of accounting directory.
 #
 
 
@@ -1136,6 +1137,7 @@ sub setupDataDirectory {
 
         mkdir( "$dataDirectory/index", oct( "0777" ) );
         mkdir( "$dataDirectory/temp", oct( "0777" ) );
+        mkdir( "$dataDirectory/accounting", oct( "0777" ) );
 
         writeFile( "$dataDirectory/topDocuments/mostQuoted", "" );
         writeFile( "$dataDirectory/topDocuments/mostRecent", "" );
