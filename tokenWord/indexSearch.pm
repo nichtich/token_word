@@ -5,6 +5,7 @@ package tokenWord::indexSearch;
 #
 # 2003-January-17   Jason Rohrer
 # Created.
+# Fixed a bug in indexing empty words.
 #
 
 use tokenWord::common;
@@ -28,7 +29,7 @@ sub addToIndex {
 
     my @docWords = split( /\s+/, $docText );
 
-    my $indexDirectory = "$dataDirectory/index/";
+    my $indexDirectory = "$dataDirectory/index";
     
 
     # we want to avoid indexing duplicate words, so hash them
@@ -53,16 +54,18 @@ sub addToIndex {
 
     # now stick them into the index
     foreach my $word ( @prunedWords ) {
-
-        my $firstLetter = substr( $word, 0, 1 );
         
-        my $letterDirectory = "$indexDirectory/$firstLetter";
+        if( $word ne "" ) {
 
-        if( not -e "$letterDirectory" ) {
-            mkdir( "$letterDirectory", oct( "0777" ) );
+            my $firstLetter = substr( $word, 0, 1 );
+        
+            my $letterDirectory = "$indexDirectory/$firstLetter";
+
+            if( not -e "$letterDirectory" ) {
+                mkdir( "$letterDirectory", oct( "0777" ) );
+            }
+            addToFile( "$letterDirectory/$word", "$docRegion\n" );
         }
-        
-        addToFile( "$letterDirectory/$word", "$docRegion\n" );
     }
 
 
