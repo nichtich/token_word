@@ -55,7 +55,7 @@ We know it would be great (or at least interesting) if a xanalogical system exis
 Is Xanadu impossible?
 
 That question by itself, the impossibility question, is extraordinarily intriguing.  We {\it know} that Xanadu is not impossible.  
-The design, on paper, is clear enough:  we just need to build it.  
+The design, on paper \cite{NelsonLiteraryMachines}, is clear enough:  we just need to build it.  
 The problem might be that no one tried to build it.  
 But many people did try to build Xanadu over the years.  
 The problem might be that the people trying to build it did not have sufficient resources.  But people with extraordinary resources did try to build it.  
@@ -67,12 +67,12 @@ The following quote from a 1988 Autodesk press release is most telling:
 In 1964, Xanadu was a dream in a single mind.  In 1980, it was the
 shared goal of a small group of brilliant technologists.  By 1989, it
 will be a product.  And by 1995 it will begin to change the world.
-Much work remains to be done to realise the potential of Xanadu--it
+Much work remains to be done to realise the potential of Xanadu---it
 will take the Xanadu development team 18 months to field the first
 Xanadu system. \cite{AutodeskPress} 
 \end{quote}
 
-In that same press release, Autodesk claims 1987 sales figures topping \$79 million.  
+In the same press release, Autodesk claims 1987 sales figures topping \$79 million.  
 Indeed, Autodesk had extraordinary resources for its time.  
 In 1992, after four years of development and \$5 million spent \cite{AutodeskCost},  Autodesk ceased development of Xanadu \cite{AutodeskPressDrop}.  
 Ironically, this decision was made just when the world was ripe for its first global hypertext system \cite{BernersLee92}.
@@ -80,12 +80,13 @@ Ironically, this decision was made just when the world was ripe for its first gl
 We are scared of Xanadu.  
 We hear its siren song and are tempted, but we know that many have tried and many have failed.  
 The most frustrating factor is that none of us really know how useful Xanadu would be, even if it {\it did} exist.  
-We can look at architecture drawings and pictures of cardboard mock-ups\cite{Nelson1999}, but these do not give us any sense of what it would be like to use a xanalogical system.  
+We can look at architecture drawings and pictures of cardboard mock-ups \cite{Nelson1999}, but these do not give us any sense of what it would be like to use a xanalogical system.  
 Few of us have ever played with a xanalogical software prototype, even fewer have paid or received a true micropayment (xanalogical or otherwise), and almost none have transcluded the work of another or had our work transcluded.
 
 What is using a xanalogical system really like?
-Is it as useful as it sounds?  
-This paper attempts to answer this question by describing the first fully-realized xanalogical implementation.
+Is it as useful as it sounds?
+What made implementing Xanadu so difficult for so many people?  
+This paper attempts to answer these question by describing the first fully-realized xanalogical implementation.
 
 
 \section{The Xanadu Model}
@@ -104,33 +105,67 @@ When trying to implement unrestricted reuse in a way that works with copyright, 
 
 Xanadu's central mechanism is {\it transclusion}, a form of quotation.  
 Transclusion differs from quotation in that it does not involve copying of any kind.  
-When document $A$ transcludes a quote from document $B$ the quote is stored as a deep reference to the quoted material in $B$:  words from $B$ are not copied into $A$. 
-Whenver $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the necessary word from $B$ are fetched from $B$'s owner.
-Thus, even though $A$'s owner has quoted document $B$, the quoted owner still retains control over his or her words.
-Avoiding copying led us to transclusion, and making transclusion work will lead us to the rest of the Xanadu model.
+When document $A$ transcludes a quote from document $B$, the quote is stored as a deep reference to the quoted material in $B$:  words from $B$ are not copied into $A$. 
+Whenver $A$ is viewed, the words from $A$ are fetched from $A$'s owner, and the necessary words from $B$ are fetched from $B$'s owner.
+Thus, even though $A$'s owner has quoted document $B$, the quoted owner still retains control over the distribution and licensing of his or her words.
+%Avoiding copying led us to transclusion, and making transclusion work will lead us to the rest of the Xanadu model.
 
-Transclusion creates a serious problem, at least in combination with how we commonly think of electronic documents.
+Transclusion creates a serious problem, at least in combination with how we commonly interact with electronic documents.
 Electronic documents change constantly.
 If $B$ changes or is deleted, $A$'s quote can break.
 Xanadu's solution is to forbid document change but encourage document versioning.
 Thus, as $B$ changes, all previous versions are maintained, and $A$'s quote can point to the particular version that $A$'s owner quoted.
 A particular version of $B$ is immutable, so $A$'s quote will never break.
 
-The Xanadu model refines this versioning model further by describing an ever-growing, add-only, content space.  
+The Xanadu model refines versioning further by describing an ever-growing, add-only, content space.  
 When a document is created, its text is added to this space.
-When a document quotes this document, it points not to the document itself, but to the quoted words in the content space.
-Thus, a document in Xanadu is a series of pointers to regions in the content space, and no text is contained in the documents themselves.
-Versioning with this mechanism is particularly space-efficient:  unchanged portions of the document can be quoted from the content space instead of being duplicated.
+When a document quotes another document, it points not to the document itself, but to the quoted words in the content space.
+Thus, a document in Xanadu is a series of pointers to regions in the content space---no text is contained in the documents themselves.
+Versioning with this mechanism is particularly space-efficient:  unchanged portions of a document can be quoted from the content space instead of being duplicated.
 
+Along with complicating document maintenance, transclusion complicates the licensing of copyrighted material.
+We commonly think about licensing documents only in their entirety.
+For example, we may assign monetary value to the printed copy of a book, but we have difficulty imagining how much a chapter, page, or paragraph of that book is worth.
+In the Xanadu model, when users read a quote from document $B$ embedded in document $A$, they may only be accessing a small portion of $B$ (for example, a single sentence from a 10,000-word document).
+Thus, $B$'s owner must be prepared to license only a portion of $B$ to readers.
+The Xanadu model handles this licensing issue with micropayments and per-character values for content.
+Nelson is fond of using the word {\it nanobuck} ($10^{-9}$ dollars) to describe the smallest unit of payment:  documents, or portions of documents, are licensed for $N$ nanobucks per character.
+For example, if $N=100$, a document containing one million characters, if licensed in its entirety, would cost \$0.10, while the first half would cost only \$0.05.
+
+When licensing a portion of a document in the Xanadu model, users are actually licensing a region of the content space.
+Each character in the content space can be acquired for a one-time licensing fee.
+Thus, if users purchase documents that overlap with regions they already own, they only pay for the portions that they have yet to acquire.
+Each user accumulates a ``library'' of acquired text regions over time and pays for each region only once.
+
+When a document is accessed that contains quotes from multiple authors, the micropayments are divided and routed to the original authors on a per-character basis. 
+Though reading content requires payment, quoting is essentially free, since the content is not accessed during the act of quoting.
+Of course, in practice, an author will need to read a document before quoting it, but this reading requires the normal first-access payment, no matter how widely the new document is expected to be read.
+In fact, the more a document is quoted and read in quoted form, the more micropayments the original author will receive.
+Thus, authors benefit from the unrestricted quotation and reuse of their work:  they have no financial motivation for placing limits on their work.
+
+We can summarize the Xanadu model with the following feature list:  deep quotation by reference; static underlying content; and per-character, one-time micropayments.
 
 
 \section{System Architecture}
+We built \tw, a full-featured xanalogical system, from scratch in only nine days.
+To acheive this kind rapid development, we relied heavily on modern technology and design techniques.
+We do not view past Xanadu failures with disdain.
+We acknowledge that those early attempts were too far ahead of their time:  the technology of the day was simly not ready for Xanadu.
+The central technologies that made \tw \  development possible were the web, CGI, and Perl.
+
+Our system, though full-featured, was not designed to be ``the'' scalable xanalogical system that will carry us all into the future.
+Instead, we focused on building a usable implemenation of xanalogical features for the purpose of experimentation.
+Though scalability was not a design goal, \tw \ was built on top of technolgies that have scaled well for other projects.
+
+
 
 
 \subsection{Xanalogical Improvements}
 
 
 \subsection{Missing Features}
+
+
 
 
 \section{Implementation}
