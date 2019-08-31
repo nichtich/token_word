@@ -67,11 +67,11 @@ $gtarPath = "/usr/local/bin/gtar";
 
 
 $dataDirectoryName = "tokenWordData";
-$dataDirectory = "../../cgi-data/tokenWordData";
-$dataDirectoryPath = "../../cgi-data/";
+$dataDirectory = "cgi-data/tokenWordData";
+$dataDirectoryPath = "cgi-data/";
 $htmlDirectory = "htmlTemplates";
 
-$dbFile = "../../cgi-data/tokenWordData.db";
+$dbFile = "cgi-data/tokenWordData.db";
 
 # 1 to use db file
 # 0 to use filesytem
