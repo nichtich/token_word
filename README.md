@@ -76,11 +76,12 @@ token_word was created as Perl CGI script in 2002/2003. It still runs on modern 
         cpanm --installdeps .
     
 3.  Optionally edit `htmlTemplates/depositConfirm.html`
-	--Change `jcr13@users.sourceforge.net` to the email address associated
+
+	- Change `jcr13@users.sourceforge.net` to the email address associated
       with your site's paypal account.
-	--Change the "return" and "cancel-return" parameter value URLs to 
+	- Change the "return" and "cancel-return" parameter value URLs to 
 	  http://myserver.com/location-of-token_word/
-    --Change the "notify_url" parameter value URLs to
+    - Change the "notify_url" parameter value URLs to
 	  http://myserver.com/location-of-token_word/
 
 4.  Start the application
@@ -90,7 +91,7 @@ token_word was created as Perl CGI script in 2002/2003. It still runs on modern 
 5.  Open <http://localhost:5000/> with a web browser.
     The "login" page should be displayed.
 
-6.  Check that `cgi-data/tokenWordData` has been created.
+If you don't want to start from scratch, copy file `exampleDatabase/tokenWordData.db` into directory `cgi-data`. You will get a user with username `user` and password `password` and s set of sample documents. See document "Summary" for an example of deep transclusion. 
 
 ## Author
 
