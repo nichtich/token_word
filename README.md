@@ -2,6 +2,16 @@
 
 > an experimental online literature system featuring deep quotation, deep reuse, and usable micropayments
 
+## Table of contents
+
+* [What is token_word, exactly?](#what-is-token_word-exactly)
+  * [frequently asked questions](#frequently-asked-questions)
+  * [token_word history](#token_word-history)
+* [Requirements and Installation](#requirements-and-installation)
+* [Author](#author)
+* [Republication](#republication)
+* [License](#license)
+
 ## What is token_word, exactly?
 
 token_word is an online literature system built around the notion of content quotation and reuse---the aim of this system is to make reuse completely frictionless.
@@ -18,7 +28,7 @@ and what about links?  token_word provides no explicit linking mechanism, though
 
 [frequently asked questions](#frequently-asked-questions)
  
-[token_word history](#history)
+[token_word history](#token_word-history)
 
 along with frictionless, deep quotation, token_word delivers a frictionless micropayment system.  Each character in the token_word universe is worth one token.  Thus, a 3000-character article is worth 3000 tokens.  When a user accesses the article for the first time, he or she pays 3000 tokens.  This payment does not go entirely to the author of the article, but is instead split up among the original authors of the words in the article (some of which may have been written by the author of the article).  If the 3000-character article contains 2300 original characters and a 700-character quote, 2300 tokens are transfered to the article author and 700 are transfered to the quote author.
 
@@ -42,7 +52,7 @@ token_word is inspired by the ideas of Ted Nelson, the inventor of hypertext, tr
 
 **A:**  we want to give new users free tokens, but we also do not want to get ourselves into a sticky financial situation.  Imagine if a particular user (perhaps with the help of other conspiring users) accumulated billions of free tokens and then tried to cash out for real-world money.  Trial tokens allow new users to try out the system for free without financial risk on our part.
 
-### history
+### token_word history
 
 token_word was coded from scratch using perl in approximately nine days (January 8, 2002 -- January 17, 2002) by jason rohrer (me, jcr13).
 
