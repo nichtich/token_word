@@ -7,13 +7,64 @@ The following paper describes token_word in great detail: "token_word: a Xanalog
 
 ## Table of contents
 
+* [Requirements and Installation](#requirements-and-installation)
+  * [Install from sources](#install-from-sources)
+  * [Run with Docker](#run-with-docker)
 * [What is token_word, exactly?](#what-is-token_word-exactly)
   * [frequently asked questions](#frequently-asked-questions)
   * [token_word history](#token_word-history)
-* [Requirements and Installation](#requirements-and-installation)
 * [Author](#author)
 * [Republication](#republication)
 * [License](#license)
+
+## Requirements and Installation
+
+token_word was created as Perl CGI script in 2002/2003. It still runs on modern Perl with some additional modules to wrap the legacy code. The modules are listed in `cpanfile`. Installation of module `DB_File` requires Berkeley Database Libraries (e.g. run `sudo apt-get install libdb-dev`).
+
+### Run with Docker
+
+For most convenience the Docker file can be used for setup including an example hypertext:
+
+1.  Build Docker image
+
+        docker build --tag token_word .
+
+2.  Run Docker image and listen on Port 5000
+
+        docker run -p 5000:5000 --rm token_word
+
+3.  Open <http://localhost:5000/> with a web browser
+
+4.  Log in with user `user` and password `password`
+
+5.  Open sample document "Summary" and enable "show embedded quotes":
+    <http://localhost:5000/tokenWord.pl?action=showDocumentQuotes&docOwner=user&docID=3>
+
+### Install from sources
+
+1.  Clone or copy the content of this repository.
+
+2.  Install required Perl modules:
+
+        cpanm --installdeps .
+    
+3.  Optionally edit `htmlTemplates/depositConfirm.html`
+
+	- Change `jcr13@users.sourceforge.net` to the email address associated
+      with your site's paypal account.
+	- Change the "return" and "cancel-return" parameter value URLs to 
+	  http://myserver.com/location-of-token_word/
+    - Change the "notify_url" parameter value URLs to
+	  http://myserver.com/location-of-token_word/
+
+4.  Start the application
+
+        plackup
+
+5.  Open <http://localhost:5000/> with a web browser.
+    The "login" page should be displayed.
+
+If you don't want to start from scratch, copy file `exampleDatabase/tokenWordData.db` into directory `cgi-data`. You will get a user with username `user` and password `password` and s set of sample documents. See document "Summary" for an example of deep transclusion. 
 
 ## What is token_word, exactly?
 
@@ -62,36 +113,6 @@ token_word was coded from scratch using perl in approximately nine days (January
 token_word is based on the ideas of Ted Nelson, which have been evolving over the last 40 years.  I had been thinking about Ted's ideas for about one year, and my thoughts on these matters culminated with the frantic production of the token_word system.
 
 in terms of code, token_word relies on CGI.pm (by Lincoln D. Stein), MD5.pm (by Neil Winton), and ispell (by a large group of people over a large number of years).
-
-## Requirements and Installation
-
-token_word was created as Perl CGI script in 2002/2003. It still runs on modern Perl with some additional modules to wrap the legacy code. The modules are listed in `cpanfile`. Installation of module `DB_File` requires Berkeley Database Libraries (e.g. run `sudo apt-get install libdb-dev`).
-
-*The following instructions have been adopted from the original `siteInstall.txt`*
-
-1.  Clone or copy the content of this repository.
-
-2.  Install required Perl modules:
-
-        cpanm --installdeps .
-    
-3.  Optionally edit `htmlTemplates/depositConfirm.html`
-
-	- Change `jcr13@users.sourceforge.net` to the email address associated
-      with your site's paypal account.
-	- Change the "return" and "cancel-return" parameter value URLs to 
-	  http://myserver.com/location-of-token_word/
-    - Change the "notify_url" parameter value URLs to
-	  http://myserver.com/location-of-token_word/
-
-4.  Start the application
-
-        plackup
-
-5.  Open <http://localhost:5000/> with a web browser.
-    The "login" page should be displayed.
-
-If you don't want to start from scratch, copy file `exampleDatabase/tokenWordData.db` into directory `cgi-data`. You will get a user with username `user` and password `password` and s set of sample documents. See document "Summary" for an example of deep transclusion. 
 
 ## Author
 
