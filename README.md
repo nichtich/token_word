@@ -92,9 +92,6 @@ token_word was created as Perl CGI script in 2002/2003. It still runs on modern 
 
 6.  Check that `cgi-data/tokenWordData` has been created.
 
-7.  If step 6 or 7 fails, look in `tokenWord_errors.log` for
-    error messages.
- 
 ## Author
 
 Jason Rohrer
