@@ -101,7 +101,9 @@ Jason Rohrer
 
 ## Republication
 
-This git repository has been exported by Jakob Voß from a CVS repository at <http://hypertext.cvs.sourceforge.net/viewvc/> with `git cvsimport` (subdirectory `token_word`). See the original [project page at SourceForge](https://sourceforge.net/projects/hypertext/) for original sources. See the git history for additional modifications in the directory layout and documentation.
+This git repository has been exported by Jakob Voß from a CVS repository at <http://hypertext.cvs.sourceforge.net/viewvc/> with `git cvsimport` (subdirectory `token_word`). See the original [project page at SourceForge](https://sourceforge.net/projects/hypertext/) for original sources. Jason's account name (jcr13) has been changed to the current name and email used at GitHub projects.
+
+See the git history for additional modifications in the directory layout and documentation.
 
 ## License
 
