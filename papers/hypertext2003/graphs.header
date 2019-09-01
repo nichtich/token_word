@@ -1,0 +1,620 @@
+% Postscript header file for version 1.53 of graphs.sty. Frank Drewes, 19.12.2000
+% Small bug in psdirbowoncircle and psdirbowonrectangle removed on 8. Dec. 97
+% (hopefully)
+
+/psloadcolour % [ r g b ] colour array
+{ aload pop setrgbcolor } def
+
+/psrectangle % width, height, interior color, linecolour, linewidth, linedash
+{/filled exch def
+0 setdash
+/lwidth exch def
+/lcolour exch def 
+/colour exch def
+/height exch def
+/width exch def
+width lwidth gt
+  {/width width lwidth sub def}
+  {/width 0 def}
+ifelse
+height lwidth gt
+  {/height height lwidth sub def}
+  {/height 0 def}
+ifelse
+newpath
+width 2 div neg height 2 div neg moveto
+width 0 rlineto
+0 height rlineto
+width neg 0 rlineto
+closepath
+filled {
+  colour psloadcolour
+  gsave
+  fill
+  grestore
+} if
+lcolour psloadcolour
+lwidth setlinewidth
+stroke} def
+
+%-----------------------------------------------------------------------------%
+
+/pscircle % diameter, interior color, line colour, line width, line dash
+{/filled exch def
+0 setdash
+/lwidth exch def
+/lcolour exch def
+/colour exch def
+/diam exch def
+diam lwidth gt
+  {/diam diam lwidth sub def}
+  {/diam 0 def}
+ifelse
+newpath
+diam 2 div 0 moveto
+0 0 diam 2 div 0 360 arc
+closepath
+filled {
+  colour psloadcolour
+  gsave
+  fill
+  grestore
+} if
+lcolour psloadcolour
+lwidth setlinewidth
+stroke} def
+
+%-----------------------------------------------------------------------------%
+
+/psline % end x, end y, line width, line colour, line dash
+{0 setdash
+psloadcolour
+setlinewidth
+/endy exch def
+/endx exch def
+newpath
+0 0 moveto
+endx endy lineto
+stroke} def
+
+%-----------------------------------------------------------------------------%
+
+/psloop % from (#1,#2) to (#3,#4), line colour, line width, line dash
+{0 setdash
+setlinewidth
+psloadcolour
+/varw exch def
+/varv exch def
+/vary exch def
+/varx exch def
+newpath 0 0 moveto
+varx vary lineto
+/varxb varx 2 mul def
+/varyb vary 2 mul def
+/varvb varv 2 mul def
+/varwb varw 2 mul def
+varxb varyb varvb varwb varv varw curveto
+closepath
+stroke} def
+
+%-----------------------------------------------------------------------------%
+
+/psloopbyangle % angle #1, axis (#2,#3), line colour, line width, line dash
+{/axisY exch def
+/axisX exch def
+/alpha exch def
+/len axisX dup mul axisY dup mul add sqrt def
+/betaA axisY axisX atan alpha 2 div sub def
+/betaB betaA alpha add def
+len betaA cos mul len betaA sin mul
+len betaB cos mul len betaB sin mul} def
+
+%-----------------------------------------------------------------------------%
+
+/pslooparrowonrectangle % (#1,#2), (#3,#4), width, height, line colour,
+                        % line width, line dash, arrow length, arrow width
+{/atype exch def
+/awid exch def
+/len exch def
+0 setdash
+setlinewidth
+psloadcolour
+/height exch def
+/width exch def
+/varw exch def
+/varv exch def
+/vary exch def
+/varx exch def
+newpath 0 0 moveto
+varx vary lineto
+/varxb varx 2 mul def
+/varyb vary 2 mul def
+/varvb varv 2 mul def
+/varwb varw 2 mul def
+varxb varyb varvb varwb varv varw curveto
+varv varw translate
+/varv varv neg def /varw varw neg def
+varv abs varw abs
+varv abs varw abs gt { exch } if
+div dup mul 1 add width height mul mul sqrt 2 div /dist exch def
+/getlen {
+	/size exch def
+	abs exch abs exch
+	div dup mul 1 add size dup mul mul sqrt 2 div
+} def
+varv 0 eq
+	{/dist height 2 div def}
+	{varw 0 eq
+		{/dist width 2 div def}
+		{
+		/fstdist varv varw height getlen def
+		/snddist varw varv width getlen def
+		fstdist snddist lt
+			{/dist fstdist def} {/dist snddist def} ifelse
+		} ifelse
+	} ifelse
+varw varv atan rotate
+/pos varv dup mul varw dup mul add sqrt dist sub def
+pos len sub 0 lineto
+stroke
+pos len awid atype psdrawarrow
+} def
+
+%-----------------------------------------------------------------------------%
+
+/pslooparrowoncircle % (#1,#2), (#3,#4), diameter, line colour, line width,
+                     % line dash, arrow length, arrow width
+{/atype exch def
+/awid exch def
+/len exch def
+0 setdash
+setlinewidth
+psloadcolour
+/diam exch def
+/varw exch def
+/varv exch def
+/vary exch def
+/varx exch def
+newpath 0 0 moveto
+varx vary lineto
+/varxb varx 2 mul def
+/varyb vary 2 mul def
+/varvb varv 2 mul def
+/varwb varw 2 mul def
+varxb varyb varvb varwb varv varw curveto
+varv varw translate
+/varv varv neg def /varw varw neg def
+varw varv atan rotate
+/pos varv dup mul varw dup mul add sqrt diam 2 div sub def
+pos len sub 0 lineto
+stroke
+pos len awid atype psdrawarrow
+} def
+
+%-----------------------------------------------------------------------------%
+
+/psdeletebox % width, height
+{/height exch def
+/width exch def
+newpath
+width 2 div neg height 2 div neg moveto
+width 0 rlineto
+0 height rlineto
+width neg 0 rlineto
+closepath
+1 setgray
+fill} def
+
+%-----------------------------------------------------------------------------%
+
+/psarrowonrectangle % x, y, width, height, arrow length, arrow width,
+		    % line colour, line width, dash array
+{0 setdash
+setlinewidth
+psloadcolour
+/atype exch def
+/awid exch def
+/len exch def
+/height exch def
+/width exch def
+/ypos exch def
+/xpos exch def
+/getlen {
+	/size exch def
+	abs exch abs exch
+	div dup mul 1 add size dup mul mul sqrt 2 div
+} def
+xpos 0 eq
+	{/dist height 2 div def}
+	{ypos 0 eq
+		{/dist width 2 div def}
+		{
+		/fstdist xpos ypos height getlen def
+		/snddist ypos xpos width getlen def
+		fstdist snddist lt
+			{/dist fstdist def} {/dist snddist def} ifelse
+		} ifelse
+	} ifelse
+ypos xpos atan rotate
+/pos xpos dup mul ypos dup mul add sqrt dist sub def
+pos len awid atype psdrawarrow
+0 0 moveto
+pos len sub 0 lineto
+stroke} def
+
+%-----------------------------------------------------------------------------%
+
+/psarrowoncircle
+{0 setdash
+setlinewidth
+psloadcolour
+/atype exch def
+/awid exch def
+/len exch def
+/diam exch def
+/ypos exch def
+/xpos exch def
+ypos xpos atan rotate
+/pos xpos dup mul ypos dup mul add sqrt diam 2 div sub def
+pos len awid atype psdrawarrow
+0 0 moveto
+pos len sub 0 lineto
+stroke} def
+
+%-----------------------------------------------------------------------------%
+
+/pspath
+{/fillyes exch def
+/fillcolour exch def
+0 setdash
+psloadcolour
+setlinewidth
+/curry exch def
+/currx exch def
+/sqr { dup mul } def
+/mtrx matrix currentmatrix def
+newpath currx curry moveto
+counttomark 3 idiv
+{	/displace exch def
+	displace abs 0 gt
+	{	currx curry translate
+		dup curry sub /ypos exch def /curry exch def
+		dup currx sub /xpos exch def /currx exch def
+		/len xpos sqr ypos sqr add sqrt def
+		/displace displace len mul def
+		ypos xpos atan rotate
+		/db len 2 div def
+		/rad displace db sqr displace div add 2 div def
+		/radb rad displace sub def
+		/anglea radb db atan def
+		/angleb 180 anglea sub def
+	        displace 0 gt
+			{ db radb neg rad angleb anglea arcn }
+			{ db radb neg rad 360 anglea sub angleb neg arc }
+		ifelse
+		mtrx setmatrix
+	}
+	{	/curry exch def
+		/currx exch def
+		currx curry lineto
+	}
+	ifelse
+}
+repeat
+pop
+fillyes {gsave fillcolour psloadcolour fill grestore} if
+0 setlinecap
+0 setlinejoin
+stroke
+} def
+
+%-----------------------------------------------------------------------------%
+
+/pscurve
+{/fillyes exch def
+/fillcolour exch def
+0 setdash
+psloadcolour
+setlinewidth
+/currx exch def
+/curry exch def
+/angle exch def
+/factora exch def
+/factorb exch def
+newpath currx curry moveto
+counttomark 5 idiv
+{	/newx exch def
+	/newy exch def
+	/len newx currx sub dup mul newy curry sub dup mul add sqrt def
+	/firstx len factora mul angle cos mul currx add def
+	/firsty len factora mul angle sin mul curry add def
+	/currx newx def
+	/curry newy def
+	/angle exch def
+	firstx
+	firsty
+	len factorb mul angle cos mul neg currx add
+	len factorb mul angle sin mul neg curry add
+	currx
+	curry
+	curveto
+	/factora exch def
+	/factorb exch def
+}
+repeat
+pop
+fillyes {gsave fillcolour psloadcolour fill grestore} if
+0 setlinecap
+0 setlinejoin
+stroke
+} def
+
+%-----------------------------------------------------------------------------%
+
+/psbubble
+{/fillyes exch def
+/fillcolour exch def
+0 setdash
+psloadcolour
+setlinewidth
+/lenfactor exch def
+/fetch {/arg exch def dup arg exch def counttomark 1 roll} def
+/compangle {
+	/firstangle exch def
+	/scndangle exch def
+	firstangle sin scndangle sin add 2 div
+	firstangle cos scndangle cos add 2 div
+	atan
+} def
+/currax fetch
+/curray fetch
+counttomark 2 idiv
+{
+/currbx exch def
+/currby exch def
+currax currbx ne curray currby ne or
+	{currby currbx /currax fetch /curray fetch}
+if
+}
+repeat
+/lastx fetch
+/lasty fetch
+/currax fetch
+/curray fetch
+/currbx fetch
+/currby fetch
+newpath currax curray moveto
+counttomark 2 idiv
+{	/nextx fetch
+	/nexty fetch
+	/fstangle
+		curray lasty sub currax lastx sub atan
+		currby curray sub currbx currax sub atan
+		compangle
+	def
+	/sndangle
+		currby curray sub currbx currax sub atan
+		nexty currby sub nextx currbx sub atan
+		compangle
+	def
+	/len currax currbx sub dup mul curray currby sub dup mul add sqrt lenfactor mul def
+	fstangle cos len mul currax add
+	fstangle sin len mul curray add
+	currbx sndangle cos len mul sub
+	currby sndangle sin len mul sub
+	currbx currby
+	curveto
+	/lastx currax def
+	/lasty curray def
+	/currax currbx def
+	/curray currby def
+	/currbx nextx def
+	/currby nexty def
+}
+repeat
+pop
+fillyes {gsave fillcolour psloadcolour fill grestore} if
+0 setlinecap
+0 setlinejoin
+stroke
+} def
+
+%-----------------------------------------------------------------------------%
+
+/psdrawarrow
+{gsave
+/type exch def
+/wid exch def
+/len exch def
+0 translate -1 1 scale
+newpath 0 0 moveto
+type 1 eq
+{	len len wid 2 div mul lineto
+	0 len wid neg mul rlineto}
+{	/mid len 2 div def
+	0 0
+	mid 0
+	len len wid 2 div mul curveto
+	len len wid -2 div mul lineto
+	mid 0
+	0 0
+	0 0 curveto
+} ifelse
+closepath
+fill
+grestore
+} def
+
+%-----------------------------------------------------------------------------%
+
+/psdirbowoncircle
+{0 setdash
+psloadcolour
+setlinewidth
+/atype exch def
+/awid exch def
+/arrowlen exch def
+2 div /targetradius exch def
+/displace exch def
+/othery exch def
+/otherx exch def
+/curry exch def
+/currx exch def
+/sqr { dup mul } def
+
+currx curry translate
+othery curry sub /othery exch def
+otherx currx sub /otherx exch def
+/angle otherx neg othery atan def
+/distance otherx sqr othery sqr add sqrt def
+/displace displace distance mul def
+/radius displace distance 2 div sqr displace div add 2 div def
+/centerx angle cos radius displace sub mul otherx 2 div add def
+/centery angle sin radius displace sub mul othery 2 div add def
+displace 0 gt
+{ /anglea othery centery sub otherx centerx sub atan def
+  /angleb centery neg centerx neg atan def
+  angleb anglea lt
+  { /anglea anglea 360 sub def }
+  if
+}
+{ /anglea centery othery sub centerx otherx sub atan def
+  /angleb centery centerx atan def
+  angleb anglea gt
+  { /anglea anglea 360 add def }
+  if
+}
+ifelse
+
+anglea angleb targetradius pscomputeposoncircle
+/tipy exch def /tipx exch def
+anglea angleb targetradius arrowlen add pscomputeposoncircle
+/taily exch def /tailx exch def
+
+newpath 0 0 moveto
+0 setlinecap
+0 setlinejoin
+displace 0 gt
+{ centerx centery radius angleb taily centery sub tailx centerx sub atan arcn }
+{ centerx centery radius angleb centery taily sub centerx tailx sub atan arc }
+ifelse
+stroke
+
+tailx taily translate
+/tipx tipx tailx sub def
+/tipy tipy taily sub def
+tipy tipx atan rotate
+arrowlen arrowlen awid atype psdrawarrow
+} def
+
+/pscomputeposoncircle
+{/otherr exch def
+/beta exch def
+/alpha exch def
+{
+  /currangle alpha beta add 2 div def
+  /xpos currangle cos radius mul centerx add def
+  /ypos currangle sin radius mul centery add def
+    otherx xpos sub sqr othery ypos sub sqr add sqrt
+    /newdist exch def
+  newdist otherr sub abs .001 le
+  {exit}
+  if
+  newdist otherr le
+  {/alpha currangle def}
+  {/beta currangle def}
+  ifelse
+} loop
+currangle cos radius mul centerx add
+currangle sin radius mul centery add
+} def
+
+
+%-----------------------------------------------------------------------------%
+
+/psdirbowonrectangle
+{0 setdash
+psloadcolour
+setlinewidth
+/atype exch def
+/awid exch def
+/arrowlen exch def
+2 div /sizey exch def
+2 div /sizex exch def
+/displace exch def
+/othery exch def
+/otherx exch def
+/curry exch def
+/currx exch def
+/sqr { dup mul } def
+
+currx curry translate
+othery curry sub /othery exch def
+otherx currx sub /otherx exch def
+/angle otherx neg othery atan def
+/distance otherx sqr othery sqr add sqrt def
+/displace displace distance mul def
+/radius displace distance 2 div sqr displace div add 2 div def
+/centerx angle cos radius displace sub mul otherx 2 div add def
+/centery angle sin radius displace sub mul othery 2 div add def
+displace 0 gt
+{ /anglea othery centery sub otherx centerx sub atan def
+  /angleb centery neg centerx neg atan def
+  angleb anglea lt
+  { /anglea anglea 360 sub def }
+  if
+}
+{ /anglea centery othery sub centerx otherx sub atan def
+  /angleb centery centerx atan def
+  angleb anglea gt
+  { /anglea anglea 360 add def }
+  if
+}
+ifelse
+
+anglea angleb pscomputeposonrectangle /tipy exch def /tipx exch def
+/targetradius otherx tipx sub sqr othery tipy sub sqr add sqrt def
+anglea angleb targetradius arrowlen add pscomputeposoncircle
+/taily exch def /tailx exch def
+
+newpath 0 0 moveto
+0 setlinecap
+0 setlinejoin
+displace 0 gt
+{ centerx centery radius angleb taily centery sub tailx centerx sub atan arcn }
+{ centerx centery radius angleb centery taily sub centerx tailx sub atan arc }
+ifelse
+stroke
+
+tailx taily translate
+/tipx tipx tailx sub def
+/tipy tipy taily sub def
+tipy tipx atan rotate
+arrowlen arrowlen awid atype psdrawarrow
+} def
+
+/pscomputeposonrectangle
+{/beta exch def
+/alpha exch def
+/counter 0 def
+{
+  /currangle alpha beta add 2 div def
+  /xpos currangle cos radius mul centerx add def
+  /ypos currangle sin radius mul centery add def
+  /xdiff xpos otherx sub abs sizex sub def
+  /ydiff ypos othery sub abs sizey sub def
+  xdiff abs .001 le ydiff abs .001 le and
+   xdiff abs .001 le ydiff 0 le and
+   xdiff 0 le ydiff  abs .001 le and
+   or
+  {exit}
+  if
+  /counter counter 1 add def
+  xdiff 0 le ydiff 0 le and
+  {/alpha currangle def}
+  {/beta currangle def}
+  ifelse
+} loop
+currangle cos radius mul centerx add
+currangle sin radius mul centery add
+} def

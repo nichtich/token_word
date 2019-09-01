@@ -1,0 +1,104 @@
+From: ht03@ht03.org
+To: rohrer@cse.ucsc.edu
+Cc: ht03@ht03.org
+Reply-To: ht03@ht03.org
+Subject: HT`03: paper registration
+Date: Sat, 15 Feb 2003 22:04:38 GMT
+Sender: www@Cs.Nott.AC.UK
+
+
+*****************************************************************************
+ NOTE: This is an automatically generated email from a paper registration
+ system used for the HT`03 conference. If you get this email without prior
+ registration of a paper for HT`03, it is likely that someone misused our
+ registration system. In this case, we apologize! Please reply to the above
+ address and let us know.
+*****************************************************************************
+
+
+Dear Jason Rohrer,
+
+You registered the following paper information for submission to HT`03:
+
+
+=============================================================================
+Paper ID: 75
+=============================================================================
+Contact Author: Jason Rohrer
+CA Title      : 
+Organization  : University of California, Santa Cruz
+Street Address: Dept. of Computer Science
+City          : Santa Cruz
+State         : CA
+Zip           : 95064
+Country       : USA
+Phone         : 831-429-4294
+Fax           : 
+Email         : rohrer@cse.ucsc.edu
+Paper Title   : token_word:  a Xanalogical Transclusion and Micropayment System
+Author Name1  : Jason Rohrer
+Author Name2  : 
+Author Name3  : 
+Author Name4  : 
+Author Name5  : 
+Author Name6  : 
+Papertype     : Full
+Keyword1      : Hypertext Structure
+Keyword2      : NONE
+Keyword3      : NONE
+Keyword4      : NONE
+Keyword5      : NONE
+Add_Keyword   : Micropayments, quotation, transclusion, Xanadu
+
+ABSTRACT:
+We describe token_word, a web-based xanalogical hypertext 
+system.  Our system supports almost every core feature 
+associated with Xanadu, an architecture that has been 
+actively discussed for nearly forty years.  Features 
+include deep quotation, unbreakable references, two-way 
+reference chasing, and frictionless micropayments that are 
+backed by real-world currency.  To our knowledge, 
+token_word is the first xanalogical system implementation 
+to included all of these features.  Furthermore, token_word 
+is the first xanalogical system of any kind to be accessible 
+using a web browser with no additional software.  Previous 
+attempts at full xanalogical implementations took many years 
+and were ultimately never completed.  Given this historical 
+backdrop, an additional contribution of this paper is in 
+analyzing the development strategies that led to a 
+relatively novel success.  A live token_word system is 
+running at:
+
+http://hypertext.sf.net/token_word
+
+
+=============================================================================
+
+
+To upload your paper at our submission site, please use link
+below or use the following url for later use:
+
+  http://www.ht03.org/ConfMan/cgi-bin/OPEN/upload_front.cgi?id=75&pw=cscseueucurohsced
+
+
+
+---------------------
+NOTE: guidelines?
+---------------------
+
+Please use one of the above mentioned formats with these guidelines:
+     - double linespace
+     - Times New Roman (or similar) font type
+     - 12 pt font size
+     - reasonable margins
+
+
+Best regards
+
+HT`03 Organising committee
+ __________________________________________________________________________
+|
+|  Organising Committee Hypertext`03
+|__________________________________________________________________________
+
+

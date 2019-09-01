@@ -1,0 +1,103 @@
+Here are some comments on the Token Word paper (first of two batches):
+
+* The title and abstract seem to imply the main contribution of the work is
+the speed with which you were able to implement the xanalogical ideas.
+However, I think this emphasis is misplaced. IMO, the main scientific
+contribution is as a proof of concept implementation of multiple
+simultaneous xanalogical ideas (the text in the introduction supports this).
+So, I'd be tempted to title the paper something like, "token_word: A
+Xanalogical Storage and Authoring System", thereby emphasizing system
+qualities, rather than implementation time.
+
+I know you want to get across the point that "this Xanalogical storage stuff
+isn't that tough nowadays." I think you still make this point pretty
+strongly in the text of the paper, even when it's not stressed in the
+title -- people will notice, believe me.
+
+Reviewers will be looking for a scientific contribution that's more than
+just how fast the system was implemented. If you had developed some new
+technology that made implementation really fast, then the paper would focus
+on that new technology, and that would be good. But, since you're using
+preexisting technology, the fact that you did it fast just means that you're
+a really good programmer -- not exactly a generalizable scientific
+discovery. The claims at the end of the Introduction are really good, and
+right-on. They just need to make their way back into the abstract.
+
+* It's a bit unusual to have a URL in the abstract -- this usually goes
+towards the end of the paper.
+
+Introduction: some in the hypertext community might claim that they have
+already developed a system that incorporates the majority of the Xanadu
+ideas. I certainly don't know of any that support transclusion and
+micropayments at the same time, though.
+
+
+* Section 3: "Given these
+precedents, we believe that token word could be scaled into
+a globally accessible system, albeit with minor code modi?-
+cations and a su?cient hardware investment."
+
+This sounds a little naive, since there are many tales of seemingly scalable
+systems that didn't. I recommend softening this claim, since it isn't
+central, saying something like, "Thus the current architecture shows promise
+for scaling to large document collections."
+
+
+* Section 3.1 -- since you have the room, in the text add a description of
+the process of taking a quotation from a document (i.e., expanding a little
+bit on the caption of Figure 2)
+
+
+* Section 3.1 -- provide more detail on Figure 3 in the text. You might also
+want to provide some motivating text -- why is this the best possible
+interface for the quotations?
+
+
+* Since you have an implicit scenario in your figures 1-5, you might want to
+make this scenario explicit in the text.
+
+
+* You need to provide a little more detail on how quote contexts emulate
+links (last paragraph before 3.2). If I hadn't seen the system demo, I
+wouldn't have understood the text in this section.
+
+
+
+--- end of first batch of comments ---
+
+* Section 3.2.4 - "Our system, in its current form, is still functional
+in terms of its goal: it can potentially support thousands
+of users and hundreds of thousands of documents..."
+
+The use of CGI adds some strong scalability limitations to the system, since
+each user accesss is relatively heavyweight. The line above makes it sound
+like you can handle thousands of simultaneous users, which this architecture
+couldn't support without a *lot* of performance tweaking. Again, since
+scalability isn't central to your point, I wouldn't stress scalability that
+much, since you currently have a weak scalability story, lacking large-scale
+experience.
+
+* Section 4 - do you ever explicitly state the text to token conversion
+rate, or how this is set? Can there be variable pricing in the system, with
+some content costing more than other content?
+
+
+* Section 4.1 - might want to explain the example in a little more detail.
+Took me a minute to understand how you got from the first to the second
+table.
+
+
+* You might want to explicitly reference the Udanax Gold project.
+
+* Might the Literate Programming ideas be viewed as related work? Not sure
+here.
+
+
+GOT HERE (whew!)
+
+
+Overall, very nicely written paper, very smooth narrative flow. I like the
+tone of the paper. It'll be really interesting to see what kinds of comments
+you get back on this...
+
+- Jim

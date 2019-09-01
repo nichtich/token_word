@@ -1,0 +1,68 @@
+
+
+Monday, January 6, 2003
+
+Format for document files:
+
+A list of chunks, one per line:
+<chunkUsername, chunkID, chunkRegionOffset, chunkRegionLength; 
+ docUserName, docID, docRegionOffset >
+
+
+
+Document-specific values are optional.
+
+Note that a "docRegionLength" is not included, since it would be redundant
+(identical to chunkRegionLength).
+
+
+
+
+Examples:
+
+<jd45, 12, 104, 20>
+
+
+<jd45, 12, 104, 20; dpj, 14, 1304>
+
+
+
+
+Tuesday, January 7, 2003
+
+Format for user abstract document submission:
+
+plain text, including <q N> quote tags, where N is a quote number.
+
+Example:
+
+This is a test document.  I am quoting David, who said:
+<q 15>
+I am also quoting David's father, who said:
+<q 23>
+ 
+
+
+Tuesday, January 8, 2003
+
+Format for user abstract quote extraction:
+
+plain text of document being quoted, including <q> and </q> tags.
+
+Example:
+
+Original document:
+This is a test document.
+
+Abstract quote extraction:
+This is <q>a test</q> document.
+
+
+
+Format for quote list:
+
+Quoted doc region followed by quoting doc region, separated by |
+
+Example:
+
+<jd45, 12, 104, 20> | <jcd14, 24, 10, 20>

@@ -1,0 +1,3 @@
+latex paper.tex
+dvips -Ppdf -t letter -o paper.ps paper.dvi
+distill -embedallfonts on -graycompr lzw -grayres 1200 paper.ps
