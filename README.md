@@ -2,6 +2,9 @@
 
 > an experimental online literature system featuring deep quotation, deep reuse, and usable micropayments
 
+The following paper describes token_word in great detail: "token_word: a Xanalogical Transclusion and Micropayment System."
+([pdf](papers/rohrer__token_word.pdf), [ps.gz](papers/rohrer__token_word.ps.gz)).
+
 ## Table of contents
 
 * [What is token_word, exactly?](#what-is-token_word-exactly)
