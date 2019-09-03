@@ -27,24 +27,26 @@ token_word was created as Perl CGI script in 2002/2003. It still runs on modern 
 
 For most convenience the Docker file can be used for setup including an example hypertext:
 
-1.  Build Docker image
+1.  Clone or copy the content of this repository
+
+2.  Build Docker image
 
         docker build --tag token_word .
 
-2.  Run Docker image and listen on Port 5000
+3.  Run Docker image and listen on Port 5000
 
         docker run -p 5000:5000 --rm token_word
 
-3.  Open <http://localhost:5000/> with a web browser
+4.  Open <http://localhost:5000/> with a web browser
 
-4.  Log in with user `user` and password `password`
+5.  Log in with user `user` and password `password`
 
-5.  Open sample document "Summary" and enable "show embedded quotes":
+6.  Open sample document "Summary" and enable "show embedded quotes":
     <http://localhost:5000/tokenWord.pl?action=showDocumentQuotes&docOwner=user&docID=3>
 
 ### Install from sources
 
-1.  Clone or copy the content of this repository.
+1.  Clone or copy the content of this repository
 
 2.  Install required Perl modules:
 
