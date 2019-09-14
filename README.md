@@ -25,17 +25,17 @@ token_word was created as Perl CGI script in 2002/2003. It still runs on modern 
 
 ### Run with Docker
 
-For most convenience the Docker file can be used for setup including an example hypertext:
+For most convenience [a Docker image](https://github.com/nichtich/token_word/packages/22627) is provided.
 
-1.  Clone or copy the content of this repository
+1.  Pull the docker image
 
-2.  Build Docker image
+        docker pull docker.pkg.github.com/nichtich/token_word/token_word:2019.1
 
-        docker build --tag token_word .
+2.  Start image in a new docker container named "token_word", listening at port 5000
 
-3.  Run Docker image and listen on Port 5000
+        docker run --name token_word -p 5000:5000 --rm docker.pkg.github.com/nichtich/token_word/token_word:2019.1
 
-        docker run -p 5000:5000 --rm token_word
+3.  Try out the web application at http://localhost:5000/
 
 4.  Open <http://localhost:5000/> with a web browser
 
@@ -43,6 +43,10 @@ For most convenience the Docker file can be used for setup including an example 
 
 6.  Open sample document "Summary" and enable "show embedded quotes":
     <http://localhost:5000/tokenWord.pl?action=showDocumentQuotes&docOwner=user&docID=3>
+
+7.  Stop docker container
+
+        stop docker container
 
 ### Install from sources
 
